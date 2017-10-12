@@ -41,7 +41,7 @@ export class MyUserInfoService {
         this.uid$,
         this.database.users$,
         ( uid: string, users: User[] ) =>
-          (!uid || users.length === 0) ? new User() : users.find( e => e.databaseKey === uid ) );
+          (!uid || users.length === 0) ? new User() : users.find( e => e.databaseKey === uid ) || new User() );
 
     this.name$              = this.myUserInfo$.map( e => e.name              ).distinctUntilChanged();
     this.name_yomi$         = this.myUserInfo$.map( e => e.name_yomi         ).distinctUntilChanged();

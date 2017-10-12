@@ -18,16 +18,22 @@
         Reset
       </button>
     </div>
-    <!-- <div class="margined-element" *ngIf="!randomizerButtonLocked">
-      <button mat-raised-button color="primary"
-          (click)='lockRandomizerButton( true )'>
-        Lock
-      </button>
-    </div> -->
     <div class="margined-element" *ngIf="randomizerButtonLocked">
       <button mat-raised-button color="warn"
           (click)='unlockRandomizerButton()'>
         Unlock
+      </button>
+    </div>
+    <div class="margined-element">
+      <button mat-raised-button class="mini-button"
+          (click)="undoOnClick()"
+          [disabled]="!undoable || randomizerButtonLocked">
+        <mat-icon>undo</mat-icon>
+      </button>
+      <button mat-raised-button class="mini-button"
+          (click)="redoOnClick()"
+          [disabled]="!redoable || randomizerButtonLocked">
+        <mat-icon>redo</mat-icon>
       </button>
     </div>
   </div>

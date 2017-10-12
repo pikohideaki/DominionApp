@@ -29,31 +29,14 @@ import { CardPropertyDialogComponent } from '../sub-components/card-property-dia
       [selectedCardsCheckbox]="selectedCardsCheckbox"
       (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange( $event )"
       (selectedCardsCheckboxOnReset)="selectedCardsCheckboxOnReset()"
-      [confirmUnlock]="false"
-      confirmMessage="ゲーム結果は登録していますか？"
+      [undoable]="undoable$ | async"
+      [redoable]="redoable$ | async"
+      (undoClicked)="undo()"
+      (redoClicked)="redo()"
       >
     </app-randomizer>
-    <div class="margined-element">
-      <button mat-raised-button class="mini-button"
-          (click)="undo()"
-          [disabled]="!(undoable$ | async)">
-        <mat-icon>undo</mat-icon>
-      </button>
-      <button mat-raised-button class="mini-button"
-          (click)="redo()"
-          [disabled]="!(redoable$ | async)">
-        <mat-icon>redo</mat-icon>
-      </button>
-    </div>
   `,
-  styles: [`
-    .mini-button {
-      padding : 0;
-      min-width : 0;
-      width: 35px;
-      color: rgba(0,0,0,.54);
-    }
-  `]
+  styles: []
 })
 export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   private alive = true;

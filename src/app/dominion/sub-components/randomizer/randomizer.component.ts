@@ -30,6 +30,8 @@ export class RandomizerComponent implements OnInit {
   /* settings */
   @Input() showSelectedCardsCheckbox: boolean = false;
   @Input() implementedOnly: boolean = false;
+  @Input() undoable: boolean = true;
+  @Input() redoable: boolean = true;
 
   @Input() private confirmUnlock: boolean = false;
   @Input() private confirmMessage: string = '';
@@ -37,6 +39,9 @@ export class RandomizerComponent implements OnInit {
 
   @Input()  randomizerButtonLocked: boolean;
   @Output() randomizerButtonLockedChange = new EventEmitter<boolean>();
+
+  @Output() undoClicked = new EventEmitter<void>();
+  @Output() redoClicked = new EventEmitter<void>();
 
   @Input()  isSelectedExpansions: boolean[] = [];
   @Output() isSelectedExpansionsPartEmitter
@@ -71,6 +76,15 @@ export class RandomizerComponent implements OnInit {
   private setRandomizerButtonLocked( value: boolean ) {
     this.randomizerButtonLocked = value;
     this.randomizerButtonLockedChange.emit( value );
+  }
+
+
+  undoOnClick() {
+    this.undoClicked.emit();
+  }
+
+  redoOnClick() {
+    this.redoClicked.emit();
   }
 
   unlockRandomizerButton() {
