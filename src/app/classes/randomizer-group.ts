@@ -67,11 +67,13 @@ export class RandomizerGroup {
     this.newGameResultDialogOpened = !!initObj.newGameResultDialogOpened;
 
     this.lastTurnPlayerName        = ( initObj.lastTurnPlayerName || '' );
-    this.selectedCardsHistory      = ( entries( initObj.selectedCardsHistory )
-                                          .map( e => ({
-                                            selectedCards: e.value.selectedCards,
-                                            date : new Date( e.value.timeStamp )
-                                          }) ) || [] );
+    this.selectedCardsHistory
+      = ( entries( initObj.selectedCardsHistory )
+            .sort( (a, b) => a.value.timeStamp - b.value.timeStamp )
+            .map( e => ({
+              selectedCards: new SelectedCards( e.value.selectedCards ),
+              date : new Date( e.value.timeStamp ),
+            }) ) || [] );
 
     if ( !!initObj.newGameResult ) {
       this.newGameResult.players     = ( entries( initObj.newGameResult.players )

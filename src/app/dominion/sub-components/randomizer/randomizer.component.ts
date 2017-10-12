@@ -36,12 +36,15 @@ export class RandomizerComponent implements OnInit {
   @Input() private confirmUnlock: boolean = false;
   @Input() private confirmMessage: string = '';
 
+  @Output() randomizerClicked = new EventEmitter<void>();
+  @Output() resetClicked      = new EventEmitter<void>();
+  @Output() unlockClicked     = new EventEmitter<void>();
+  @Output() undoClicked       = new EventEmitter<void>();
+  @Output() redoClicked       = new EventEmitter<void>();
 
   @Input()  randomizerButtonLocked: boolean;
   @Output() randomizerButtonLockedChange = new EventEmitter<boolean>();
 
-  @Output() undoClicked = new EventEmitter<void>();
-  @Output() redoClicked = new EventEmitter<void>();
 
   @Input()  isSelectedExpansions: boolean[] = [];
   @Output() isSelectedExpansionsPartEmitter
@@ -88,6 +91,8 @@ export class RandomizerComponent implements OnInit {
   }
 
   unlockRandomizerButton() {
+    this.unlockClicked.emit();
+
     if ( !this.confirmUnlock ) {
       this.setRandomizerButtonLocked( false );
     } else {
@@ -113,6 +118,8 @@ export class RandomizerComponent implements OnInit {
 
 
   resetSelectedCards() {
+    this.resetClicked.emit();
+
     this.setRandomizerButtonLocked(false);
 
     this.selectedCards = new SelectedCards();
@@ -121,12 +128,14 @@ export class RandomizerComponent implements OnInit {
     this.selectedCardsCheckbox.clear();
     this.selectedCardsCheckboxOnReset.emit();
 
-    this.BlackMarketPileShuffledChange.emit( [] );
+    this.BlackMarketPileShuffledChange.emit([]);
   }
 
 
 
-  randomizerClicked() {
+  randomizerOnClick() {
+    this.randomizerClicked.emit();
+
     if ( this.expansionsToggleIsEmpty() ) return;
 
     this.setRandomizerButtonLocked(true);

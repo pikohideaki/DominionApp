@@ -61,8 +61,10 @@ export class MyRandomizerGroupService {
   async addToSelectedCardsHistory( newSelectedCards: SelectedCards ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-      .add.selectedCardsHistory( this.myRandomizerGroupID,
-            { selectedCards: newSelectedCards, timeStamp: Date.now() } );
+      .add.selectedCardsHistory( this.myRandomizerGroupID, {
+              selectedCards: newSelectedCards,
+              timeStamp: Date.now(),
+            } );
   }
 
 

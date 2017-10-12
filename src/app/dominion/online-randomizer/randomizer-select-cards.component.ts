@@ -33,6 +33,7 @@ import { CardPropertyDialogComponent } from '../sub-components/card-property-dia
       [redoable]="redoable$ | async"
       (undoClicked)="undo()"
       (redoClicked)="redo()"
+      (resetClicked)="resetClicked()"
       >
     </app-randomizer>
   `,
@@ -45,12 +46,14 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   selectedCards: SelectedCards = new SelectedCards();
   selectedCardsCheckbox = new SelectedCardsCheckbox();
   selectedCardsHistory: { selectedCards: SelectedCards, date: Date }[] = [];
+  private BlackMarketPileShuffled: BlackMarketPileCard[] = [];
 
   private historyRefIndexSource = new BehaviorSubject<number>(0);
   historyRefIndex$: Observable<number> = this.historyRefIndexSource.asObservable();
   historyRefIndex: number = 0;
   undoable$: Observable<boolean>;
   redoable$: Observable<boolean>;
+
 
   constructor(
     private utils: UtilitiesService,
@@ -96,6 +99,9 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
       .takeWhile( () => this.alive )
       .subscribe( val => this.selectedCardsHistory = val );
 
+    this.myRandomizerGroup.BlackMarketPileShuffled$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.BlackMarketPileShuffled = val );
   }
 
   ngOnInit() {
@@ -106,6 +112,11 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   }
 
 
+
+  resetClicked() {
+    this.historyRefIndexSource.next( this.selectedCardsHistory.length );
+    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
+  }
 
   randomizerButtonLockedOnChange( lock: boolean ) {
     this.myRandomizerGroup.setRandomizerButtonLocked( lock );
@@ -118,6 +129,7 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   selectedCardsOnChange( selectedCards: SelectedCards ) {
     this.selectedCards = new SelectedCards( selectedCards );
     this.myRandomizerGroup.setSelectedCards( this.selectedCards );
+    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
     if ( this.selectedCards.KingdomCards10.length > 0 ) {
       this.myRandomizerGroup.addToSelectedCardsHistory( this.selectedCards );
     }
@@ -140,6 +152,10 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   private restoreFromHistory( index: number ) {
     this.selectedCards = new SelectedCards( this.selectedCardsHistory[ index ].selectedCards );
     this.myRandomizerGroup.setSelectedCards( this.selectedCards );
+    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
+    const BlackMarketPileShuffled
+      = this.selectedCards.BlackMarketPile.map( e => ({ cardIndex: e, faceUp: false }) );
+    this.myRandomizerGroup.setBlackMarketPileShuffled( BlackMarketPileShuffled );
   }
 
   undo() {
