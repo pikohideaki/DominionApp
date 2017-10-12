@@ -1,0 +1,13 @@
+.dominionCard {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.description {
+  justify-content: center;
+  text-align: center;
+}

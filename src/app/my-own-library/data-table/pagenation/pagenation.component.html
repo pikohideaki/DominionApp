@@ -1,0 +1,35 @@
+<div class='pagenation'>
+  <button mat-raised-button class="navigationButton"
+      (click)='goToFirstPage()'
+      [disabled]='selectedPageIndex <= 0' >
+    <mat-icon>first_page</mat-icon>
+  </button>
+
+  <button mat-raised-button class="navigationButton"
+      (click)='goToPreviousPage()'
+      [disabled]='selectedPageIndex <= 0' >
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+
+  <mat-button-toggle-group #group="matButtonToggleGroup" >
+    <mat-button-toggle *ngFor='let pageIndex of generatePageIndices()'
+        [value]="pageIndex"
+        [class.mat-button-toggle-normal]="selectedPageIndex != pageIndex"
+        [class.mat-button-toggle-selected]="selectedPageIndex == pageIndex"
+        (click)="setSelectedPageIndex(pageIndex)" >
+      <span>{{pageIndex + 1}}</span>
+    </mat-button-toggle>
+  </mat-button-toggle-group>
+
+  <button mat-raised-button class="navigationButton"
+      (click)='goToNextPage()'
+      [disabled]='selectedPageIndex >= pageLength() - 1' >
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+
+  <button mat-raised-button class="navigationButton"
+      (click)='goToLastPage()'
+      [disabled]='selectedPageIndex >= pageLength() - 1' >
+    <mat-icon>last_page</mat-icon>
+  </button>
+</div>

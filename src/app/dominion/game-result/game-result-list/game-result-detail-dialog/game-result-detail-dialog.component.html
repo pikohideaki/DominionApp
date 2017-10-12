@@ -1,0 +1,75 @@
+<div  class="bodyWithPadding" >
+
+  <h1 mat-dialog-title>結果</h1>
+
+  <div mat-dialog-content class="container">
+    <div class="playerResult">
+      <p>日付：
+          {{gameResult.date.getFullYear()}}年
+          {{gameResult.date.getMonth() + 1}}月
+          {{gameResult.date.getDate()}}日</p>
+      <p>場所：{{gameResult.place}}</p>
+      <div>
+        <table class='data-table data-table--shadow3px data-table--vertical-line'>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Name</th>
+              <th>VP</th>
+              <th>Score</th>
+              <th *ngIf="gameResult.players[0].turnOrder <= 6">Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let player of gameResult.players">
+            <tr>
+              <td> {{player.rank}} </td>
+              <td> {{player.name}} </td>
+              <td> {{player.VP}} </td>
+              <td> {{player.score}} </td>
+              <td *ngIf="player.turnOrder <= 6"
+                  class='data-table--cell-numeric  sub-table--narrow-cell'>
+                <span *ngIf="player.name !== gameResult.lastTurnPlayerName">
+                  {{player.turnOrder}}
+                </span>
+                <span *ngIf="player.name === gameResult.lastTurnPlayerName"
+                    matTooltip="[]で囲まれている手番が最終手番です">
+                  [{{player.turnOrder}}]
+                </span>
+              </td>
+            </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <p> Memo : {{gameResult.memo}} </p>
+    </div>
+
+    <app-selected-expansions [selectedExpansions]="gameResult.selectedExpansions" >
+    </app-selected-expansions>
+    <app-selected-cards-list [(selectedCards)]="selectedCards" >
+    </app-selected-cards-list>
+
+    <div class='actionButtons'>
+      <span class="margined-element">
+        <button mat-raised-button
+            mat-dialog-close="delete Clicked"
+            color='warn'
+            (click)='deleteGameResult()'>
+          Delete
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class='actionButtons'>
+    <span class="margined-element">
+      <button mat-raised-button
+          mat-dialog-close="OK Clicked"
+          color='primary'>
+        OK
+      </button>
+    </span>
+  </div>
+
+</div>

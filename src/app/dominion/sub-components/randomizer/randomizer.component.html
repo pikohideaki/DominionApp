@@ -1,0 +1,43 @@
+<div class="bodyWithPadding two-column">
+  <div class="randomizerOptions">
+    <app-expansions-toggle
+        [isSelectedExpansions]="isSelectedExpansions"
+        (isSelectedExpansionsPartEmitter)="expansionToggleOnChange( $event )" >
+    </app-expansions-toggle>
+    <div class="margined-element">
+      <button mat-raised-button color='primary'
+          (click)='randomizerClicked()'
+          [disabled]="randomizerButtonLocked || expansionsToggleIsEmpty()">
+        Randomizer
+      </button>
+    </div>
+    <div class="margined-element">
+      <button mat-raised-button
+          [disabled]="randomizerButtonLocked"
+          (click)='resetSelectedCards()'>
+        Reset
+      </button>
+    </div>
+    <!-- <div class="margined-element" *ngIf="!randomizerButtonLocked">
+      <button mat-raised-button color="primary"
+          (click)='lockRandomizerButton( true )'>
+        Lock
+      </button>
+    </div> -->
+    <div class="margined-element" *ngIf="randomizerButtonLocked">
+      <button mat-raised-button color="warn"
+          (click)='unlockRandomizerButton()'>
+        Unlock
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <app-selected-cards-list
+      showSelectedCardsCheckbox="true"
+      [selectedCards]="selectedCards"
+      [selectedCardsCheckbox]="selectedCardsCheckbox"
+      (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange( $event )">
+    </app-selected-cards-list>
+  </div>
+</div>

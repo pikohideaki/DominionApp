@@ -1,0 +1,14 @@
+.sub-table {
+  box-shadow: none;
+}
+.sub-table td {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  height: 28px;
+}
+.sub-table td.sub-table--normal-cell {
+  width: 80px;
+}
+.sub-table td.sub-table--narrow-cell {
+  width: 60px;
+}

@@ -1,0 +1,14 @@
+<div *ngIf="empty" class='dominionCard'>
+  <img [src]="sourceDir" [width]='width' [height]='height'>
+  <div *ngIf="description.length > 0" class="description">{{description}}</div>
+</div>
+
+<div *ngIf="!empty" class='dominionCard'
+      [class.faceUp]="faceUp"
+      [class.faceDown]="!faceUp"
+      [class.pointer]="isButton"
+      (click)="onClicked()">
+  <img [src]="sourceDir" [width]='width' [height]='height'
+      class="box-shadow" [style.border-radius.px]="borderRadius">
+  <div *ngIf="description.length > 0" class="description">{{description}}</div>
+</div>

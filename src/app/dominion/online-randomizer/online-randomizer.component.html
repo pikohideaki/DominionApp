@@ -1,0 +1,48 @@
+<app-waiting-spinner [done]="dataIsready$ | async"></app-waiting-spinner>
+
+<mat-sidenav-container class="sidenavContainer" *ngIf="dataIsready$ | async">
+  <mat-sidenav #sidenav class="sidenav">
+    <app-randomizer-group-list [sidenav]="sidenav"> </app-randomizer-group-list>
+  </mat-sidenav>
+
+  <div class="sidenavMain" *ngIf="!(signedIn$ | async)" >
+    ログインしてください。
+  </div>
+
+  <div class="sidenavMain" *ngIf="!(signedInToRandomizerGroup$ | async)" >
+    グループに参加してください。
+  </div>
+
+
+  <div class="sidenavMain" *ngIf="signedIn$ | async" >
+    <div class="margined-element">
+      <button mat-raised-button color="primary" (click)="sidenav.open()">
+        <mat-icon>group</mat-icon>
+      </button>
+      <span> Group : {{myRandomizerGroupName$ | async}} </span>
+    </div>
+
+    <!-- <mat-tab-group [(selectedIndex)]="selectedTabIndex" *ngIf="signedInToRandomizerGroup$ | async"> -->
+    <mat-tab-group *ngIf="signedInToRandomizerGroup$ | async">
+      <mat-tab label="Randomizer">
+        <ng-container data-comment="使用する拡張セットにチェック"></ng-container>
+        <app-randomizer-select-cards></app-randomizer-select-cards>
+        <hr>
+        <app-randomizer-card-image longSideLength="180"> </app-randomizer-card-image>
+      </mat-tab>
+
+      <mat-tab *ngIf="BlackMarketIsUsed$ | async" label="闇市場デッキ">
+        <app-black-market-pile longSideLength="180"> </app-black-market-pile>
+      </mat-tab>
+
+      <mat-tab label="結果入力">
+        <app-add-game-result></app-add-game-result>
+      </mat-tab>
+
+      <mat-tab label="勝利点計算機">
+        <app-online-victory-points-calculator></app-online-victory-points-calculator>
+      </mat-tab>
+    </mat-tab-group>
+
+  </div>
+</mat-sidenav-container>

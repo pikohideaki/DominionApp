@@ -1,0 +1,75 @@
+<button mat-button color="primary" id="closeSideNavBtn" (click)="closeSideNav()">
+  <mat-icon>cancel</mat-icon>
+</button>
+<div class="clear"></div>
+
+<div class="bodyWithPadding sideBarBody" (click)="backgroundClicked()">
+
+  <div id="addGroup">
+    <mat-form-field>
+      <input matInput
+          [value]="newGroupName || '' "
+          (input)="newGroupNameOnChange( $event.target.value )"
+          placeholder="New group name"
+          required>
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput
+          [value]="newGroupPassword || '' "
+          (input)="newGroupPasswordOnChange( $event.target.value )"
+          placeholder="Password"
+          required>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary"
+          (click)="addRandomizerGroup()"
+          [disabled]="newGroupName === '' || newGroupPassword === '' ">
+      <mat-icon>group_add</mat-icon>
+    </button>
+  </div>
+
+
+  <hr>
+
+  <div *ngFor="let group of randomizerGroupListWithUsers$ | async">
+    <mat-card class="groupListItem" (click)="groupClicked( $event, group.group.databaseKey )">
+
+      <mat-card-header>
+        <mat-icon mat-card-avatar>group</mat-icon>
+        <mat-card-title> {{group.group.name}} </mat-card-title>
+        <mat-card-subtitle>
+          {{group.users.join(", ")}}<br>
+          {{utils.toYMDHMS( group.group.date )}}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content *ngIf="group.group.databaseKey === selectedGroupID">
+        <mat-form-field [color]="(showWrongPasswordAlert ? 'primary' : 'warn')" >
+          <input matInput
+              placeholder="Password"
+              [required]="signInPassword == '' "
+              name="signInPassword"
+              [value]="signInPassword || '' "
+              (input)="signInPasswordOnChange( $event.target.value )">
+          <mat-hint *ngIf="showWrongPasswordAlert" class="alert">
+            Password does not match
+          </mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+
+      <mat-card-actions *ngIf="group.group.databaseKey === selectedGroupID">
+        <button mat-raised-button color="primary"
+              (click)="signIn( group.group.databaseKey )"
+              [disabled]="!signInPassword">
+          参加
+        </button>
+        <button mat-raised-button color="warn"
+              (click)="signOut( group.group.databaseKey )"
+              [disabled]="!signInPassword">
+          退出
+        </button>
+      </mat-card-actions>
+
+    </mat-card>
+  </div>
+</div>

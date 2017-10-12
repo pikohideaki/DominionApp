@@ -1,0 +1,67 @@
+<div class="bodyWithPadding">
+
+  <div class="margined-element" >
+
+    <button *ngIf="currentPhase === BMPhase.init"
+        mat-raised-button color="primary"
+        (click)="revealTop3Cards()">
+      上から3枚めくる
+    </button>
+
+    <button *ngIf="currentPhase === BMPhase.buy"
+        mat-raised-button color="primary"
+        (click)="onClick('buy', -1)">
+      購入しない
+    </button>
+
+    <span *ngIf="currentPhase === BMPhase.putOnTheBottom" >
+      残りを好きな順に戻してください。（クリックしたものが一番下に差し込まれます）
+    </span>
+    <button *ngIf="currentPhase === BMPhase.putOnTheBottom"
+        mat-raised-button color="primary"
+        [disabled]="!putOnTheBottomDone()"
+        (click)="onClick('putOnTheBottom', -1)">
+      OK
+    </button>
+
+  </div>
+
+
+  <div class="CardArea BlackMarketPile" *ngIf="receiveDataDone">
+    <ng-container *ngIf="currentPhase === BMPhase.init">
+      <span *ngFor="let card of BlackMarketPileShuffled; let idx = index" >
+        <app-dominion-card-image
+          [height]="longSideLength"
+          [isButton]="false"
+          [faceUp]="card.faceUp"
+          [description]="idx + 1"
+          [card]="cardPropertyList[card.cardIndex]">
+        </app-dominion-card-image>
+      </span>
+    </ng-container>
+    <ng-container *ngIf="currentPhase === BMPhase.buy">
+      <span *ngFor="let card of BlackMarketPileShuffled; let idx = index" >
+        <app-dominion-card-image
+          [height]="longSideLength"
+          [isButton]="card.faceUp"
+          [faceUp]="card.faceUp"
+          [description]="idx + 1"
+          [card]="cardPropertyList[card.cardIndex]"
+          (click)="onClick('buy', idx)">
+        </app-dominion-card-image>
+      </span>
+    </ng-container>
+    <ng-container *ngIf="currentPhase === BMPhase.putOnTheBottom">
+      <span *ngFor="let card of BlackMarketPileShuffled; let idx = index" >
+        <app-dominion-card-image
+          [height]="longSideLength"
+          [isButton]="card.faceUp"
+          [faceUp]="card.faceUp"
+          [description]="idx + 1"
+          [card]="cardPropertyList[card.cardIndex]"
+          (click)="onClick('putOnTheBottom', idx)">
+        </app-dominion-card-image>
+      </span>
+    </ng-container>
+  </div>
+</div>

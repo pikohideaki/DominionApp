@@ -1,0 +1,39 @@
+<h1 mat-dialog-title>
+  {{card.name_jp}} ({{card.name_eng}})
+</h1>
+
+<div mat-dialog-content>
+
+  <div class="flex-content">
+    <div class="image">
+      <app-dominion-card-image
+        [card]='card'
+        [faceUp]='true'
+        width='250'>
+      </app-dominion-card-image>
+    </div>
+    <div class="description">
+      <ul>
+        <li *ngFor="let item of items">
+          【{{item.name}}】{{cardForView[item.memberName]}}
+        </li>
+        <li *ngIf="card.linkId >= 0">
+          <a [href]="cardListLinkPath( card.linkId )" target="_blank">カードリスト</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+<!--
+  <iframe *ngIf="card.linkId >= 0"
+      [src]="cardListLinkPath( card.linkId )"
+      width="200"
+      height="500"
+      scrolling="no"
+      frameborder="0">
+  </iframe> -->
+
+</div>
+
+<div mat-dialog-actions class="actionButtons">
+  <button mat-raised-button color='primary' class='actionButton' (click)="dialogRef.close()">OK</button>
+</div>

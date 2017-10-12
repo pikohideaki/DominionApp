@@ -1,0 +1,49 @@
+<app-waiting-spinner [done]="receiveDataDone"></app-waiting-spinner>
+
+<div *ngIf="receiveDataDone" class="supplyTable">
+  <div class="Prosperity_DarkAges" *ngIf="selectedCards.KingdomCards10.length > 0" >
+    <mat-chip-list>
+      <mat-chip color="accent" [selected]="selectedCards.Prosperity" >植民地場</mat-chip>
+      <mat-chip color="accent" [selected]="selectedCards.DarkAges"   >避難所場</mat-chip>
+    </mat-chip-list>
+  </div>
+
+  <table class='data-table data-table--shadow3px data-table--vertical-line'>
+    <thead>
+      <tr *ngIf="selectedCards.KingdomCards10.length > 0">
+        <th *ngIf="showSelectedCardsCheckbox"></th>
+        <th>セット</th>
+        <th>名前</th>
+        <th>name</th>
+        <th>コスト</th>
+      </tr>
+    </thead>
+
+    <ng-container *ngFor="let category of selectedCardsCategories">
+      <thead>
+        <tr *ngIf="selectedCards[category.id].length > 0">
+          <th colspan="5">{{category.title}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let cardIndex of selectedCards[category.id]; let idx = index ">
+          <td *ngIf="showSelectedCardsCheckbox">
+            <mat-checkbox
+                [checked]="selectedCardsCheckbox[category.id][idx]"
+                (change)="selectedCardsCheckboxOnChange( category.id, idx, $event.checked )">
+            </mat-checkbox>
+          </td>
+          <td> {{ cardPropertyList[cardIndex].expansionName.join('，') }} </td>
+          <td>
+            <button mat-button color="primary" (click)="cardInfoButtonClicked( cardIndex )">
+              {{ cardPropertyList[cardIndex].name_jp }}
+            </button>
+          </td>
+          <td> {{ cardPropertyList[cardIndex].name_eng  }} </td>
+          <td> {{ cardPropertyList[cardIndex].costStr() }} </td>
+        </tr>
+      </tbody>
+    </ng-container>
+
+  </table>
+</div>

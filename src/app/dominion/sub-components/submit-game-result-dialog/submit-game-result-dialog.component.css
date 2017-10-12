@@ -1,0 +1,4 @@
+/*to put button in the middle of dialog*/
+.actionButtons {
+  justify-content: center;
+}

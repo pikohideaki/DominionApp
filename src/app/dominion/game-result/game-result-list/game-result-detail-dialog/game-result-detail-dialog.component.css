@@ -1,0 +1,17 @@
+/*to put button in the middle of dialog*/
+.actionButtons {
+  display: flex;
+  justify-content: center;
+  margin: 20px;
+}
+
+.container {
+  /* display: flex;
+  flex-wrap: wrap; */
+}
+
+
+.playerResult {
+  padding: 20px;
+  flex-basis: auto;
+}

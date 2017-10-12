@@ -1,0 +1,57 @@
+<div  class="bodyWithPadding" >
+
+  <h1 mat-dialog-title>結果</h1>
+
+  <div mat-dialog-content>
+    <p> 以下の内容で登録します。 </p>
+
+    <p>日付：
+        {{newGameResult.date.getFullYear()}}年
+        {{newGameResult.date.getMonth() + 1}}月
+        {{newGameResult.date.getDate()}}日</p>
+    <p>場所：{{newGameResult.place}}</p>
+    <div>
+      <table class='data-table data-table--shadow3px data-table--vertical-line'>
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Name</th>
+            <th>VP</th>
+            <th>Score</th>
+            <th>Turn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngFor="let player of newGameResult.players">
+          <tr>
+            <td> {{player.rank}} </td>
+            <td> {{player.name}} </td>
+            <td> {{player.VP}} </td>
+            <td> {{player.score}} </td>
+            <td></td>
+          </tr>
+          </ng-container>
+        </tbody>
+      </table>
+    </div>
+    <p> Memo : {{newGameResult.memo}} </p>
+  </div>
+
+
+  <div mat-dialog-actions class='actionButtons'>
+    <span class="margined-element">
+      <button mat-raised-button
+          mat-dialog-close="OK Clicked"
+          color='primary'
+          (click)="submitGameResult()">
+        OK
+      </button>
+    </span>
+    <span class="margined-element">
+      <button mat-raised-button
+          mat-dialog-close="Cancel Clicked">
+        Cancel
+      </button>
+    </span>
+  </div>
+</div>

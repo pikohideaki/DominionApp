@@ -1,0 +1,11 @@
+.randomizerOptions,
+.expansionsNameList {
+  padding: 20px;
+  flex-basis: auto;
+}
+
+.two-column {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}

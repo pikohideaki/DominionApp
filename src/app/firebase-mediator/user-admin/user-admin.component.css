@@ -1,0 +1,11 @@
+.loginFormWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.bodyWithoutHeader {
+  height: calc(100vh - 64px);  /* subtract header height */
+  width: 100vw;
+}

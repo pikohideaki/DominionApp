@@ -10,7 +10,8 @@
       true,
       "check-space"
     ],
-    "curly": true,
+    // "curly": true,
+    "curly": [true, "ignore-same-line"],
     "eofline": true,
     "forin": true,
     "import-blacklist": [
@@ -25,7 +26,7 @@
     "interface-over-type-literal": true,
     "label-position": true,
     "max-line-length": [
-      true,
+      false,
       140
     ],
     "member-access": false,

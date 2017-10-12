@@ -12,7 +12,7 @@ export const environment = {
     projectId: 'dominionappstest',
     storageBucket: '',
     messagingSenderId: '901667738014'
-  }
+  },
   // firebase: {
   //     apiKey: 'AIzaSyBGFhmydRA7hmBMjTqe9pfa80lNEjb7G-0',
   //     authDomain: 'dominionapps.firebaseapp.com',
@@ -20,5 +20,5 @@ export const environment = {
   //     projectId: 'dominionapps',
   //     storageBucket: 'dominionapps.appspot.com',
   //     messagingSenderId: '830879011229'
-  // }
+  // },
 };
