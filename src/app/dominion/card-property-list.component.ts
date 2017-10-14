@@ -3,11 +3,11 @@ import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Rx';
 
 import { UtilitiesService } from '../my-own-library/utilities.service';
-import { DataTableComponent } from '../my-own-library/data-table/data-table.component';
+import { ColumnSetting } from '../my-own-library/data-table/data-table2.component';
 
 import { CloudFirestoreMediatorService } from '../firebase-mediator/cloud-firestore-mediator.service';
 
-import { CardProperty } from '../classes/card-property';
+import { CardProperty, transform } from '../classes/card-property';
 import { CardPropertyDialogComponent } from './sub-components/card-property-dialog/card-property-dialog.component';
 
 
@@ -16,42 +16,43 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
   selector: 'app-card-property-list',
   template: `
     <div class="bodyWithPadding">
-      <app-data-table
-        [data]='cardPropertyListForView$ | async'
+      <app-data-table2
+        [data$]='cardPropertyList$'
+        [transform]="transformFunction"
         [columnSettings]='columnSettings'
         [itemsPerPageOptions]='[ 25, 50, 100, 200 ]'
-        [itemsPerPageDefault]='50'
+        [itemsPerPage]='50'
         (onClick)='showDetail( $event.rowIndex )' >
-      </app-data-table>
-      <app-waiting-spinner [done]="receiveDataDone"></app-waiting-spinner>
+      </app-data-table2>
+      <app-waiting-spinner [done]="cardPropertyList$ | async"></app-waiting-spinner>
     </div>
   `,
 })
 export class CardPropertyListComponent implements OnInit, OnDestroy {
 
-  receiveDataDone = false;
   private alive: boolean = true;
 
   private cardPropertyList: CardProperty[] = [];
-  cardPropertyListForView$: Observable<any[]>;
+  cardPropertyList$: Observable<CardProperty[]>;
 
-  columnSettings = [
-    { align: 'c', button: false, manip: 'none'             , name: 'no'                 , headerTitle: 'No.' },
-    { align: 'c', button: true , manip: 'incrementalSearch', name: 'name_jp'            , headerTitle: '名前' },
-    { align: 'c', button: false, manip: 'incrementalSearch', name: 'name_eng'           , headerTitle: 'Name' },
-    { align: 'c', button: false, manip: 'filterBySelecter' , name: 'expansionName'      , headerTitle: 'セット名' },
-    { align: 'c', button: false, manip: 'filterBySelecter' , name: 'category'           , headerTitle: '分類' },
-    // { align: 'c', button: false, manip: 'multiSelect'      , name: 'cardTypesStr'       , headerTitle: '種別' },
-    { align: 'c', button: false, manip: 'filterBySelecter' , name: 'cardTypesStr'       , headerTitle: '種別' },
-    { align: 'c', button: false, manip: 'none'             , name: 'costStr'            , headerTitle: 'コスト' },
-    { align: 'c', button: false, manip: 'none'             , name: 'VP'                 , headerTitle: 'VP' },
-    { align: 'c', button: false, manip: 'none'             , name: 'drawCard'           , headerTitle: '+card' },
-    { align: 'c', button: false, manip: 'none'             , name: 'action'             , headerTitle: '+action' },
-    { align: 'c', button: false, manip: 'none'             , name: 'buy'                , headerTitle: '+buy' },
-    { align: 'c', button: false, manip: 'none'             , name: 'coin'               , headerTitle: '+coin' },
-    { align: 'c', button: false, manip: 'none'             , name: 'VPtoken'            , headerTitle: '+VPtoken' },
-    { align: 'c', button: false, manip: 'filterBySelecter' , name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
-    { align: 'c', button: false, manip: 'filterBySelecter' , name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
+
+
+  columnSettings: ColumnSetting[] = [
+    { isButton: false, manip: '',            name: 'no'                 , headerTitle: 'No.' },
+    { isButton: true,  manip: 'input',       name: 'name_jp'            , headerTitle: '名前' },
+    { isButton: false, manip: 'input',       name: 'name_eng'           , headerTitle: 'Name' },
+    { isButton: false, manip: 'multiSelect', name: 'expansionName'      , headerTitle: 'セット名' },
+    { isButton: false, manip: 'select',      name: 'category'           , headerTitle: '分類' },
+    { isButton: false, manip: 'multiSelect', name: 'cardTypes'          , headerTitle: '種別' },
+    { isButton: false, manip: '',            name: 'cost'               , headerTitle: 'コスト' },
+    { isButton: false, manip: '',            name: 'VP'                 , headerTitle: 'VP' },
+    { isButton: false, manip: '',            name: 'drawCard'           , headerTitle: '+card' },
+    { isButton: false, manip: '',            name: 'action'             , headerTitle: '+action' },
+    { isButton: false, manip: '',            name: 'buy'                , headerTitle: '+buy' },
+    { isButton: false, manip: '',            name: 'coin'               , headerTitle: '+coin' },
+    { isButton: false, manip: '',            name: 'VPtoken'            , headerTitle: '+VPtoken' },
+    { isButton: false, manip: 'select',      name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
+    { isButton: false, manip: 'select',      name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
   ];
 
 
@@ -62,15 +63,12 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private database: CloudFirestoreMediatorService,
   ) {
-    this.cardPropertyListForView$
-      = this.database.cardPropertyList$.map( list => list.map( e => e.transform() ) );
+    this.cardPropertyList$ = this.database.cardPropertyList$;
 
+    /* subscriptions */
     this.database.cardPropertyList$
       .takeWhile( () => this.alive )
-      .subscribe( list => {
-        this.cardPropertyList = list;
-        this.receiveDataDone = true;
-      });
+      .subscribe( list => this.cardPropertyList = list );
   }
 
   ngOnInit() {
@@ -78,6 +76,10 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.alive = false;
+  }
+
+  transformFunction( property: string, value ) {
+    return transform( property, value );
   }
 
   showDetail( dataIndex: number ) {

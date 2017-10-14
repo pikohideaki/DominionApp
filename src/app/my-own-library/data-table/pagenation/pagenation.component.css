@@ -20,3 +20,9 @@
   min-width : 30px;
   color: rgba(0,0,0,.54);
 }
+
+.range {
+  width: 150px;
+  display: inline-block;
+  text-align: center;
+}

@@ -10,8 +10,7 @@ import { OnlineRandomizerModule } from './online-randomizer/online-randomizer.mo
 /* components */
 import { CardPropertyListComponent        } from './card-property-list.component';
 import { RuleBooksComponent               } from './rule-books.component';
-import { ScoringTableComponent            } from './scoring-table.component';
-import { PlayersComponent                 } from './players.component';
+import { ScoringTableComponent            } from './game-result/scoring-table.component';
 import { GameResultComponent              } from './game-result/game-result.component';
 import { GameResultOfPlayerComponent      } from './game-result/game-result-of-player/game-result-of-player.component';
 import { GameResultListComponent          } from './game-result/game-result-list/game-result-list.component';
@@ -34,7 +33,6 @@ import { GameResultDetailDialogComponent } from './game-result/game-result-list/
     CardPropertyListComponent,
     RuleBooksComponent,
     ScoringTableComponent,
-    PlayersComponent,
     GameResultComponent,
     GameResultOfPlayerComponent,
     GameResultListComponent,
@@ -45,7 +43,6 @@ import { GameResultDetailDialogComponent } from './game-result/game-result-list/
     CardPropertyListComponent,
     RuleBooksComponent,
     ScoringTableComponent,
-    PlayersComponent,
     GameResultComponent,
     GameResultOfPlayerComponent,
     GameResultListComponent,

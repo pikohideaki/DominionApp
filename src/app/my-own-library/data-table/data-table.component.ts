@@ -8,12 +8,11 @@ import 'rxjs/add/operator/map';
 import { UtilitiesService } from '../utilities.service';
 
 import { ResetButtonComponent } from './reset-button.component';
-import { ItemsPerPageComponent } from './items-per-page/items-per-page.component';
+import { ItemsPerPageComponent } from './items-per-page.component';
 import { PagenationComponent, getDataAtPage } from './pagenation/pagenation.component';
 
 
 @Component({
-  providers: [ResetButtonComponent],
   selector: 'app-data-table',
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.css']
@@ -31,14 +30,13 @@ export class DataTableComponent implements OnInit, OnChanges  {
         manipState:   any,
         options:      string[],
         asyncOptions: any,
-        button:       boolean,
+        isButton:     boolean,
         headerTitle:  string,
     }[] = [];
 
   // pagenation
   @Input() itemsPerPageOptions: number[];
-  @Input() itemsPerPageDefault: number = Number.MAX_VALUE;
-  itemsPerPage: number = 100;
+  @Input() itemsPerPage: number = 100;
   selectedPageIndex: number = 0;
 
   @Output() onClick = new EventEmitter<{ rowIndex: number, columnName: string }>();
@@ -65,11 +63,10 @@ export class DataTableComponent implements OnInit, OnChanges  {
   }
 
   ngOnInit() {
-    this.itemsPerPage = this.itemsPerPageDefault;
   }
 
 
-  filterAsyncOptions( columnName: string, inputString: string ): string[] {
+  private filterAsyncOptions( columnName: string, inputString: string ): string[] {
     const uniqValues = this.utils.uniq( this.filteredData.map( e => e[columnName] ) );
     return inputString ? uniqValues.filter( s => this.utils.submatch( s, inputString, true ) )
                        : uniqValues;
@@ -93,7 +90,7 @@ export class DataTableComponent implements OnInit, OnChanges  {
   }
 
 
-  filterFunction( lineOfData: any ): boolean {
+  private filterFunction( lineOfData: any ): boolean {
     const validSettings = this.columnSettings.filter( column => column.manipState !== undefined );
 
     for ( const column of validSettings ) {
@@ -121,11 +118,11 @@ export class DataTableComponent implements OnInit, OnChanges  {
 
 
   /* データから指定列を取り出す */
-  getColumn( data: any[], columnName: string ): any[] {
+  private getColumn( data: any[], columnName: string ): any[] {
     return data.map( e => e[ columnName ] );
   }
 
-  setSelectorOptions( data: any[] ): any {
+  private setSelectorOptions( data: any[] ): any {
     const selectorOptions = {};
     for ( const e of this.columnSettings ) {
         if ( (e.manip !== 'filterBySelecter') && (e.manip !== 'multiSelect') ) continue;
@@ -151,7 +148,7 @@ export class DataTableComponent implements OnInit, OnChanges  {
       columnName: columnName } );
   }
 
-  indexOnDataBeforeFilter( indexOnFilteredData: number ): number {
+  private indexOnDataBeforeFilter( indexOnFilteredData: number ): number {
     let filteredDataNum = 0;
     for ( let i = 0; i < this.data.length; ++i ) {
       if ( this.filterFunction(this.data[i]) ) filteredDataNum++;

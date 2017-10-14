@@ -1,5 +1,27 @@
 import { submatch } from '../my-own-library/utilities';
 
+
+type CardType = (
+       'Curse'
+      |'Action'
+      |'Treasure'
+      |'Victory'
+      |'Attack'
+      |'Reaction'
+      |'Duration'
+      |'Ruins'
+      |'Prize'
+      |'Looter'
+      |'Shelter'
+      |'Knights'
+      |'Reserve'
+      |'Traveller'
+      |'Castle'
+      |'Gather'
+      |'EventCards'
+      |'LandmarkCards'
+    );
+
 export class CardProperty {
   no:                     number = 0;
   cardID:                 string = '';
@@ -9,8 +31,7 @@ export class CardProperty {
   expansionName:          string[] = [];
   cost:                   CardCost = new CardCost({ coin: 0, potion: 0, debt: 0 });
   category:               string = '';
-  cardType:               string = '';
-  cardTypes:              CardTypes = new CardTypes();
+  cardTypes:              CardType[];
   VP:                     number = 0;
   drawCard:               number = 0;
   action:                 number = 0;
@@ -30,8 +51,7 @@ export class CardProperty {
     expansionName:          string[],
     cost:                   CardCost,
     category:               string,
-    cardType:               string,
-    cardTypes:              CardTypes,
+    cardTypes:              Object,
     VP:                     number,
     drawCard:               number,
     action:                 number,
@@ -44,61 +64,46 @@ export class CardProperty {
   }) {
     if ( !initObj ) return;
 
-    this.no                     = ( initObj.no                     || 0 );
-    this.cardID                 = ( initObj.cardID                 || '' );
-    this.name_jp                = ( initObj.name_jp                || '' );
-    this.name_jp_yomi           = ( initObj.name_jp_yomi           || '' );
-    this.name_eng               = ( initObj.name_eng               || '' );
-    this.expansionName          = ( initObj.expansionName          || [] );
+    this.no                     = ( initObj.no            || 0 );
+    this.cardID                 = ( initObj.cardID        || '' );
+    this.name_jp                = ( initObj.name_jp       || '' );
+    this.name_jp_yomi           = ( initObj.name_jp_yomi  || '' );
+    this.name_eng               = ( initObj.name_eng      || '' );
+    this.expansionName          = ( initObj.expansionName || [] );
     this.cost                   = new CardCost( initObj.cost );
-    this.category               = ( initObj.category               || '' );
-    this.cardType               = ( initObj.cardType               || '' );
-    this.cardTypes              = new CardTypes( initObj.cardTypes );
-    this.VP                     = ( initObj.VP                     || 0 );
-    this.drawCard               = ( initObj.drawCard               || 0 );
-    this.action                 = ( initObj.action                 || 0 );
-    this.buy                    = ( initObj.buy                    || 0 );
-    this.coin                   = ( initObj.coin                   || 0 );
-    this.VPtoken                = ( initObj.VPtoken                || 0 );
+    this.category               = ( initObj.category      || '' );
+    this.cardTypes              = <CardType[]>Object.keys( initObj.cardTypes )
+                                      .filter( key => initObj.cardTypes[key] );
+    this.VP                     = ( initObj.VP            || 0 );
+    this.drawCard               = ( initObj.drawCard      || 0 );
+    this.action                 = ( initObj.action        || 0 );
+    this.buy                    = ( initObj.buy           || 0 );
+    this.coin                   = ( initObj.coin          || 0 );
+    this.VPtoken                = ( initObj.VPtoken       || 0 );
     this.implemented            = !!initObj.implemented;
     this.randomizerCandidate    = !!initObj.randomizerCandidate;
-    this.linkId                 = ( initObj.linkId                 || -1 );
+    this.linkId                 = ( initObj.linkId        || -1 );
   }
 
 
   isWideType(): boolean {
-    return (this.cardTypes.EventCards || this.cardTypes.LandmarkCards);
+    return (this.cardTypes.includes('EventCards') || this.cardTypes.includes('LandmarkCards') );
   }
 
-  costStr(): string {
-    let costStr = '';
-    if ( this.cost.coin > 0 || ( this.cost.potion === 0 && this.cost.debt === 0 ) ) {
-      costStr += this.cost.coin.toString();
-    }
-    if ( this.cost.potion > 0 ) {
-      for ( let i = 0; i < this.cost.potion; ++i ) { costStr += 'P'; }
-    }
-    if ( this.cost.debt   > 0 ) {
-      costStr += `<${this.cost.debt.toString()}>`;
-    }
-    return costStr;
-  }
-
-
-  transform(): any {
+  transformAll(): any {
     return {
       no                     : this.no,
       cardID                 : this.cardID,
       name_jp                : this.name_jp,
       name_jp_yomi           : this.name_jp_yomi,
       name_eng               : this.name_eng,
-      expansionName          : this.expansionName.join('，'),
+      expansionName          : transform( 'expansionName', this.expansionName ),
       cost_coin              : this.cost.coin,
       cost_potion            : this.cost.potion,
       cost_debt              : this.cost.debt,
-      costStr                : this.costStr(),
+      costStr                : transform( 'cost', this.cost ),
       category               : this.category,
-      cardTypesStr           : this.cardTypes.toStr(),
+      cardTypesStr           : transform( 'cardTypes', this.cardTypes ),
       cardTypes              : this.cardTypes,
       VP                     : this.VP,
       drawCard               : this.drawCard,
@@ -106,97 +111,72 @@ export class CardProperty {
       buy                    : this.buy,
       coin                   : this.coin,
       VPtoken                : this.VPtoken,
-      implemented            : ( this.implemented ?  '実装済み' : '未実装' ),
-      randomizerCandidate    : ( this.randomizerCandidate ?  '〇' : '×' ),
+      implemented            : transform( 'implemented', this.implemented ),
+      randomizerCandidate    : transform( 'randomizerCandidate', this.randomizerCandidate ),
     };
   }
-
 }
 
 
-export class CardTypes {
-  Curse:         boolean = false;  // 呪い
-  Action:        boolean = false;  // アクション
-  Treasure:      boolean = false;  // 財宝
-  Victory:       boolean = false;  // 勝利点
-  Attack:        boolean = false;  // アタック
-  Reaction:      boolean = false;  // リアクション
-  Duration:      boolean = false;  // 持続
-  Ruins:         boolean = false;  // 廃墟
-  Prize:         boolean = false;  // 褒賞
-  Looter:        boolean = false;  // 略奪者
-  Shelter:       boolean = false;  // 避難所
-  Knights:       boolean = false;  // 騎士
-  Reserve:       boolean = false;  // リザーブ
-  Traveller:     boolean = false;  // トラベラー
-  Castle:        boolean = false;  // 城
-  Gather:        boolean = false;  // 集合
-  EventCards:    boolean = false;  // イベント
-  LandmarkCards: boolean = false;  // ランドマーク
-
-  constructor( initObj?: {
-    Curse:         boolean,
-    Action:        boolean,
-    Treasure:      boolean,
-    Victory:       boolean,
-    Attack:        boolean,
-    Reaction:      boolean,
-    Duration:      boolean,
-    Ruins:         boolean,
-    Prize:         boolean,
-    Looter:        boolean,
-    Shelter:       boolean,
-    Knights:       boolean,
-    Reserve:       boolean,
-    Traveller:     boolean,
-    Castle:        boolean,
-    Gather:        boolean,
-    EventCards:    boolean,
-    LandmarkCards: boolean,
-  } ) {
-    if ( !initObj ) return;
-    this.Curse         = !!initObj.Curse;
-    this.Action        = !!initObj.Action;
-    this.Treasure      = !!initObj.Treasure;
-    this.Victory       = !!initObj.Victory;
-    this.Attack        = !!initObj.Attack;
-    this.Reaction      = !!initObj.Reaction;
-    this.Duration      = !!initObj.Duration;
-    this.Ruins         = !!initObj.Ruins;
-    this.Prize         = !!initObj.Prize;
-    this.Looter        = !!initObj.Looter;
-    this.Shelter       = !!initObj.Shelter;
-    this.Knights       = !!initObj.Knights;
-    this.Reserve       = !!initObj.Reserve;
-    this.Traveller     = !!initObj.Traveller;
-    this.Castle        = !!initObj.Castle;
-    this.Gather        = !!initObj.Gather;
-    this.EventCards    = !!initObj.EventCards;
-    this.LandmarkCards = !!initObj.LandmarkCards;
-  }
 
 
-  toStr() {
-    const resultArray = [];
-    if ( this.Curse         ) resultArray.push( '呪い' );
-    if ( this.Action        ) resultArray.push( 'アクション' );
-    if ( this.Treasure      ) resultArray.push( '財宝' );
-    if ( this.Victory       ) resultArray.push( '勝利点' );
-    if ( this.Attack        ) resultArray.push( 'アタック' );
-    if ( this.Reaction      ) resultArray.push( 'リアクション' );
-    if ( this.Duration      ) resultArray.push( '持続' );
-    if ( this.Ruins         ) resultArray.push( '廃墟' );
-    if ( this.Prize         ) resultArray.push( '褒賞' );
-    if ( this.Looter        ) resultArray.push( '略奪者' );
-    if ( this.Shelter       ) resultArray.push( '避難所' );
-    if ( this.Knights       ) resultArray.push( '騎士' );
-    if ( this.Reserve       ) resultArray.push( 'リザーブ' );
-    if ( this.Traveller     ) resultArray.push( 'トラベラー' );
-    if ( this.Castle        ) resultArray.push( '城' );
-    if ( this.Gather        ) resultArray.push( '集合' );
-    if ( this.EventCards    ) resultArray.push( 'イベント' );
-    if ( this.LandmarkCards ) resultArray.push( 'ランドマーク' );
-    return resultArray.join('－');
+
+
+export function transform( property: string, value ) {
+  switch ( property ) {
+
+    case 'cardTypes' :
+      return value.map( e => {
+        switch (e) {
+          case 'Curse' :         return '呪い';
+          case 'Action' :        return 'アクション';
+          case 'Treasure' :      return '財宝';
+          case 'Victory' :       return '勝利点';
+          case 'Attack' :        return 'アタック';
+          case 'Reaction' :      return 'リアクション';
+          case 'Duration' :      return '持続';
+          case 'Ruins' :         return '廃墟';
+          case 'Prize' :         return '褒賞';
+          case 'Looter' :        return '略奪者';
+          case 'Shelter' :       return '避難所';
+          case 'Knights' :       return '騎士';
+          case 'Reserve' :       return 'リザーブ';
+          case 'Traveller' :     return 'トラベラー';
+          case 'Castle' :        return '城';
+          case 'Gather' :        return '集合';
+          case 'EventCards' :    return 'イベント';
+          case 'LandmarkCards' : return 'ランドマーク';
+          default: return '';
+        }
+      } );
+
+    case 'cost' :
+      return value.toStr();
+
+    case 'implemented' :
+      return ( value ?  '実装済み' : '未実装' );
+
+    case 'randomizerCandidate' :
+      return ( value ?  '〇' : '×' );
+
+    case 'no' :
+    case 'cardID' :
+    case 'expansionName' :
+    case 'name_jp' :
+    case 'name_jp_yomi' :
+    case 'name_eng' :
+    case 'category' :
+    case 'VP' :
+    case 'drawCard' :
+    case 'action' :
+    case 'buy' :
+    case 'coin' :
+    case 'VPtoken' :
+    case 'linkId' :
+      return value;
+
+    default:
+      throw new Error(`unknown property name '${property}'`);
   }
 }
 
@@ -213,6 +193,22 @@ export class CardCost {
     this.potion = ( initObj.potion || 0 );
     this.debt   = ( initObj.debt   || 0 );
   }
+
+
+  toStr(): string {
+    let result = '';
+    if ( this.coin > 0 || ( this.potion === 0 && this.debt === 0 ) ) {
+      result += this.coin.toString();
+    }
+    if ( this.potion > 0 ) {
+      for ( let i = 0; i < this.potion; ++i ) result += 'P';
+    }
+    if ( this.debt   > 0 ) {
+      result += `<${this.debt.toString()}>`;
+    }
+    return result;
+  }
+
 }
 
 export function toListIndex( cardPropertyList: CardProperty[], cardID: string ) {
@@ -239,9 +235,9 @@ export function numberToPrepare(
     if ( DarkAges ) return ( numberOfPlayer > 2 ? 12 : 8 );
     return numberOfPlayer * 3 + ( numberOfPlayer > 2 ? 12 : 8 );
   }
-  if ( cardPropertyList[cardIndex].cardTypes.Victory ) {
+  if ( cardPropertyList[cardIndex].cardTypes.includes('Victory') ) {
     return ( numberOfPlayer > 2 ? 12 : 8 );
   }
-  if ( cardPropertyList[cardIndex].cardTypes.Prize ) return 1;
+  if ( cardPropertyList[cardIndex].cardTypes.includes('Prize') ) return 1;
   return 10; /* KingdomCard default */
 }

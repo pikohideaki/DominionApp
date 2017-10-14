@@ -3,7 +3,6 @@
 </h1>
 
 <div mat-dialog-content>
-
   <div class="flex-content">
     <div class="image">
       <app-dominion-card-image
@@ -13,25 +12,25 @@
       </app-dominion-card-image>
     </div>
     <div class="description">
-      <ul>
-        <li *ngFor="let item of items">
-          【{{item.name}}】{{cardForView[item.memberName]}}
-        </li>
-        <li *ngIf="card.linkId >= 0">
-          <a [href]="cardListLinkPath( card.linkId )" target="_blank">カードリスト</a>
-        </li>
-      </ul>
+      <table class='data-table small-table data-table--shadow3px data-table--vertical-line'>
+        <tbody>
+          <tr *ngFor="let item of items">
+            <td>{{item.name}}</td>
+            <td>{{cardForView[item.memberName]}}</td>
+          </tr>
+          <tr *ngIf="card.linkId >= 0">
+            <td></td>
+            <td>
+              <a mat-raised-button [href]="cardListLinkPath( card.linkId )" target="_blank">
+                カードリスト
+              </a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-  </div>
-<!--
-  <iframe *ngIf="card.linkId >= 0"
-      [src]="cardListLinkPath( card.linkId )"
-      width="200"
-      height="500"
-      scrolling="no"
-      frameborder="0">
-  </iframe> -->
 
+  </div>
 </div>
 
 <div mat-dialog-actions class="actionButtons">

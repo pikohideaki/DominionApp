@@ -6,6 +6,7 @@ import { Component, OnInit, Input } from '@angular/core';
     <div mat-dialog-content>
       <mat-form-field>
         <input matInput type="number"
+          onclick="this.select(0, this.value.length)"
           [value]="newVP"
           (input)="changeVP( $event.target.value )" >
       </mat-form-field>

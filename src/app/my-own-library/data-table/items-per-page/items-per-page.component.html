@@ -1,9 +1,0 @@
-<mat-form-field class='itemsPerPage'>
-  <mat-select placeholder="items per page" [value]="itemsPerPage">
-    <mat-option *ngFor="let option of itemsPerPageOptions"
-        [value]="option"
-        (click)="setItemsPerPage( option )" >
-      {{ option }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>

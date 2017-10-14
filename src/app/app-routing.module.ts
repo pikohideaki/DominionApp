@@ -12,8 +12,6 @@ import { OnlineRandomizerComponent } from './dominion/online-randomizer/online-r
 import { GameResultComponent       } from './dominion/game-result/game-result.component';
 import { CardPropertyListComponent } from './dominion/card-property-list.component';
 import { RuleBooksComponent        } from './dominion/rule-books.component';
-import { PlayersComponent          } from './dominion/players.component';
-import { ScoringTableComponent     } from './dominion/scoring-table.component';
 
 @NgModule({
   imports: [
@@ -27,8 +25,6 @@ import { ScoringTableComponent     } from './dominion/scoring-table.component';
       { component: GameResultComponent,       path: 'game-result'       },
       { component: CardPropertyListComponent, path: 'cardlist'          },
       { component: RuleBooksComponent,        path: 'rulebooks'         },
-      { component: PlayersComponent,          path: 'players'           },
-      { component: ScoringTableComponent,     path: 'scoring'           },
     ], { useHash: true } ),
   ],
   exports: [

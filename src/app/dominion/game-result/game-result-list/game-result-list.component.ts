@@ -4,7 +4,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MatDialog } from '@angular/material';
 
 import { DataTableComponent                 } from '../../../my-own-library/data-table/data-table.component';
-import { ItemsPerPageComponent              } from '../../../my-own-library/data-table/items-per-page/items-per-page.component';
+import { ItemsPerPageComponent              } from '../../../my-own-library/data-table/items-per-page.component';
 import { PagenationComponent, getDataAtPage } from '../../../my-own-library/data-table/pagenation/pagenation.component';
 
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -18,10 +18,7 @@ import { GameResult } from '../../../classes/game-result';
 @Component({
   selector: 'app-game-result-list',
   templateUrl: './game-result-list.component.html',
-  styleUrls: [
-    '../../../my-own-library/data-table/data-table.component.css',
-    './game-result-list.component.css'
-  ]
+  styleUrls: [ '../../../my-own-library/data-table/data-table.component.css' ]
 })
 export class GameResultListComponent implements OnInit {
   receiveDataDone = false;
@@ -31,8 +28,9 @@ export class GameResultListComponent implements OnInit {
 
   // pagenation
   private selectedPageIndexSource = new BehaviorSubject<number>(0);
-  private itemsPerPageSource = new BehaviorSubject<number>(200);
   selectedPageIndex$ = this.selectedPageIndexSource.asObservable();
+
+  private itemsPerPageSource = new BehaviorSubject<number>(50);
   itemsPerPage$ = this.itemsPerPageSource.asObservable();
 
   currentPageData$: Observable<GameResult[]>;

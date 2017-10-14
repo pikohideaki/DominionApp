@@ -19,6 +19,13 @@ export class PagenationComponent implements OnInit {
   ngOnInit() {
   }
 
+  range() {
+    return ({
+      start : this.itemsPerPage * this.selectedPageIndex + 1,
+      end   : Math.min( this.dataSize, (this.itemsPerPage * (this.selectedPageIndex + 1)) ),
+    });
+  }
+
   generatePageIndices() {  // dummy array to loop |dataSize/itemsPerPage| times
     return Array.from( new Array( this.pageLength() )).map( (_, i) => i );
   }

@@ -261,6 +261,14 @@ export class UtilitiesService {
     array[index2] = temp;
   }
 
+  isSubset<T>( array1: T[], array2: T[] ): boolean {
+    return array1.every( e => array2.includes(e) );
+  }
+
+  setIntersection<T>( array1: T[], array2: T[] ): T[] {
+    return array1.filter( e => array2.includes(e) );
+  }
+
   setDifference( sortedArray1: number[], sortedArray2: number[] ): number[] {
     const result: number[] = [];
     let it1 = 0;  // iterator for sortedArray1

@@ -45,7 +45,7 @@
           </button>
         </td>
         <td>
-          <mat-form-field>
+          <mat-form-field class="OtherVictoryPointsInput">
             <input matInput type="number"
               min="0"
               [value]="numberOfVictoryCards[ victoryPoint.id ]"
@@ -136,7 +136,7 @@
             <button mat-raised-button class="mini-button" *ngIf="victoryCard.maxNumber >= 12"
                 [disabled]="numberOfVictoryCards[ victoryCard.id ] <= 0"
                 (click)="decrement( victoryCard.id, 2 )">
-              <span class="numberIcon">+2</span>
+              <span class="numberIcon">-2</span>
             </button>
             <button mat-raised-button class="mini-button"
                 [disabled]="numberOfVictoryCards[ victoryCard.id ] <= 0"

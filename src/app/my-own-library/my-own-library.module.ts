@@ -15,8 +15,9 @@ import { UtilitiesService        } from './utilities.service';
 // data table
 import { DataTableComponent    } from './data-table/data-table.component';
 import { ResetButtonComponent  } from './data-table/reset-button.component';
-import { ItemsPerPageComponent } from './data-table/items-per-page/items-per-page.component';
+import { ItemsPerPageComponent } from './data-table/items-per-page.component';
 import { PagenationComponent   } from './data-table/pagenation/pagenation.component';
+import { DataTable2Component   } from './data-table/data-table2.component';
 
 
 
@@ -33,6 +34,7 @@ import { PagenationComponent   } from './data-table/pagenation/pagenation.compon
     WaitingSpinnerComponent,
     AppListComponent,
     DataTableComponent,
+    DataTable2Component,
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,
@@ -44,12 +46,14 @@ import { PagenationComponent   } from './data-table/pagenation/pagenation.compon
     WaitingSpinnerComponent,
     AppListComponent,
     DataTableComponent,
+    DataTable2Component,
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,
   ],
   providers: [
     UtilitiesService,
+    ResetButtonComponent,
   ],
   entryComponents: [
     MessageDialogComponent,

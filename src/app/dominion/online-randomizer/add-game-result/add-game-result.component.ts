@@ -211,6 +211,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
 
   async setEmptyTurnOrder( playerIndex: number ) {
     // index == 2, turnOrders == [1, 0, 0, 2] -> [1, 0, 3, 2]
+    console.log(playerIndex, this.selectedPlayers);
     const uid = this.selectedPlayers[ playerIndex ].uid;
     await this.myRandomizerGroup.setNewGameResultPlayerTurnOrder( uid, this.nextMissingNumber );
   }
@@ -260,9 +261,9 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
       if ( result === 'OK Clicked' ) {
         this.myRandomizerGroup.resetSelectedCards();
         this.myRandomizerGroup.resetSelectedCardsCheckbox();
-        this.selectedPlayers.forEach( player => {
-          this.myRandomizerGroup.setNewGameResultPlayerVP( player.uid, 0 );
-        });
+        this.selectedPlayers.forEach( player =>
+            this.myRandomizerGroup.setNewGameResultPlayerVP( player.uid, 0 ));
+        this.myRandomizerGroup.setLastTurnPlayerName('');
         this.myRandomizerGroup.setNewGameResultMemo('');
         this.myRandomizerGroup.resetVPCalculator();
         this.openSnackBar();

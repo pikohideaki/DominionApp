@@ -1,6 +1,5 @@
 <div *ngIf="receiveDataDone">
   <app-data-table--items-per-page
-    [itemsPerPageDefault]='50'
     [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
     [itemsPerPage]='itemsPerPage$ | async'
     [selectedPageIndex]='selectedPageIndex$ | async'
@@ -36,7 +35,7 @@
         <td> {{line.date.getFullYear()}}/{{line.date.getMonth() + 1}}/{{line.date.getDate()}} </td>
         <td> {{line.place}}</td>
         <td>
-          <table class='data-table  sub-table' >
+          <table class='data-table  small-table' >
             <thead>
               <tr>
                 <th>Rank</th>
@@ -48,20 +47,20 @@
             </thead>
             <tbody>
               <tr *ngFor='let playerResult of line.players'>
-                <td class='data-table--cell-numeric  sub-table--narrow-cell'>
+                <td class='small-table--narrow-cell  data-table--cell-numeric'>
                   {{playerResult.rank}}
                 </td>
-                <td class='sub-table--normal-cell'>
+                <td class='small-table--normal-cell'>
                   {{playerResult.name}}
                 </td>
-                <td class='data-table--cell-numeric  sub-table--narrow-cell'>
-                  {{playerResult.VP}}<!-- {{(playerResult.winByTurn ? '*' : '')}} -->
+                <td class='small-table--narrow-cell  data-table--cell-numeric'>
+                  {{playerResult.VP}}
                 </td>
-                <td class='data-table--cell-numeric  sub-table--narrow-cell'>
+                <td class='small-table--narrow-cell  data-table--cell-numeric'>
                   {{playerResult.score}}
                 </td>
                 <td *ngIf="playerResult.turnOrder <= 6"
-                    class='data-table--cell-numeric  sub-table--narrow-cell'>
+                    class='small-table--narrow-cell  data-table--cell-numeric'>
                   <span *ngIf="playerResult.name !== line.lastTurnPlayerName">
                     {{playerResult.turnOrder}}
                   </span>
@@ -89,7 +88,6 @@
 
 
   <app-data-table--items-per-page
-    [itemsPerPageDefault]='50'
     [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
     [itemsPerPage]='itemsPerPage$ | async'
     [selectedPageIndex]='selectedPageIndex$ | async'

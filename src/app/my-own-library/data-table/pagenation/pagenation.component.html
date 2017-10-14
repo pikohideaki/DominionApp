@@ -11,15 +11,24 @@
     <mat-icon>chevron_left</mat-icon>
   </button>
 
-  <mat-button-toggle-group #group="matButtonToggleGroup" >
-    <mat-button-toggle *ngFor='let pageIndex of generatePageIndices()'
-        [value]="pageIndex"
-        [class.mat-button-toggle-normal]="selectedPageIndex != pageIndex"
-        [class.mat-button-toggle-selected]="selectedPageIndex == pageIndex"
-        (click)="setSelectedPageIndex(pageIndex)" >
-      <span>{{pageIndex + 1}}</span>
-    </mat-button-toggle>
-  </mat-button-toggle-group>
+  <div *ngIf="pageLength() <= 10; then thenBlock; else elseBlock" ></div>
+  <ng-template #thenBlock>
+    <mat-button-toggle-group #group="matButtonToggleGroup" >
+      <mat-button-toggle *ngFor='let pageIndex of generatePageIndices()'
+          [value]="pageIndex"
+          [class.mat-button-toggle-normal]="selectedPageIndex !== pageIndex"
+          [class.mat-button-toggle-selected]="selectedPageIndex === pageIndex"
+          (click)="setSelectedPageIndex(pageIndex)" >
+        <span>{{pageIndex + 1}}</span>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+  </ng-template>
+  <ng-template #elseBlock>
+    <span class="range">
+      {{range().start}}-{{range().end}} of {{dataSize}}
+    </span>
+  </ng-template>
+
 
   <button mat-raised-button class="navigationButton"
       (click)='goToNextPage()'

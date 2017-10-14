@@ -1,18 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
-import { CloudFirestoreMediatorService } from '../firebase-mediator/cloud-firestore-mediator.service';
+import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { ColumnSetting } from '../../my-own-library/data-table/data-table2.component';
 
 
 @Component({
   selector: 'app-scoring-table',
   template: `
     <div class="bodyWithPadding">
-      <app-data-table *ngIf="receiveDataDone$ | async"
-          [data]='scoringTableForView$ | async'
+      <app-data-table2
+          [data$]='scoringTableForView$'
           [columnSettings]='columnSettings' >
-      </app-data-table>
-
+      </app-data-table2>
       <app-waiting-spinner [done]="receiveDataDone$ | async"></app-waiting-spinner>
     </div>
   `,
@@ -32,14 +32,14 @@ export class ScoringTableComponent implements OnInit {
     rank_6th: string,
   }[]>;
 
-  columnSettings = [
-    { align: 'c', manip: 'none', button: false, name: 'numberOfPlayers', headerTitle: 'プレイヤー数' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_1st'       , headerTitle: '1位' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_2nd'       , headerTitle: '2位' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_3rd'       , headerTitle: '3位' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_4th'       , headerTitle: '4位' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_5th'       , headerTitle: '5位' },
-    { align: 'c', manip: 'none', button: false, name: 'rank_6th'       , headerTitle: '6位' },
+  columnSettings: ColumnSetting[] = [
+    { name: 'numberOfPlayers', headerTitle: 'プレイヤー数' },
+    { name: 'rank_1st'       , headerTitle: '1位' },
+    { name: 'rank_2nd'       , headerTitle: '2位' },
+    { name: 'rank_3rd'       , headerTitle: '3位' },
+    { name: 'rank_4th'       , headerTitle: '4位' },
+    { name: 'rank_5th'       , headerTitle: '5位' },
+    { name: 'rank_6th'       , headerTitle: '6位' },
   ];
 
 

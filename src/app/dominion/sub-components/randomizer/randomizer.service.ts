@@ -49,10 +49,10 @@ export class RandomizerService {
         selectedCardsTemp.KingdomCards10.push( card.index );
       }
       if ( (selectedCardsTemp.EventCards.length + selectedCardsTemp.LandmarkCards.length ) < 2 ) {
-        if ( card.data.cardType === 'イベント' ) {
+        if ( card.data.cardTypes.includes('EventCards') ) {
           selectedCardsTemp.EventCards.push( card.index );
         }
-        if ( card.data.cardType === 'ランドマーク' ) {
+        if ( card.data.cardTypes.includes('LandmarkCards') ) {
           selectedCardsTemp.LandmarkCards.push( card.index );
         }
       }

@@ -22,12 +22,13 @@
 
   <ng-container data-comment="プレイヤー"></ng-container>
   <div class="margined-element">
+
     <app-waiting-spinner [done]="!!(playerResults$ | async)"></app-waiting-spinner>
 
-    <div *ngIf="!!(playerResults$ | async)">
+    <div *ngIf="(playerResults$ | async) as playerResults">
       <mat-list class="player-list" dense>
         <h3 mat-subheader>参加者を選択（2~6人）：</h3>
-        <mat-list-item *ngFor="let player of (playerResults$ | async)">
+        <mat-list-item *ngFor="let player of playerResults">
           <mat-checkbox class="playerChbox"
               [checked]="player.selected"
               (change)="changePlayersResultSelected( player.uid, $event.checked )" >
@@ -38,7 +39,7 @@
     </div>
   </div>
 
-  <div class="margined-element" *ngIf="!!(playerResults$ | async)">
+  <div class="margined-element" *ngIf="(selectedPlayers$ | async) as selectedPlayers">
     <mat-radio-group [value]="lastTurnPlayerName">
     <table class='data-table data-table--shadow3px data-table--vertical-line'>
       <thead>
@@ -69,35 +70,31 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let player of (playerResults$ | async); let idx = index">
-          <tr *ngIf="player.selected">
-            <td>
-              {{player.name}}
-            </td>
-            <td>
-              <ng-container *ngIf="player.turnOrder !== 0">
-                {{player.turnOrder}}
-              </ng-container>
-              <ng-container *ngIf="player.turnOrder === 0">
-                <button mat-raised-button
-                    (click)="setEmptyTurnOrder( idx )">
-                  this is {{nextMissingNumber$ | async}}
-                </button>
-              </ng-container>
-            </td>
-            <td>
-              <mat-radio-button
-                  [value]="player.name"
-                  (change)="changeLastTurnPlayerName( player.name )">
-              </mat-radio-button>
-            </td>
-            <td>
-              <button mat-button (click)="VPClicked( player.uid )">
-                {{player.VP}}
+        <tr *ngFor="let player of selectedPlayers; let idx = index">
+          <td> {{player.name}} </td>
+          <td>
+            <ng-container *ngIf="player.turnOrder !== 0">
+              {{player.turnOrder}}
+            </ng-container>
+            <ng-container *ngIf="player.turnOrder === 0">
+              <button mat-raised-button
+                  (click)="setEmptyTurnOrder( idx )">
+                this is {{nextMissingNumber$ | async}}
               </button>
-            </td>
-          </tr>
-        </ng-container>
+            </ng-container>
+          </td>
+          <td>
+            <mat-radio-button
+                [value]="player.name"
+                (change)="changeLastTurnPlayerName( player.name )">
+            </mat-radio-button>
+          </td>
+          <td>
+            <button mat-button (click)="VPClicked( player.uid )">
+              {{player.VP}}
+            </button>
+          </td>
+        </tr>
       </tbody>
     </table>
     </mat-radio-group>

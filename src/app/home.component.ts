@@ -42,7 +42,6 @@ export class HomeComponent implements OnInit {
           description: ( signedIn ? '' : '（※要ログイン）'),
         },
         { routerLink: '/game-result', inService: true, title: 'Game Result List', subtitle: '成績表', },
-        { routerLink: '/scoring'    , inService: true, title: 'Scoring'         , subtitle: 'ゲーム結果のスコアのつけ方', },
         { routerLink: '/cardlist'   , inService: true, title: 'Card List'       , subtitle: 'カード一覧表', },
         { routerLink: '/rulebooks'  , inService: true, title: 'RuleBooks'       , subtitle: 'Dominionのルールブック(PDF)', },
       ] );
