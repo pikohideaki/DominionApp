@@ -220,6 +220,7 @@ export class CloudFirestoreMediatorService {
     this.gameResult = {
       add: ( gameResult: GameResult ) => {
         const copy = this.utils.copyObject( gameResult );
+        delete copy.no;
         delete copy.date;
         copy.timeStamp = gameResult.date.valueOf();
         copy.players.forEach( pl => {
@@ -326,7 +327,7 @@ export class CloudFirestoreMediatorService {
       add: {
         member: ( groupId: string, uid: string, value: PlayerResult ) => {
           const obj = this.utils.copyObject( value );
-          delete obj.id;
+          delete obj.uid;
           return randomizerGroupSetValue( groupId, `newGameResult/players/${uid}`, obj );
         },
 

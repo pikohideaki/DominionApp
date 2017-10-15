@@ -28,6 +28,8 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
   @Input() gameResult: GameResult = new GameResult();
   @Input() selectedCards: SelectedCards = new SelectedCards();
 
+  firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
+
 
   constructor(
     public dialog: MatDialog,
@@ -37,6 +39,8 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.firebasePath += this.gameResult.databaseKey;
+
     const toIndex = ( cardID => this.cardPropertyList.findIndex( e => e.cardID === cardID ) );
 
     this.database.cardPropertyList$
@@ -72,7 +76,7 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
 
   deleteGameResult() {
     const dialogRef = this.dialog.open( ConfirmDialogComponent );
-    dialogRef.componentInstance.message = 'このゲーム記録を削除してもよろしいですか？';
+    dialogRef.componentInstance.message = 'ゲーム記録を削除してもよろしいですか？';
     dialogRef.afterClosed().subscribe( answer => {
       if ( answer === 'yes' ) {
         this.database.gameResult.remove( this.gameResult.databaseKey );

@@ -52,11 +52,20 @@
 
     <div class='actionButtons'>
       <span class="margined-element">
+        <a mat-raised-button
+            color='accent'
+            mat-dialog-close="edit Clicked"
+            [href]="firebasePath"
+            target="_blank">
+          Firebaseで編集
+        </a>
+      </span>
+      <span class="margined-element">
         <button mat-raised-button
             mat-dialog-close="delete Clicked"
             color='warn'
             (click)='deleteGameResult()'>
-          Delete
+          削除
         </button>
       </span>
     </div>

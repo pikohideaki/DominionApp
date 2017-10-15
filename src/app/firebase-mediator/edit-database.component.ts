@@ -17,9 +17,15 @@ export class EditDatabaseComponent implements OnInit {
     afs: AngularFirestore,
     afdb: AngularFireDatabase,
   ) {
-    // afdb.object('/data/gameResultList').valueChanges().first().subscribe( value => {
-    //   afdb.object('/data/gameResultList_bk').set(value);
-    //   afdb.object('/data/gameResultList').remove();
+    // afdb.list('/data/cardPropertyList').valueChanges().first().subscribe( cardPropertyList => {
+      // afdb.object('/data/cardPropertyList_bk').set(cardPropertyList);
+      // cardPropertyList.forEach( (cardProperty: any, i) => {
+      //   afdb.object(`/data/cardPropertyList/${i}/cardType`).remove();
+      //   afdb.object(`/data/cardPropertyList/${i}/cardTypes`)
+      //     .set( Object.keys( cardProperty.cardTypes ).filter( key => cardProperty.cardTypes[key] ).join(',') );
+      //   afdb.object(`/data/cardPropertyList/${i}/expansionName`)
+      //     .set( cardProperty.expansionName.join(',') );
+      // });
     // });
     // afdb.list('/data/gameResultList').snapshotChanges().first().subscribe( actions => {
     //   actions.forEach( (action, index) => {

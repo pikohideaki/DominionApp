@@ -48,10 +48,10 @@ export class CardProperty {
     name_jp:                string,
     name_jp_yomi:           string,
     name_eng:               string,
-    expansionName:          string[],
+    expansionName:          string,
     cost:                   CardCost,
     category:               string,
-    cardTypes:              Object,
+    cardTypes:              string,
     VP:                     number,
     drawCard:               number,
     action:                 number,
@@ -69,11 +69,10 @@ export class CardProperty {
     this.name_jp                = ( initObj.name_jp       || '' );
     this.name_jp_yomi           = ( initObj.name_jp_yomi  || '' );
     this.name_eng               = ( initObj.name_eng      || '' );
-    this.expansionName          = ( initObj.expansionName || [] );
+    this.expansionName          = ( initObj.expansionName || '' ).split(',');
     this.cost                   = new CardCost( initObj.cost );
     this.category               = ( initObj.category      || '' );
-    this.cardTypes              = <CardType[]>Object.keys( initObj.cardTypes )
-                                      .filter( key => initObj.cardTypes[key] );
+    this.cardTypes              = <CardType[]>( initObj.cardTypes || '' ).split(',');
     this.VP                     = ( initObj.VP            || 0 );
     this.drawCard               = ( initObj.drawCard      || 0 );
     this.action                 = ( initObj.action        || 0 );
