@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { MatDialog } from '@angular/material';
 
 import { DataTableComponent                 } from '../../../my-own-library/data-table/data-table.component';

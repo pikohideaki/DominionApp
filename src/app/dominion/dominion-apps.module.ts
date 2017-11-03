@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 
 /* modules */
 import { MyOwnCustomMaterialModule } from '../my-own-custom-material.module';
-import { MyOwnLibraryModule } from '../my-own-library/my-own-library.module';
-import { SubComponentsModule } from './sub-components/sub-components.module';
-import { OnlineRandomizerModule } from './online-randomizer/online-randomizer.module';
+import { MyOwnLibraryModule        } from '../my-own-library/my-own-library.module';
+import { SubComponentsModule       } from './sub-components/sub-components.module';
+import { OnlineRandomizerModule    } from './online-randomizer/online-randomizer.module';
 
 /* components */
 import { CardPropertyListComponent        } from './card-property-list.component';

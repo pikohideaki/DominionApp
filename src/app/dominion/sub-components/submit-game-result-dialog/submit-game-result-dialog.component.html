@@ -18,7 +18,7 @@
             <th>Name</th>
             <th>VP</th>
             <th>Score</th>
-            <th>Turn</th>
+            <th>Order</th>
           </tr>
         </thead>
         <tbody>
@@ -28,7 +28,11 @@
             <td> {{player.name}} </td>
             <td> {{player.VP}} </td>
             <td> {{player.score}} </td>
-            <td></td>
+            <td>
+              <span *ngIf="player.name === newGameResult.lastTurnPlayerName; then braced; else normal"></span>
+              <ng-template #braced>[{{player.turnOrder}}]</ng-template>
+              <ng-template #normal>{{player.turnOrder}}</ng-template>
+            </td>
           </tr>
           </ng-container>
         </tbody>

@@ -5,7 +5,6 @@
 /*sidenav*/
 .sidenavContainer {
   height: calc(100vh - 64px);
-  background-color: #F3EBAA;
 }
 
 .sidenavMain {

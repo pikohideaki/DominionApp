@@ -11,9 +11,13 @@ a {
   text-decoration: none;
 }
 
+
+.default-background-color {
+  background-color: #F3EBAA;
+}
+
 body {
   margin: 0;
-  background-color: #F3EBAA;
 }
 
 input {

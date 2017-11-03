@@ -18,15 +18,16 @@ import { NgPipesModule } from 'ngx-pipes';
 import { MyOwnLibraryModule } from './my-own-library/my-own-library.module';
 
 import { HomeComponent } from './home.component';
-import { EditDatabaseComponent } from './firebase-mediator/edit-database.component';
 
 import { DominionAppsModule } from './dominion/dominion-apps.module';
+import { NotFoundPageComponent } from './not-found-page.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
+    NotFoundPageComponent,
   ],
   imports: [
     BrowserModule,

@@ -1,6 +1,7 @@
 <app-waiting-spinner [done]="dataIsready$ | async"></app-waiting-spinner>
 
-<mat-sidenav-container class="sidenavContainer" *ngIf="dataIsready$ | async">
+<mat-sidenav-container class="sidenavContainer default-background-color"
+    *ngIf="dataIsready$ | async">
   <mat-sidenav #sidenav class="sidenav">
     <app-randomizer-group-list [sidenav]="sidenav"> </app-randomizer-group-list>
   </mat-sidenav>

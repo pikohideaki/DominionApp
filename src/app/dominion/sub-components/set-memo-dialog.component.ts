@@ -21,7 +21,7 @@ import { Component, OnInit, Input } from '@angular/core';
       </span>
       <span class="margined-element">
         <button mat-raised-button
-            mat-dialog-close="">
+            [mat-dialog-close]="undefined">
           Cancel
         </button>
       </span>

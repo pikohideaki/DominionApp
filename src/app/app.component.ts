@@ -4,11 +4,10 @@ import { MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Rx';
 
 import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
-// import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';
+import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';
 
 
 @Component({
-  // providers: [AutoBackupOnFirebaseService],
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
@@ -22,12 +21,12 @@ export class AppComponent {
     private snackBar: MatSnackBar,
     private afAuth: AngularFireAuth,
     private myUserInfo: MyUserInfoService,
-    // private autoBackup: AutoBackupOnFirebaseService,
+    private autoBackup: AutoBackupOnFirebaseService,
   ) {
     this.myName$ = myUserInfo.name$;
     this.signedIn$ = this.myUserInfo.signedIn$;
 
-    // this.autoBackup.checkAndExecuteBackup();
+    this.autoBackup.checkAndExecuteBackup();
   }
 
 

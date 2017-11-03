@@ -2,8 +2,10 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
-import { EditDatabaseComponent     } from './firebase-mediator/edit-database.component';
 import { HomeComponent             } from './home.component';
+import { NotFoundPageComponent     } from './not-found-page.component';
+
+import { EditDatabaseComponent     } from './firebase-mediator/edit-database.component';
 import { UserAdminComponent        } from './firebase-mediator/user-admin/user-admin.component';
 import { MyPageComponent           } from './firebase-mediator/my-page.component';
 
@@ -17,21 +19,21 @@ import { RuleBooksComponent        } from './dominion/rule-books.component';
   imports: [
     CommonModule,
     RouterModule.forRoot([
-      { component: EditDatabaseComponent,     path: 'edit-database'     },
       { component: HomeComponent,             path: ''                  },
+      { component: EditDatabaseComponent,     path: 'edit-database'     },
       { component: UserAdminComponent,        path: 'user-admin'        },
       { component: MyPageComponent,           path: 'my-page'           },
       { component: OnlineRandomizerComponent, path: 'online-randomizer' },
       { component: GameResultComponent,       path: 'game-result'       },
       { component: CardPropertyListComponent, path: 'cardlist'          },
       { component: RuleBooksComponent,        path: 'rulebooks'         },
+      { component: NotFoundPageComponent,     path: '**'                },
     ], { useHash: true } ),
   ],
   exports: [
     RouterModule,
   ],
   declarations: [
-    EditDatabaseComponent,
   ]
 })
 export class AppRoutingModule { }

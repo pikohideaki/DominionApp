@@ -171,7 +171,7 @@ export class MyRandomizerGroupService {
               selected  : false,
               VP        : 0,
               turnOrder : 0,
-            } );
+            });
     return this.database.randomizerGroup.add.member( this.myRandomizerGroupID, uid, value );
   }
 
