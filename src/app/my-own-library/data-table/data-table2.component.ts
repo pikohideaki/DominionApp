@@ -9,13 +9,13 @@ import { PagenationComponent, getDataAtPage } from './pagenation/pagenation.comp
 
 
 export class ColumnSetting {
-  name:                string  = '';
-  headerTitle:         string  = '';
-  align?:              'l'|'c'|'r'  = 'c';
-  isButton?:           boolean = false;
-  manip?:              ''|'input'|'select'|'multiSelect' = '';
-  selectOptions$?:     Observable<{ value: any, viewValue: string }[]>;  // select, multiSelect
-  manipState?:         any;
+  name:            string  = '';
+  headerTitle:     string  = '';
+  align?:          'l'|'c'|'r'  = 'c';
+  isButton?:       boolean = false;
+  manip?:          ''|'input'|'select'|'multiSelect' = '';
+  selectOptions$?: Observable<{ value: any, viewValue: string }[]>;  // select, multiSelect
+  manipState?:     any;
 }
 
 
@@ -33,7 +33,7 @@ export class DataTable2Component implements OnInit, OnDestroy {
   private data: Object[] = [];
 
   filteredData$: Observable<any[]>;
-  filteredDataLength$: Observable<number>;
+  filteredDataLength: number;
 
   @Input() columnSettings: ColumnSetting[] = [];
   private columnSettingsChange = new EventEmitter<void>();
@@ -49,7 +49,7 @@ export class DataTable2Component implements OnInit, OnDestroy {
   pagenatedData$: Observable<any[]>;
 
   @Input() transform = ((columnName: string, value) => value);  // transform cell data at printing
-  transformedPagenatedData$: Observable<any[]>;
+  transformedPagenatedData: any[] = [];
 
   @Output() onClick = new EventEmitter<{ rowIndex: number, columnName: string }>();
 
@@ -97,8 +97,6 @@ export class DataTable2Component implements OnInit, OnDestroy {
             this.columnSettingsChange.asObservable().debounceTime( 300 /* ms */ ),
             data => data.filter( line => this.filterFunction( line ) ) );
 
-    this.filteredDataLength$ = this.filteredData$.pluck('length');
-
     this.pagenatedData$
       = Observable.combineLatest(
             this.filteredData$,
@@ -110,7 +108,7 @@ export class DataTable2Component implements OnInit, OnDestroy {
                   itemsPerPage,
                   selectedPageIndex ) );
 
-    this.transformedPagenatedData$
+    const transformedPagenatedData$
       = this.pagenatedData$.map( data => data.map( line => {
           const transformed = {};
           Object.keys( line ).forEach( key => {
@@ -131,6 +129,14 @@ export class DataTable2Component implements OnInit, OnDestroy {
         this.columnSettingsChange.emit();  // 最初に1回
       });
 
+    transformedPagenatedData$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.transformedPagenatedData = val );
+
+    this.filteredData$.map( e => e.length )
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.filteredDataLength = val );
+
     this.filteredData$
       .takeWhile( () => this.alive )
       .subscribe( _ => this.selectedPageIndexSource.next(0) );
@@ -140,9 +146,9 @@ export class DataTable2Component implements OnInit, OnDestroy {
     this.alive = false;
   }
 
-  test( value ) {
-    console.log(value);
-  }
+  // test( value ) {
+  //   console.log(value);
+  // }
 
   /* view */
   itemsPerPageOnChange( value ) {
@@ -195,7 +201,6 @@ export class DataTable2Component implements OnInit, OnDestroy {
         case 'multiSelect' :
           if ( !!column.manipState && column.manipState.length > 0 ) {
             const cellValue = lineOfData[ column.name ];
-            // console.log(column.manipState, cellValue);
             if ( !this.utils.isSubset( column.manipState, cellValue ) ) return false;
           }
           break;

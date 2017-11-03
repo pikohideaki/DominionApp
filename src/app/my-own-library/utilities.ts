@@ -1,5 +1,11 @@
 
 
+export function entries( obj: any ): { key: string, value: any }[] {
+  if ( !obj ) return [];
+  return Object.keys(obj).map( key => ({ key: key, value: obj[key] }) );
+}
+
+
 export function objectKeysAsNumber( object: Object ): number[] {
   return Object.keys( object ).map( e => Number(e) );
 }

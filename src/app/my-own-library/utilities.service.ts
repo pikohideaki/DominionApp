@@ -85,12 +85,53 @@ export class UtilitiesService {
 
 
   /* Date */
+  weekNumber( date: Date ) {
+    const date0Saturday = date.getDate() - 1 + ( 6 - date.getDay() );
+    return Math.floor( date0Saturday / 7 );
+  }
+
   isToday( date: Date ) {
     // Get today's date
     const todaysDate = new Date();
 
     // call setHours to take the time out of the comparison
     return ( date.setHours(0, 0, 0, 0).valueOf() === todaysDate.setHours(0, 0, 0, 0).valueOf() );
+  }
+
+  getAllDatesIn( year: number, month: number ): Date[] {
+    const firstDateOfMonth = new Date( year, month, 1, 0, 0, 0, 0 );
+    return this.numSeq( 1, 31 )
+            .filter( dateNumber => {
+              const date = new Date( firstDateOfMonth.setDate( dateNumber ) );
+              return date.getMonth() === month;
+            })
+            .map( dateNumber => new Date( year, month, dateNumber, 0, 0, 0, 0 ) );
+  }
+
+  compareDates( date1: Date, date2: Date ): -1|0|1 {
+    if ( date1.getFullYear()     > date2.getFullYear()     ) return 1;
+    if ( date1.getFullYear()     < date2.getFullYear()     ) return -1;
+    if ( date1.getMonth()        > date2.getMonth()        ) return 1;
+    if ( date1.getMonth()        < date2.getMonth()        ) return -1;
+    if ( date1.getDate()         > date2.getDate()         ) return 1;
+    if ( date1.getDate()         < date2.getDate()         ) return -1;
+    if ( date1.getHours()        > date2.getHours()        ) return 1;
+    if ( date1.getHours()        < date2.getHours()        ) return -1;
+    if ( date1.getMinutes()      > date2.getMinutes()      ) return 1;
+    if ( date1.getMinutes()      < date2.getMinutes()      ) return -1;
+    if ( date1.getSeconds()      > date2.getSeconds()      ) return 1;
+    if ( date1.getSeconds()      < date2.getSeconds()      ) return -1;
+    if ( date1.getMilliseconds() > date2.getMilliseconds() ) return 1;
+    if ( date1.getMilliseconds() < date2.getMilliseconds() ) return -1;
+    return 0;
+  }
+
+  getDayStringJp( date ) {
+    return ['日', '月', '火', '水', '木', '金', '土'][ date.getDay() ];
+  }
+
+  getDayStringEng( date ) {
+    return [ 'Sun', 'Mon', 'Tue', 'Wed', 'Thr', 'Fri', 'Sat'][ date.getDay() ];
   }
 
   toYMD( date: Date, delimiter: string = '/' ): string {
@@ -102,11 +143,18 @@ export class UtilitiesService {
         + padzero(date.getDate());
   }
 
+  toHM( date: Date, delimiter: string = ':' ): string {
+    const padzero = ( str => ('00' + str).slice(-2) );
+    return padzero(date.getHours())
+        + delimiter
+        + padzero(date.getMinutes());
+  }
+
   toHMS( date: Date, delimiter: string = ':' ): string {
     const padzero = ( str => ('00' + str).slice(-2) );
     return padzero(date.getHours())
         + delimiter
-        + padzero(date.getMinutes() + 1)
+        + padzero(date.getMinutes())
         + delimiter
         + padzero(date.getSeconds());
   }
@@ -121,10 +169,10 @@ export class UtilitiesService {
     return yestereday;
   }
 
-  getTommorow( date: Date ): Date {
-    const tommorow = new Date( date );
-    tommorow.setDate( tommorow.getDate() - 1 );  // yesterday
-    return tommorow;
+  getTomorrow( date: Date ): Date {
+    const tomorrow = new Date( date );
+    tomorrow.setDate( tomorrow.getDate() + 1 );  // tomorrow
+    return tomorrow;
   }
 
   getMidnightOfDate( date: Date ): Date {
@@ -198,6 +246,10 @@ export class UtilitiesService {
     return this.removeIf( ar, e => e === value );
   }
 
+  removeValue<T>( ar: Array<T>, value: T ): T|undefined {
+    return this.removeIf( ar, e => e === value );
+  }
+
   removeIf<T>( ar: Array<T>, f: (T) => boolean ): T {
     return this.removeAt( ar, ar.findIndex(f) );
   }
@@ -211,7 +263,7 @@ export class UtilitiesService {
     return ar.splice( index, 1 )[0];
   }
 
-  removeValue<T>( ar: Array<T>, target: T ): Array<T> {
+  removedCopy<T>( ar: Array<T>, target: T ): Array<T> {
     return ar.filter( e => e !== target );
   }
 
@@ -253,6 +305,15 @@ export class UtilitiesService {
 
   sortNumeric( array: any[] ): any[] {
     return array.sort( (a, b) => ( parseFloat(a) - parseFloat(b) ) );
+  }
+
+  sum( array: number[] ): number {
+    return array.reduce( (prev, curr) => prev + curr );
+  }
+
+  average( array: number[] ): number {
+    if ( this.isEmpty(array) ) return 0;
+    return this.sum( array ) / array.length;
   }
 
   swap( array: any[], index1: number, index2: number ): void {

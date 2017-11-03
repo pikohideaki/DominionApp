@@ -18,6 +18,7 @@ import { ResetButtonComponent  } from './data-table/reset-button.component';
 import { ItemsPerPageComponent } from './data-table/items-per-page.component';
 import { PagenationComponent   } from './data-table/pagenation/pagenation.component';
 import { DataTable2Component   } from './data-table/data-table2.component';
+import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-date-picker.component';
 
 
 
@@ -38,6 +39,7 @@ import { DataTable2Component   } from './data-table/data-table2.component';
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,
+    MultipleDatePickerComponent,
   ],
   declarations: [
     MessageDialogComponent,
@@ -50,6 +52,7 @@ import { DataTable2Component   } from './data-table/data-table2.component';
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,
+    MultipleDatePickerComponent,
   ],
   providers: [
     UtilitiesService,

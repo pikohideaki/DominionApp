@@ -1,14 +1,14 @@
-<app-waiting-spinner [done]="!!(apps$ | async)"></app-waiting-spinner>
+<app-waiting-spinner [done]="!!apps"></app-waiting-spinner>
 
 
-<ng-container *ngIf="!!appName && !!(apps$ | async)">
+<ng-container *ngIf="!!appName && !!apps">
   <mat-toolbar color="primary">
     <span>{{appName}}</span>
   </mat-toolbar>
 </ng-container>
 
 
-<div *ngFor="let app of apps$ | async">
+<div *ngFor="let app of apps">
   <mat-card class="appElement"
       [class.inService]="app.inService"
       [class.notInService]="!(app.inService)"

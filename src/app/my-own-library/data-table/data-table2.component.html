@@ -7,13 +7,13 @@
   </app-data-table--items-per-page>
   <app-data-table--pagenation
       [itemsPerPage]='itemsPerPageSource.value'
-      [dataSize]='filteredDataLength$ | async'
+      [dataSize]='filteredDataLength'
       [selectedPageIndex]='selectedPageIndexSource.value'
       (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
   </app-data-table--pagenation>
   <app-data-table--reset-buttons (click)='reset()' >
   </app-data-table--reset-buttons>
-  <span>{{filteredDataLength$ | async}} items</span>
+  <span>{{filteredDataLength}} items</span>
 </div>
 
 
@@ -78,7 +78,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor='let value of (transformedPagenatedData$ | async); let rowIndex = index'>
+    <tr *ngFor='let value of transformedPagenatedData; let rowIndex = index'>
       <td *ngFor='let column of columnSettings'
           [class.data-table--cell-alignLeft]  ="column.align=='l'"
           [class.data-table--cell-alignCenter]="column.align=='c'"
@@ -110,9 +110,9 @@
   </app-data-table--items-per-page>
   <app-data-table--pagenation
       [itemsPerPage]='itemsPerPageSource.value'
-      [dataSize]='filteredDataLength$ | async'
+      [dataSize]='filteredDataLength'
       [selectedPageIndex]='selectedPageIndexSource.value'
       (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
   </app-data-table--pagenation>
-  <span>{{filteredDataLength$ | async}} items</span>
+  <span>{{filteredDataLength}} items</span>
 </div>
