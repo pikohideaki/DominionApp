@@ -17,13 +17,12 @@
       <input matInput
           [value]="newGroupPassword || '' "
           (input)="newGroupPasswordOnChange( $event.target.value )"
-          placeholder="Password"
-          required>
+          placeholder="Password (option)" >
     </mat-form-field>
 
     <button mat-raised-button color="primary"
           (click)="addRandomizerGroup()"
-          [disabled]="newGroupName === '' || newGroupPassword === '' ">
+          [disabled]="!newGroupName">
       <mat-icon>group_add</mat-icon>
     </button>
   </div>
@@ -44,7 +43,8 @@
       </mat-card-header>
 
       <mat-card-content *ngIf="group.group.databaseKey === selectedGroupID">
-        <mat-form-field [color]="(showWrongPasswordAlert ? 'primary' : 'warn')" >
+        <mat-form-field *ngIf="group.group.password !== ''"
+            [color]="(showWrongPasswordAlert ? 'primary' : 'warn')" >
           <input matInput
               placeholder="Password"
               [required]="signInPassword == '' "
@@ -60,12 +60,12 @@
       <mat-card-actions *ngIf="group.group.databaseKey === selectedGroupID">
         <button mat-raised-button color="primary"
               (click)="signIn( group.group.databaseKey )"
-              [disabled]="!signInPassword">
+              [disabled]="!!group.group.password && !signInPassword">
           参加
         </button>
         <button mat-raised-button color="warn"
               (click)="signOut( group.group.databaseKey )"
-              [disabled]="!signInPassword">
+              [disabled]="!!group.group.password && !signInPassword">
           退出
         </button>
       </mat-card-actions>

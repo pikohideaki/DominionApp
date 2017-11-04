@@ -66,6 +66,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     /* observables */
     const playerResults$: Observable<PlayerResult[]>
       = this.myRandomizerGroup.newGameResult.players$;
+      // .do( val => console.log('playerResult changed', val) );
 
     const selectedPlayers$: Observable<PlayerResult[]>
       = playerResults$.map( list => list.filter( e => e.selected ) );
@@ -227,7 +228,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
 
   async setEmptyTurnOrder( playerIndex: number ) {
     // index == 2, turnOrders == [1, 0, 0, 2] -> [1, 0, 3, 2]
-    console.log(playerIndex, this.selectedPlayers);
+    // console.log(playerIndex, this.selectedPlayers);
     const uid = this.selectedPlayers[ playerIndex ].uid;
     await this.myRandomizerGroup.setNewGameResultPlayerTurnOrder( uid, this.nextMissingNumber );
   }

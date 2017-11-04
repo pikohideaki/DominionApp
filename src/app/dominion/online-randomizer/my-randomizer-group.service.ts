@@ -20,6 +20,7 @@ export class MyRandomizerGroupService {
       this.database.randomizerGroupList$,
       this.myUserInfo.randomizerGroupID$,
       (list, id) => (list.find( e => e.databaseKey === id ) || new RandomizerGroup() ) );
+      // .do( val => console.log('myRandomizerGroup changed', val) );
 
   private signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
 
@@ -164,7 +165,7 @@ export class MyRandomizerGroupService {
   }
 
 
-  async addMember( uid: string, name: string ) {
+  async addMember( groupID: string, uid: string, name: string ) {
     await this.signedIn$.first().toPromise();
     const value = new PlayerResult( uid, {
               name      : name,
@@ -172,13 +173,13 @@ export class MyRandomizerGroupService {
               VP        : 0,
               turnOrder : 0,
             });
-    return this.database.randomizerGroup.add.member( this.myRandomizerGroupID, uid, value );
+    return this.database.randomizerGroup.add.member( groupID, uid, value );
   }
 
 
-  async removeMember( uid: string ) {
+  async removeMember( groupID: string, uid: string ) {
     await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup.remove.member( this.myRandomizerGroupID, uid );
+    return this.database.randomizerGroup.remove.member( groupID, uid );
   }
 
 

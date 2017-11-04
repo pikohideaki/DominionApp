@@ -28,7 +28,7 @@
               <td> {{player.VP}} </td>
               <td> {{player.score}} </td>
               <td *ngIf="player.turnOrder <= 6"
-                  class='data-table--cell-numeric  sub-table--narrow-cell'>
+                  class='sub-table--narrow-cell'>
                 <span *ngIf="player.name !== gameResult.lastTurnPlayerName">
                   {{player.turnOrder}}
                 </span>

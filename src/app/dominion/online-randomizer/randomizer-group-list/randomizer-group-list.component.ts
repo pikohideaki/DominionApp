@@ -84,7 +84,7 @@ export class RandomizerGroupListComponent implements OnInit, OnDestroy {
     const group = this.randomizerGroupListWithUsers
                     .map( e => e.group )
                     .find( g => g.databaseKey === groupID );
-    const isValid = ( this.signInPassword === group.password );
+    const isValid = ( !group.password ) || ( this.signInPassword === group.password );
     this.showWrongPasswordAlert = !isValid;
     return isValid;
   }
@@ -138,7 +138,7 @@ export class RandomizerGroupListComponent implements OnInit, OnDestroy {
     const ref = await this.database.randomizerGroup.addGroup( newRandomizerGroup );
     const groupID = ref.key;
     await this.myUserInfo.setRandomizerGroupID( groupID );
-    await this.myRandomizerGroup.addMember( this.uid, this.myName );
+    await this.myRandomizerGroup.addMember( groupID, this.uid, this.myName );
     await this.removeMemberEmptyGroup();
     this.resetAddGroupForm();
 
@@ -154,7 +154,7 @@ export class RandomizerGroupListComponent implements OnInit, OnDestroy {
     await this.myUserInfo.name$.first().toPromise(); // wait for first value
 
     await this.myUserInfo.setRandomizerGroupID( groupID );
-    await this.myRandomizerGroup.addMember( this.uid, this.myName );
+    await this.myRandomizerGroup.addMember( groupID, this.uid, this.myName );
 
     await this.removeMemberEmptyGroup();
     this.resetSignInForm();
@@ -167,8 +167,8 @@ export class RandomizerGroupListComponent implements OnInit, OnDestroy {
 
     await this.myUserInfo.uid$.first().toPromise();  // wait for first value
 
-    await this.myUserInfo.setRandomizerGroupID( groupID );
-    await this.myRandomizerGroup.addMember( this.uid, this.myName );
+    await this.myRandomizerGroup.removeMember( groupID, this.uid );
+    await this.myUserInfo.setRandomizerGroupID('');
 
     await this.removeMemberEmptyGroup();
     this.resetSignInForm();
