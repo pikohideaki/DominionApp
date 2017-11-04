@@ -1,20 +1,20 @@
 <div *ngIf="receiveDataDone">
   <app-data-table--items-per-page
     [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
-    [itemsPerPage]='itemsPerPage$ | async'
-    [selectedPageIndex]='selectedPageIndex$ | async'
+    [itemsPerPage]='itemsPerPage'
+    [selectedPageIndex]='selectedPageIndex'
     (itemsPerPageChange)="changeItemsPerPage( $event )">
   </app-data-table--items-per-page>
 
   <app-data-table--pagenation
-    [selectedPageIndex]='selectedPageIndex$ | async'
-    [itemsPerPage]='itemsPerPage$ | async'
-    [dataSize]='(gameResultListFiltered$ | async)?.length'
+    [selectedPageIndex]='selectedPageIndex'
+    [itemsPerPage]='itemsPerPage'
+    [dataSize]='gameResultListFiltered.length'
     (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
   </app-data-table--pagenation>
 
 
-  <p>{{(gameResultListFiltered$ | async)?.length}} Games</p>
+  <p>{{gameResultListFiltered.length}} Games</p>
   <div class='clear'></div>
 
 
@@ -30,7 +30,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor='let line of currentPageData$ | async'>
+      <tr *ngFor='let line of currentPageData'>
         <td class='data-table--cell-numeric'>{{line.no}}</td>
         <td> {{line.date.getFullYear()}}/{{line.date.getMonth() + 1}}/{{line.date.getDate()}} </td>
         <td> {{line.place}}</td>
@@ -47,20 +47,20 @@
             </thead>
             <tbody>
               <tr *ngFor='let playerResult of line.players'>
-                <td class='small-table--narrow-cell  data-table--cell-numeric'>
+                <td class='small-table--narrow-cell'>
                   {{playerResult.rank}}
                 </td>
                 <td class='small-table--normal-cell'>
                   {{playerResult.name}}
                 </td>
-                <td class='small-table--narrow-cell  data-table--cell-numeric'>
+                <td class='small-table--narrow-cell'>
                   {{playerResult.VP}}
                 </td>
-                <td class='small-table--narrow-cell  data-table--cell-numeric'>
+                <td class='small-table--narrow-cell'>
                   {{playerResult.score}}
                 </td>
                 <td *ngIf="playerResult.turnOrder <= 6"
-                    class='small-table--narrow-cell  data-table--cell-numeric'>
+                    class='small-table--narrow-cell'>
                   <span *ngIf="playerResult.name !== line.lastTurnPlayerName">
                     {{playerResult.turnOrder}}
                   </span>
@@ -89,15 +89,15 @@
 
   <app-data-table--items-per-page
     [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
-    [itemsPerPage]='itemsPerPage$ | async'
-    [selectedPageIndex]='selectedPageIndex$ | async'
+    [itemsPerPage]='itemsPerPage'
+    [selectedPageIndex]='selectedPageIndex'
     (itemsPerPageChange)="changeItemsPerPage( $event )">
   </app-data-table--items-per-page>
 
   <app-data-table--pagenation
-    [selectedPageIndex]='selectedPageIndex$ | async'
-    [itemsPerPage]='itemsPerPage$ | async'
-    [dataSize]='(gameResultListFiltered$ | async)?.length'
+    [selectedPageIndex]='selectedPageIndex'
+    [itemsPerPage]='itemsPerPage'
+    [dataSize]='gameResultListFiltered.length'
     (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
   </app-data-table--pagenation>
 </div>

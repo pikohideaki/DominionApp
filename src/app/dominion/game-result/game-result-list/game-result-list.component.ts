@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { MatDialog } from '@angular/material';
 
@@ -19,26 +19,36 @@ import { GameResult } from '../../../classes/game-result';
   templateUrl: './game-result-list.component.html',
   styleUrls: [ '../../../my-own-library/data-table/data-table.component.css' ]
 })
-export class GameResultListComponent implements OnInit {
+export class GameResultListComponent implements OnInit, OnDestroy {
+  private alive = true;
   receiveDataDone = false;
 
-  @Input() gameResultListFiltered$: Observable<GameResult[]>;
-  private gameResultListFiltered: GameResult[] = [];
+  @Input() private gameResultListFiltered$: Observable<GameResult[]>;
+  gameResultListFiltered: GameResult[] = [];
 
   // pagenation
   private selectedPageIndexSource = new BehaviorSubject<number>(0);
-  selectedPageIndex$ = this.selectedPageIndexSource.asObservable();
+  private selectedPageIndex$ = this.selectedPageIndexSource.asObservable();
+  selectedPageIndex: number;
 
   private itemsPerPageSource = new BehaviorSubject<number>(50);
-  itemsPerPage$ = this.itemsPerPageSource.asObservable();
+  private itemsPerPage$ = this.itemsPerPageSource.asObservable();
+  itemsPerPage: number;
 
-  currentPageData$: Observable<GameResult[]>;
+  currentPageData: GameResult[] = [];
 
 
   constructor(
     public dialog: MatDialog,
     private database: CloudFirestoreMediatorService
-  ) {}
+  ) {
+    this.itemsPerPage$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.itemsPerPage = val );
+    this.selectedPageIndex$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.selectedPageIndex = val );
+  }
 
   ngOnInit() {
     this.gameResultListFiltered$.subscribe( gameResultListFiltered => {
@@ -47,7 +57,7 @@ export class GameResultListComponent implements OnInit {
       this.gameResultListFiltered = gameResultListFiltered;
     });
 
-    this.currentPageData$
+    const currentPageData$: Observable<GameResult[]>
       = this.gameResultListFiltered$.combineLatest(
           this.itemsPerPage$,
           this.selectedPageIndex$,
@@ -56,8 +66,15 @@ export class GameResultListComponent implements OnInit {
                   Array.from( gameResultListFiltered ).reverse(),
                   itemsPerPage,
                   selectedPageIndex ) );
+
+    currentPageData$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.currentPageData = val );
   }
 
+  ngOnDestroy() {
+    this.alive = false;
+  }
 
   changeSelectedPageIndex( selectedPageIndex: number ) {
     this.selectedPageIndexSource.next(selectedPageIndex);

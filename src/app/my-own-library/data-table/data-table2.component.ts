@@ -28,11 +28,12 @@ export class ColumnSetting {
 })
 export class DataTable2Component implements OnInit, OnDestroy {
   private alive: boolean = true;
+  ready: boolean = false;
 
   @Input() private data$: Observable<any[]>;
   private data: Object[] = [];
 
-  filteredData$: Observable<any[]>;
+  private filteredData$: Observable<any[]>;
   filteredDataLength: number;
 
   @Input() columnSettings: ColumnSetting[] = [];
@@ -127,6 +128,7 @@ export class DataTable2Component implements OnInit, OnDestroy {
       .subscribe( data => {
         this.data = data;
         this.columnSettingsChange.emit();  // 最初に1回
+        this.ready = true;
       });
 
     transformedPagenatedData$

@@ -2,7 +2,7 @@
 
   <ng-container data-comment="場所"></ng-container>
   <span class="margined-element">
-    <mat-form-field *ngIf="!!(places$ | async)">
+    <mat-form-field *ngIf="!!places">
       <input type="text" placeholder="場所"
           matInput
           [value]="place || '' "
@@ -10,7 +10,7 @@
           [matAutocomplete]="auto">
       <mat-autocomplete #auto="matAutocomplete"
           (optionSelected)="changePlace( $event.option.value )" >
-        <mat-option *ngFor="let placeOption of (places$ | async)" [value]="placeOption" >
+        <mat-option *ngFor="let placeOption of places" [value]="placeOption" >
           {{ placeOption }}
         </mat-option>
       </mat-autocomplete>
@@ -22,9 +22,9 @@
   <ng-container data-comment="プレイヤー"></ng-container>
   <div class="margined-element">
 
-    <app-waiting-spinner [done]="!!(playerResults$ | async)"></app-waiting-spinner>
+    <app-waiting-spinner [done]="!!playerResults"></app-waiting-spinner>
 
-    <div *ngIf="(playerResults$ | async) as playerResults">
+    <div *ngIf="playerResults">
       <mat-list class="player-list" dense>
         <h3 mat-subheader>参加者を選択（2~6人）：</h3>
         <mat-list-item *ngFor="let player of playerResults">
@@ -38,7 +38,7 @@
     </div>
   </div>
 
-  <div class="margined-element" *ngIf="(selectedPlayers$ | async) as selectedPlayers">
+  <div class="margined-element" *ngIf="selectedPlayers">
     <mat-radio-group [value]="lastTurnPlayerName">
     <table class='data-table data-table--shadow3px data-table--vertical-line'>
       <thead>
@@ -49,12 +49,12 @@
                 (click)="shuffleTurnOrders()">
               <mat-icon>shuffle</mat-icon>
             </button>
-            <button *ngIf="turnOrderFilled$ | async"
+            <button *ngIf="turnOrderFilled"
                 mat-button class="mini-button"
                 (click)="rotateAtRandom()">
               <mat-icon>import_export</mat-icon>
             </button>
-            <button *ngIf="turnOrderFilled$ | async"
+            <button *ngIf="turnOrderFilled"
                 mat-button class="mini-button"
                 (click)="rotateTurnOrders()">
               <mat-icon>refresh</mat-icon>
@@ -78,7 +78,7 @@
             <ng-container *ngIf="player.turnOrder === 0">
               <button mat-raised-button
                   (click)="setEmptyTurnOrder( idx )">
-                this is {{nextMissingNumber$ | async}}
+                this is {{nextMissingNumber}}
               </button>
             </ng-container>
           </td>
@@ -112,20 +112,20 @@
   <ng-container data-comment="登録ボタン"></ng-container>
   <div class="margined-element">
     <button mat-raised-button color='primary'
-        [disabled]=" (newGameResultDialogOpened$ | async) ||
-                    !(numberOfPlayersOK$         | async) ||
-                    !(turnOrderFilled$           | async) ||
+        [disabled]=" newGameResultDialogOpened ||
+                    !numberOfPlayersOK ||
+                    !turnOrderFilled ||
                     !lastTurnPlayerName"
         (click)='submitGameResult()' >
       Submit
     </button>
-    <p *ngIf=" (newGameResultDialogOpened$ | async)">
+    <p *ngIf="newGameResultDialogOpened">
       結果登録中…
     </p>
-    <p *ngIf="!(numberOfPlayersOK$ | async)">
+    <p *ngIf="!numberOfPlayersOK">
       プレイヤー数は2～6人にしてください。
     </p>
-    <p *ngIf="!(turnOrderFilled$ | async)">
+    <p *ngIf="!turnOrderFilled">
       手番が未入力です。
     </p>
     <p *ngIf="!lastTurnPlayerName">

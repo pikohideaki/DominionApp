@@ -27,14 +27,14 @@ export class EditDatabaseComponent implements OnInit {
       //     .set( cardProperty.expansionName.join(',') );
       // });
     // });
-    afdb.list('/data/gameResultList').snapshotChanges().first().subscribe( actions => {
-      actions.forEach( (action, index) => {
-        const databaseKey = action.key;
-        const gameResult = action.payload.val();
+    // afdb.list('/data/gameResultList').snapshotChanges().first().subscribe( actions => {
+    //   actions.forEach( (action, index) => {
+    //     const databaseKey = action.key;
+    //     const gameResult = action.payload.val();
         // afdb.object(`/data/gameResultList/${databaseKey}/dateString`).remove();
         // afdb.object(`/data/gameResultList/${databaseKey}/timeStamp`).set( (new Date( gameResult.dateString )).valueOf() );
 
-        const players = gameResult.players;
+        // const players = gameResult.players;
         // players.forEach( (e, i) =>
         //   afdb.object(`/data/gameResultList/${databaseKey}/players/${i}/winByTurn`).remove() );
         // // if ( players.map( e => e.winByTurn ).filter( e => !!e ).length >= 2 ) {
@@ -44,9 +44,9 @@ export class EditDatabaseComponent implements OnInit {
         //   afdb.object(`/data/gameResultList/${databaseKey}/players/${i}/turnOrder`)
         //     .set( ( e.winByTurn ? 20 : 10 ) )
         // );
-      });
-      console.log('done');
-    });
+    //   });
+    //   console.log('done');
+    // });
   }
 
   ngOnInit() {

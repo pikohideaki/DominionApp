@@ -22,7 +22,7 @@ export class PagenationComponent implements OnInit {
   range() {
     return ({
       start : this.itemsPerPage * this.selectedPageIndex + 1,
-      end   : Math.min( this.dataSize, (this.itemsPerPage * (this.selectedPageIndex + 1)) ),
+      end   : (Math.min( this.dataSize, (this.itemsPerPage * (this.selectedPageIndex + 1)) ) || 0),
     });
   }
 
@@ -46,7 +46,10 @@ export class PagenationComponent implements OnInit {
 
 
 export function getDataAtPage<T>(
-    data: Array<T>, itemsPerPage: number, selectedPageIndex: number ): Array<T> {
-  return data.slice( itemsPerPage * selectedPageIndex, itemsPerPage * (selectedPageIndex + 1) );
+    data: Array<T>,
+    itemsPerPage: number,
+    selectedPageIndex: number
+  ): Array<T> {
+    return data.slice( itemsPerPage * selectedPageIndex, itemsPerPage * (selectedPageIndex + 1) );
 }
 

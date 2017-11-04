@@ -42,24 +42,16 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
   private cardPropertyList: CardProperty[];
   private selectedCards: SelectedCards = new SelectedCards();
 
-
-  places$: Observable<string[]>;
-
-  playerResults$:   Observable<PlayerResult[]>;
-  selectedPlayers$: Observable<PlayerResult[]>;
-  private selectedPlayers: PlayerResult[] = [];
-  numberOfPlayersOK$: Observable<boolean>;
-
+  places: string[];
+  playerResults: PlayerResult[] = [];
+  selectedPlayers: PlayerResult[] = [];
+  numberOfPlayersOK: boolean;
   place = '';
   memo = '';
   lastTurnPlayerName: string = '';
-
-  nextMissingNumber$: Observable<number>;
-  private nextMissingNumber: number = 1;
-  turnOrderFilled$: Observable<boolean>;
-
-  newGameResultDialogOpened$: Observable<boolean>;
-
+  nextMissingNumber: number = 1;
+  turnOrderFilled: boolean;
+  newGameResultDialogOpened: boolean;
   myID: string = '';
 
 
@@ -72,15 +64,19 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
     /* observables */
-    this.playerResults$ = this.myRandomizerGroup.newGameResult.players$;
-    this.selectedPlayers$ = this.playerResults$.map( list => list.filter( e => e.selected ) );
+    const playerResults$: Observable<PlayerResult[]>
+      = this.myRandomizerGroup.newGameResult.players$;
 
-    this.numberOfPlayersOK$
-      = this.selectedPlayers$.pluck('length').map( e => ( 2 <= e && e <= 6 ) );
+    const selectedPlayers$: Observable<PlayerResult[]>
+      = playerResults$.map( list => list.filter( e => e.selected ) );
 
-    this.newGameResultDialogOpened$ = this.myRandomizerGroup.newGameResultDialogOpened$;
+    const numberOfPlayersOK$
+      = selectedPlayers$.map( e => e.length ).map( e => ( 2 <= e && e <= 6 ) );
 
-    this.places$
+    const newGameResultDialogOpened$
+      = this.myRandomizerGroup.newGameResultDialogOpened$;
+
+    const places$
       = this.database.gameResultList$.map( gameResultList =>
           this.utils.uniq( gameResultList.map( e => e.place ).filter( e => e !== '' ) ) );
 
@@ -92,17 +88,21 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
             expansionsNameList.filter( (_, i) => isSelectedExpansions[i] ) );
 
     // turnOrders == [1, 0, 0, 2] -> 3
-    this.nextMissingNumber$
-      = this.selectedPlayers$.map( list => list.filter( e => e.turnOrder !== 0 ).length + 1 );
+    const nextMissingNumber$: Observable<number>
+      = selectedPlayers$.map( list => list.filter( e => e.turnOrder !== 0 ).length + 1 );
 
-    this.turnOrderFilled$
-      = this.selectedPlayers$.map( list => list.every( e => e.turnOrder !== 0 ) );
+    const turnOrderFilled$
+      = selectedPlayers$.map( list => list.every( e => e.turnOrder !== 0 ) );
 
 
     /* subscriptions */
     this.myUserInfo.uid$
       .takeWhile( () => this.alive )
       .subscribe( val => this.myID = val );
+
+    playerResults$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.playerResults = val );
 
     this.myRandomizerGroup.selectedCards$
       .takeWhile( () => this.alive )
@@ -137,13 +137,29 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
       .takeWhile( () => this.alive )
       .subscribe( val => this.lastTurnPlayerName = val );
 
-    this.selectedPlayers$
+    selectedPlayers$
       .takeWhile( () => this.alive )
       .subscribe( val => this.selectedPlayers = val );
 
-    this.nextMissingNumber$
+    nextMissingNumber$
       .takeWhile( () => this.alive )
       .subscribe( val => this.nextMissingNumber = val );
+
+    turnOrderFilled$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.turnOrderFilled = val );
+
+    numberOfPlayersOK$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.numberOfPlayersOK = val );
+
+    newGameResultDialogOpened$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.newGameResultDialogOpened = val );
+
+    places$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.places = val );
   }
 
 

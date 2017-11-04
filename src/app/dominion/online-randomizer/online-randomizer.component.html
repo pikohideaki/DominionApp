@@ -1,30 +1,30 @@
-<app-waiting-spinner [done]="dataIsready$ | async"></app-waiting-spinner>
+<app-waiting-spinner [done]="dataIsready"></app-waiting-spinner>
 
 <mat-sidenav-container class="sidenavContainer default-background-color"
-    *ngIf="dataIsready$ | async">
+    *ngIf="dataIsready">
   <mat-sidenav #sidenav class="sidenav">
     <app-randomizer-group-list [sidenav]="sidenav"> </app-randomizer-group-list>
   </mat-sidenav>
 
-  <div class="sidenavMain" *ngIf="!(signedIn$ | async)" >
+  <div class="sidenavMain" *ngIf="!signedIn" >
     ログインしてください。
   </div>
 
-  <div class="sidenavMain" *ngIf="!(signedInToRandomizerGroup$ | async)" >
+  <div class="sidenavMain" *ngIf="!signedInToRandomizerGroup" >
     グループに参加してください。
   </div>
 
 
-  <div class="sidenavMain" *ngIf="signedIn$ | async" >
+  <div class="sidenavMain" *ngIf="signedIn" >
     <div class="margined-element">
       <button mat-raised-button color="primary" (click)="sidenav.open()">
         <mat-icon>group</mat-icon>
       </button>
-      <span> Group : {{myRandomizerGroupName$ | async}} </span>
+      <span> Group : {{myRandomizerGroupName}} </span>
     </div>
 
-    <!-- <mat-tab-group [(selectedIndex)]="selectedTabIndex" *ngIf="signedInToRandomizerGroup$ | async"> -->
-    <mat-tab-group *ngIf="signedInToRandomizerGroup$ | async">
+    <!-- <mat-tab-group [(selectedIndex)]="selectedTabIndex" *ngIf="signedInToRandomizerGroup"> -->
+    <mat-tab-group *ngIf="signedInToRandomizerGroup">
       <mat-tab label="Randomizer">
         <ng-container data-comment="使用する拡張セットにチェック"></ng-container>
         <app-randomizer-select-cards></app-randomizer-select-cards>
@@ -32,7 +32,7 @@
         <app-randomizer-card-image longSideLength="180"> </app-randomizer-card-image>
       </mat-tab>
 
-      <mat-tab *ngIf="BlackMarketIsUsed$ | async" label="闇市場デッキ">
+      <mat-tab *ngIf="BlackMarketIsUsed" label="闇市場デッキ">
         <app-black-market-pile longSideLength="180"> </app-black-market-pile>
       </mat-tab>
 

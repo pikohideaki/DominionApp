@@ -24,7 +24,6 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
         [itemsPerPage]='50'
         (onClick)='showDetail( $event.rowIndex )' >
       </app-data-table2>
-      <app-waiting-spinner [done]="cardPropertyList$ | async"></app-waiting-spinner>
     </div>
   `,
 })

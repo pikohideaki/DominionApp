@@ -1,7 +1,7 @@
 <mat-toolbar color='primary' class='header box-shadow'>
   <a mat-icon-button routerLink='/'> <mat-icon>home</mat-icon> </a>
 
-  <div *ngIf="signedIn$ | async">
+  <div *ngIf="signedIn">
 
     <a mat-icon-button [matMenuTriggerFor]="appMenu">
       <mat-icon>menu</mat-icon>
@@ -15,9 +15,9 @@
 
   <span class="spacer"></span>
 
-  <span class="userName">{{ myName$ | async }}</span>
+  <span class="userName">{{myName}}</span>
 
-  <ng-container *ngIf="(signedIn$ | async); then thenBlock; else ElseBlock"></ng-container>
+  <ng-container *ngIf="signedIn; then thenBlock; else ElseBlock"></ng-container>
   <ng-template #thenBlock>
     <a mat-icon-button [matMenuTriggerFor]="userMenu"> <mat-icon>person</mat-icon> </a>
     <mat-menu #userMenu="matMenu" [overlapTrigger]="false">

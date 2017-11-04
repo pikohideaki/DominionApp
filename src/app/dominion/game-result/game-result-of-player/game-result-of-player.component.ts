@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
@@ -11,12 +11,12 @@ import { GameResult } from '../../../classes/game-result';
   templateUrl: './game-result-of-player.component.html',
   styleUrls: [ '../../../my-own-library/data-table/data-table.component.css' ]
 })
-export class GameResultOfPlayerComponent implements OnInit {
+export class GameResultOfPlayerComponent implements OnInit, OnDestroy {
+  private alive = true;
 
   @Input() private gameResultListFiltered$: Observable<GameResult[]>;
 
-  gameResultOfEachPlayerForView$: Observable<any>;
-
+  gameResultOfEachPlayerForView;
 
   private sortKeySource = new BehaviorSubject<string>('scoreAverage');
   private sortKey$ = this.sortKeySource.asObservable();
@@ -45,7 +45,7 @@ export class GameResultOfPlayerComponent implements OnInit {
 
 
   ngOnInit() {
-    this.gameResultOfEachPlayerForView$
+    const gameResultOfEachPlayerForView$
       = Observable.combineLatest(
         this.gameResultListFiltered$, this.sortKey$,
         (grList, sortKey) => {
@@ -53,12 +53,21 @@ export class GameResultOfPlayerComponent implements OnInit {
           return this.toGameResultOfEachPlayerForView( result, sortKey );
         } );
 
-    this.gameResultListFiltered$.subscribe( gameResultListFiltered => {
-      const maxNumberOfPlayers = this.utils.maxOfArray( gameResultListFiltered.map( e => e.players.length ) );
-      this.rankOptions = Array.from( new Array(7) ).fill(true).fill( false, maxNumberOfPlayers + 1 );
-    });
+    gameResultOfEachPlayerForView$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.gameResultOfEachPlayerForView = val );
+
+    this.gameResultListFiltered$
+      .takeWhile( () => this.alive )
+      .subscribe( gameResultListFiltered => {
+        const maxNumberOfPlayers = this.utils.maxOfArray( gameResultListFiltered.map( e => e.players.length ) );
+        this.rankOptions = Array.from( new Array(7) ).fill(true).fill( false, maxNumberOfPlayers + 1 );
+      });
   }
 
+  ngOnDestroy() {
+    this.alive = false;
+  }
 
 
   setSortKey( sortKey: string ) {
