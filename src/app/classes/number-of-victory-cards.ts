@@ -16,6 +16,8 @@ export class NumberOfVictoryCards {
   Tunnel:           number = 0;  //  2
   Dame_Josephine:   number = 0;  //  2
   Overgrown_Estate: number = 0;  //  0
+  Mill:             number = 0;  //  1
+  Cemetery:         number = 0;  //  2
 
   Gardens:          number = 0;
   Duke:             number = 0;  // 公爵
@@ -24,6 +26,7 @@ export class NumberOfVictoryCards {
   Silk_Road:        number = 0;
   Feodum:           number = 0;  // 封土
   Distant_Lands:    number = 0;
+  Pasture:          number = 0;
 
   Humble_Castle:    number = 0;
   Crumbling_Castle: number = 0;
@@ -57,6 +60,8 @@ export class NumberOfVictoryCards {
       + this.Tunnel
       + this.Dame_Josephine
       + this.Overgrown_Estate
+      + this.Mill
+      + this.Cemetery
       + this.Gardens
       + this.Duke
       + this.Vineyard
@@ -64,6 +69,7 @@ export class NumberOfVictoryCards {
       + this.Silk_Road
       + this.Feodum
       + this.Distant_Lands
+      + this.Pasture
       + this.countCastles();
   }
 
@@ -78,5 +84,6 @@ export class NumberOfVictoryCards {
       + this.Sprawling_Castle
       + this.Grand_Castle
       + this.Kings_Castle
+      ;
   }
 }

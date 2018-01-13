@@ -19,6 +19,7 @@ import {
     MatListModule,
     MatCardModule,
     MatTabsModule,
+    MatExpansionModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatChipsModule,
@@ -29,7 +30,6 @@ import {
     MatTooltipModule,
     MatSnackBarModule,
   } from '@angular/material';
-
 
 
 @NgModule({
@@ -51,6 +51,7 @@ import {
     MatListModule,
     MatCardModule,
     MatTabsModule,
+    MatExpansionModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatChipsModule,
@@ -78,6 +79,7 @@ import {
     MatListModule,
     MatCardModule,
     MatTabsModule,
+    MatExpansionModule,
     MatButtonModule,
     MatButtonToggleModule,
     MatChipsModule,

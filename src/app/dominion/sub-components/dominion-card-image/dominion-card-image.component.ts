@@ -51,7 +51,7 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
       return;
     }
     if ( this.faceUp ) {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/${this.card.name_eng.replace( / /g , '_' ).replace( /'/g , '' )}@2x.png`;
+      this.sourceDir = `${this.CARD_IMAGE_DIR}/${this.card.name_eng.replace( / /g , '_' ).replace( /'/g , '' )}.png`;
     } else {
       this.sourceDir = `${this.CARD_IMAGE_DIR}/BlankCard.png`;
     }

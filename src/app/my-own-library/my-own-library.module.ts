@@ -13,11 +13,10 @@ import { AppListComponent        } from './app-list/app-list.component';
 import { UtilitiesService        } from './utilities.service';
 
 // data table
-import { DataTableComponent    } from './data-table/data-table.component';
 import { ResetButtonComponent  } from './data-table/reset-button.component';
 import { ItemsPerPageComponent } from './data-table/items-per-page.component';
 import { PagenationComponent   } from './data-table/pagenation/pagenation.component';
-import { DataTable2Component   } from './data-table/data-table2.component';
+import { DataTableComponent   } from './data-table/data-table.component';
 import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-date-picker.component';
 
 
@@ -35,7 +34,6 @@ import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-dat
     WaitingSpinnerComponent,
     AppListComponent,
     DataTableComponent,
-    DataTable2Component,
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,
@@ -48,7 +46,6 @@ import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-dat
     WaitingSpinnerComponent,
     AppListComponent,
     DataTableComponent,
-    DataTable2Component,
     ResetButtonComponent,
     ItemsPerPageComponent,
     PagenationComponent,

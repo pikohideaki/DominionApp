@@ -38,6 +38,8 @@ export class VictoryPointsCalculatorService {
       case 'Tunnel'           : return  2;
       case 'Dame_Josephine'   : return  2;
       case 'Overgrown_Estate' : return  0;
+      case 'Mill'             : return  1;
+      case 'Cemetery'         : return  2;
 
 
       // 庭園 : デッキ枚数 ÷ 10 点
@@ -71,6 +73,9 @@ export class VictoryPointsCalculatorService {
       case 'Sprawling_Castle' : return 4;
       case 'Grand_Castle'     : return 5;
       case 'Kings_Castle'     : return 2 * numberOfVictoryCards.countCastles();
+
+      // Pasture : 屋敷1枚につき1点
+      case 'Pasture'        : return numberOfVictoryCards.Estate;
 
       default : return 0;
     }

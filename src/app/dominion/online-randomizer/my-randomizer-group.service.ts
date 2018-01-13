@@ -29,15 +29,15 @@ export class MyRandomizerGroupService {
   randomizerButtonLocked$    = this.myRandomizerGroup$.map( e => e.randomizerButtonLocked    ).distinctUntilChanged();
   isSelectedExpansions$      = Observable.combineLatest(
                 this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
-                this.myRandomizerGroup$.map( e => e.isSelectedExpansions      ).distinctUntilChanged(),
+                this.myRandomizerGroup$.map( e => e.isSelectedExpansions      ).distinctUntilChanged( this.cmpObj ),
                 (initArray, isSelectedExpansions) => initArray.map( (_, i) => !!isSelectedExpansions[i] ) );
 
-  selectedCards$             = this.myRandomizerGroup$.map( e => e.selectedCards             ).distinctUntilChanged();
-  selectedCardsCheckbox$     = this.myRandomizerGroup$.map( e => e.selectedCardsCheckbox     ).distinctUntilChanged();
-  BlackMarketPileShuffled$   = this.myRandomizerGroup$.map( e => e.BlackMarketPileShuffled   ).distinctUntilChanged();
+  selectedCards$             = this.myRandomizerGroup$.map( e => e.selectedCards             ).distinctUntilChanged( this.cmpObj );
+  selectedCardsCheckbox$     = this.myRandomizerGroup$.map( e => e.selectedCardsCheckbox     ).distinctUntilChanged( this.cmpObj );
+  BlackMarketPileShuffled$   = this.myRandomizerGroup$.map( e => e.BlackMarketPileShuffled   ).distinctUntilChanged( this.cmpObj );
   BlackMarketPhase$          = this.myRandomizerGroup$.map( e => e.BlackMarketPhase          ).distinctUntilChanged();
   newGameResult = {
-    players$ : this.myRandomizerGroup$.map( e => e.newGameResult.players ).distinctUntilChanged(),
+    players$ : this.myRandomizerGroup$.map( e => e.newGameResult.players ).distinctUntilChanged( this.cmpObj ),
     place$   : this.myRandomizerGroup$.map( e => e.newGameResult.place   ).distinctUntilChanged(),
     memo$    : this.myRandomizerGroup$.map( e => e.newGameResult.memo    ).distinctUntilChanged(),
   };
@@ -45,7 +45,7 @@ export class MyRandomizerGroupService {
   newGameResultDialogOpened$ = this.myRandomizerGroup$.map( e => e.newGameResultDialogOpened ).distinctUntilChanged();
   resetVPCalculator$         = this.myRandomizerGroup$.map( e => e.resetVPCalculator         ).distinctUntilChanged();
 
-  selectedCardsHistory$ = this.myRandomizerGroup$.map( e => e.selectedCardsHistory ).distinctUntilChanged();
+  selectedCardsHistory$ = this.myRandomizerGroup$.map( e => e.selectedCardsHistory ).distinctUntilChanged( this.cmpObj );
 
 
   constructor(
@@ -57,6 +57,9 @@ export class MyRandomizerGroupService {
   }
 
 
+  cmpObj( x, y ) {
+    return JSON.stringify(x) === JSON.stringify(y);
+  }
 
 
   async addToSelectedCardsHistory( newSelectedCards: SelectedCards ) {

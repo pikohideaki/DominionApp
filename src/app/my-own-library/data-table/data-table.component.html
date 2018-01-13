@@ -1,155 +1,137 @@
-<div *ngIf="itemsPerPageOptions != undefined" class="pagerWrapper">
-  <app-data-table--items-per-page
-      [itemsPerPageOptions]='itemsPerPageOptions'
-      [(itemsPerPage)]='itemsPerPage'
-      [(selectedPageIndex)]='selectedPageIndex' >
-  </app-data-table--items-per-page>
+<app-waiting-spinner [done]="ready"></app-waiting-spinner>
 
-  <app-data-table--pagenation
-      [itemsPerPage]='itemsPerPage'
-      [dataSize]='filteredData.length'
-      [(selectedPageIndex)]='selectedPageIndex' >
-  </app-data-table--pagenation>
+<ng-container *ngIf="ready">
+  <div *ngIf="itemsPerPageOptions !== undefined" class="pagerWrapper">
+    <app-data-table--items-per-page
+        [itemsPerPageOptions]='itemsPerPageOptions'
+        [itemsPerPage]='itemsPerPageSource.value'
+        (itemsPerPageChange)="itemsPerPageOnChange( $event )"
+        [selectedPageIndex]='selectedPageIndexSource.value'>
+    </app-data-table--items-per-page>
+    <app-data-table--pagenation
+        [itemsPerPage]='itemsPerPageSource.value'
+        [dataSize]='filteredDataLength'
+        [selectedPageIndex]='selectedPageIndexSource.value'
+        (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
+    </app-data-table--pagenation>
+    <app-data-table--reset-buttons (click)='reset()' >
+    </app-data-table--reset-buttons>
+    <span>{{filteredDataLength}} items</span>
+  </div>
 
 
-  <app-data-table--reset-buttons (click)='reset()' >
-  </app-data-table--reset-buttons>
 
-  <span>{{filteredData.length}} items</span>
-</div>
-
-
-<table class='data-table data-table--shadow3px data-table--vertical-line'>
-  <thead>
-    <tr>
-      <th *ngFor='let column of columnSettings'
-          [class.data-table--cell-alignLeft]  ="column.align === 'l' "
-          [class.data-table--cell-alignCenter]="column.align === 'c' "
-          [class.data-table--cell-alignRight] ="column.align === 'r' " >
-
-        <ng-container [ngSwitch]="column.manip">
-          <ng-container *ngSwitchCase="'none'">
-            <span> {{column.headerTitle}} </span>
-          </ng-container>
-
-          <ng-container *ngSwitchCase="'filterBySelecter'">
-            <mat-form-field>
-              <mat-select
-                  [placeholder]="column.headerTitle"
-                  [value]="column.manipState || ''"
-                  (change)="changeColumnState( column.name, $event.value ); updateView()" >
-                <mat-option *ngFor="let option of column.options"
-                    [value]="option">
-                  {{ option }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-            <button mat-icon-button (click)="reset( column.name )">
-              <mat-icon class='clearSelectIcon'>clear</mat-icon>
-            </button>
-          </ng-container>
-
-          <ng-container *ngSwitchCase="'multiSelect'">
-            <mat-form-field>
-              <mat-select
-                  [multiple]="true"
-                  [placeholder]="column.headerTitle"
-                  [value]="column.manipState || ''"
-                  (change)="changeColumnState( column.name, $event.value ); updateView()" >
-                <mat-option *ngFor="let option of column.options"
-                    [value]="option">
-                  {{ option }}
-                </mat-option>
-              </mat-select>
-            </mat-form-field>
-
-            <button mat-icon-button (click)="reset( column.name )">
-              <mat-icon class='clearSelectIcon'>clear</mat-icon>
-            </button>
-          </ng-container>
-
-          <ng-container *ngSwitchCase="'incrementalSearch'">
-            <mat-form-field>
-              <input matInput
-                  id="filteringInputBox"
-                  [placeholder]="column.headerTitle"
-                  [value]="column.manipState || ''"
-                  (input)="changeColumnState( column.name, $event.target.value ); updateView()" >
-              <button matSuffix mat-icon-button (click)="reset( column.name )">
+  <table class='data-table data-table--shadow3px data-table--vertical-line'>
+    <thead>
+      <tr>
+        <th *ngFor='let column of columnSettings'
+            [class.data-table--cell-alignLeft]  ="column.align === 'l' "
+            [class.data-table--cell-alignCenter]="column.align === 'c' "
+            [class.data-table--cell-alignRight] ="column.align === 'r' " >
+          <ng-container [ngSwitch]="column.manip">
+            <ng-container *ngSwitchCase="'input'">
+              <mat-form-field>
+                <input matInput
+                    id="filteringInputBox"
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState || ''"
+                    (input)="changeColumnState( column.name, $event.target.value )" >
+                <button matSuffix mat-icon-button (click)="reset( column.name )">
+                  <mat-icon class='clearSelectIcon'>clear</mat-icon>
+                </button>
+              </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'select'">
+              <mat-form-field>
+                <mat-select
+                    [placeholder]="column.headerTitle"
+                    [value]="column.manipState || ''"
+                    (change)="changeColumnState( column.name, $event.value )" >
+                  <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    {{option.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-icon-button (click)="reset( column.name )">
                 <mat-icon class='clearSelectIcon'>clear</mat-icon>
               </button>
-            </mat-form-field>
+            </ng-container>
+            <ng-container *ngSwitchCase="'multiSelect-and'">
+              <mat-form-field>
+                <mat-select
+                      [placeholder]="column.headerTitle"
+                      [value]="column.manipState"
+                      (change)="changeColumnState( column.name, $event.value )"
+                      multiple>
+                  <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    {{option.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-icon-button (click)="reset( column.name )">
+                <mat-icon class='clearSelectIcon'>clear</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngSwitchCase="'multiSelect-or'">
+              <mat-form-field>
+                <mat-select
+                      [placeholder]="column.headerTitle"
+                      [value]="column.manipState"
+                      (change)="changeColumnState( column.name, $event.value )"
+                      multiple>
+                  <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    {{option.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <button mat-icon-button (click)="reset( column.name )">
+                <mat-icon class='clearSelectIcon'>clear</mat-icon>
+              </button>
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              <span> {{column.headerTitle}} </span>
+            </ng-container>
           </ng-container>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor='let value of transformedPagenatedData; let rowIndex = index'>
+        <td *ngFor='let column of columnSettings'
+            [class.data-table--cell-alignLeft]  ="column.align=='l'"
+            [class.data-table--cell-alignCenter]="column.align=='c'"
+            [class.data-table--cell-alignRight] ="column.align=='r'" >
 
-          <!-- <ng-container *ngSwitchCase="'autoComplete'">
-            <mat-form-field>
-                <input matInput
-                    [placeholder]="column.headerTitle"
-                    [(ngModel)]="column.manipState"
-                    [matAutocomplete]=autoCompColumn
-                    [formControl]="stateCtrl">
-            </mat-form-field>
-            <mat-autocomplete #autoCompColumn="matAutocomplete">
-                <mat-option *ngFor="let option of column.asyncOptions | async" [value]="option">
-                    {{ option }}
-                </mat-option>
-            </mat-autocomplete>
-          </ng-container> -->
-
-          <!-- <ng-container>
-            <button mat-icon-button (click)="sort( column.name )">
-              <mat-icon class='sort'>sort</mat-icon>
+          <div *ngIf="column.isButton; then thenBlock; else elseBlock"></div>
+          <ng-template #thenBlock>
+            <button mat-button color="primary"
+                  (click)="cellClicked( rowIndex, column.name )">
+              {{ value[column.name] }}
             </button>
-            <mat-icon>arrow_upwards</mat-icon>
-            <mat-icon>arrow_downwards</mat-icon>
-            <button mat-button disableRipple *ngIf="column.manip == 'sort'"
-                class="headerSortButton"
-                (click)="sortColumn( column.manipState, column.name )" >
-              {{column.headerTitle}}
-              <mat-icon *ngIf="column.manipState == 'accending' " class='sortIcon'>arrow_drop_up</mat-icon>
-              <mat-icon *ngIf="column.manipState == 'descending'" class='sortIcon'>arrow_drop_down</mat-icon>
-            </button>
-          </ng-container> -->
-
-        </ng-container>
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor='let value of getDataAtPage( this.selectedPageIndex ); let rowIndex = index'>
-      <td *ngFor='let column of columnSettings'
-          [class.data-table--cell-alignLeft]  ="column.align=='l'"
-          [class.data-table--cell-alignCenter]="column.align=='c'"
-          [class.data-table--cell-alignRight] ="column.align=='r'" >
-
-        <button mat-button color="primary" *ngIf="column.isButton" (click)="clicked(rowIndex, column.name)">
-          {{ value[column.name] }}
-        </button>
-        <span *ngIf="!column.isButton">
-          {{ value[column.name] }}
-        </span>
-      </td>
-    </tr>
-  </tbody>
-</table>
+          </ng-template>
+          <ng-template #elseBlock>
+            {{ value[column.name] }}
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 
 
-<div *ngIf="itemsPerPageOptions != undefined" class="pagerWrapper">
-  <app-data-table--items-per-page
-      [itemsPerPageOptions]='itemsPerPageOptions'
-      [(itemsPerPage)]='itemsPerPage'
-      [(selectedPageIndex)]='selectedPageIndex' >
-  </app-data-table--items-per-page>
 
-  <app-data-table--pagenation
-      [(selectedPageIndex)]='selectedPageIndex'
-      [itemsPerPage]='itemsPerPage'
-      [dataSize]='filteredData.length' >
-  </app-data-table--pagenation>
-
-  <app-data-table--reset-buttons (click)='reset()' >
-  </app-data-table--reset-buttons>
-
-  <span>{{filteredData.length}} items</span>
-  <div class='clear'></div>
-</div>
+  <div *ngIf="itemsPerPageOptions !== undefined" class="pagerWrapper">
+    <app-data-table--items-per-page
+        [itemsPerPageOptions]='itemsPerPageOptions'
+        [itemsPerPage]='itemsPerPageSource.value'
+        (itemsPerPageChange)="itemsPerPageOnChange( $event )"
+        [selectedPageIndex]='selectedPageIndexSource.value'>
+    </app-data-table--items-per-page>
+    <app-data-table--pagenation
+        [itemsPerPage]='itemsPerPageSource.value'
+        [dataSize]='filteredDataLength'
+        [selectedPageIndex]='selectedPageIndexSource.value'
+        (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
+    </app-data-table--pagenation>
+    <span>{{filteredDataLength}} items</span>
+  </div>
+</ng-container>

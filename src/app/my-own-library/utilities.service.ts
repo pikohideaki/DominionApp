@@ -11,6 +11,7 @@ export class Stopwatch {
     this._name = name;
   }
 
+
   start( log = false ) {
     this._startTime = (new Date()).valueOf();
     this._result = 0;
@@ -30,8 +31,8 @@ export class Stopwatch {
   printResult() {
     console.log( `${this._name} ${this._result} msec` );
   }
-
 }
+
 
 
 
@@ -39,6 +40,15 @@ export class Stopwatch {
 export class UtilitiesService {
 
   constructor() { }
+
+
+  getAlphabets( charCase: 'upper'|'lower' ) {
+    const code_a = 'a'.charCodeAt(0);
+    const code_A = 'A'.charCodeAt(0);
+    const code = ( charCase === 'upper' ? code_A : code_a );
+    return this.seq0(26).map( i => String.fromCharCode( code + i ) );
+  }
+
 
 
   /* localStorage */
@@ -381,6 +391,9 @@ export class UtilitiesService {
     return max;
   }
 
+  seq0( length: number, step: number = 1 ): number[] {
+    return this.numberSequence( 0, length, step );
+  }
   /**
    * @description (0, 5) => [0,1,2,3,4], (2,12,3) => [2,5,8,11]
    * @param start start number
@@ -388,9 +401,6 @@ export class UtilitiesService {
    * @param step step number (default = 1)
    * @return the number sequence array
    */
-  seq0( length: number, step: number = 1 ): number[] {
-    return this.numberSequence( 0, length, step );
-  }
   numSeq( start: number, length: number, step: number = 1 ): number[] {
     return this.numberSequence( start, length, step );
   }

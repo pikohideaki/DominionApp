@@ -28,7 +28,7 @@ export class CardPropertyDialogComponent implements OnInit {
     { memberName: 'cost_potion'   , name: 'コスト（ポーション）' },
     { memberName: 'cost_debt'     , name: 'コスト（借金）' },
     { memberName: 'category'      , name: '種類' },
-    { memberName: 'cardType'      , name: '属性' },
+    { memberName: 'cardTypesStr'  , name: '属性' },
     { memberName: 'VP'            , name: 'VP' },
     { memberName: 'drawCard'      , name: '+Draw Cards' },
     { memberName: 'action'        , name: '+Action' },

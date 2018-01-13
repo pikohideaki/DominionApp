@@ -2,7 +2,6 @@ import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs/Rx';
 import { MatDialog } from '@angular/material';
 
-import { DataTableComponent                 } from '../../../my-own-library/data-table/data-table.component';
 import { ItemsPerPageComponent              } from '../../../my-own-library/data-table/items-per-page.component';
 import { PagenationComponent, getDataAtPage } from '../../../my-own-library/data-table/pagenation/pagenation.component';
 

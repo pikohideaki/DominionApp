@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Rx';
 
 import { UtilitiesService } from '../my-own-library/utilities.service';
-import { ColumnSetting } from '../my-own-library/data-table/data-table2.component';
+import { ColumnSetting } from '../my-own-library/data-table/data-table.component';
 
 import { CloudFirestoreMediatorService } from '../firebase-mediator/cloud-firestore-mediator.service';
 
@@ -16,14 +16,14 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
   selector: 'app-card-property-list',
   template: `
     <div class="bodyWithPadding">
-      <app-data-table2
+      <app-data-table
         [data$]='cardPropertyList$'
         [transform]="transformFunction"
         [columnSettings]='columnSettings'
         [itemsPerPageOptions]='[ 25, 50, 100, 200 ]'
         [itemsPerPage]='50'
         (onClick)='showDetail( $event.rowIndex )' >
-      </app-data-table2>
+      </app-data-table>
     </div>
   `,
 })
@@ -37,21 +37,21 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
 
 
   columnSettings: ColumnSetting[] = [
-    { isButton: false, manip: '',            name: 'no'                 , headerTitle: 'No.' },
-    { isButton: true,  manip: 'input',       name: 'name_jp'            , headerTitle: '名前' },
-    { isButton: false, manip: 'input',       name: 'name_eng'           , headerTitle: 'Name' },
-    { isButton: false, manip: 'multiSelect', name: 'expansionName'      , headerTitle: 'セット名' },
-    { isButton: false, manip: 'select',      name: 'category'           , headerTitle: '分類' },
-    { isButton: false, manip: 'multiSelect', name: 'cardTypes'          , headerTitle: '種別' },
-    { isButton: false, manip: '',            name: 'cost'               , headerTitle: 'コスト' },
-    { isButton: false, manip: '',            name: 'VP'                 , headerTitle: 'VP' },
-    { isButton: false, manip: '',            name: 'drawCard'           , headerTitle: '+card' },
-    { isButton: false, manip: '',            name: 'action'             , headerTitle: '+action' },
-    { isButton: false, manip: '',            name: 'buy'                , headerTitle: '+buy' },
-    { isButton: false, manip: '',            name: 'coin'               , headerTitle: '+coin' },
-    { isButton: false, manip: '',            name: 'VPtoken'            , headerTitle: '+VPtoken' },
-    { isButton: false, manip: 'select',      name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
-    { isButton: false, manip: 'select',      name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
+    { isButton: false, manip: '',                name: 'no'                 , headerTitle: 'No.' },
+    { isButton: true,  manip: 'input',           name: 'name_jp'            , headerTitle: '名前' },
+    { isButton: false, manip: 'input',           name: 'name_eng'           , headerTitle: 'Name' },
+    { isButton: false, manip: 'multiSelect-or',  name: 'expansionName'      , headerTitle: 'セット名' },
+    { isButton: false, manip: 'select',          name: 'category'           , headerTitle: '分類' },
+    { isButton: false, manip: 'multiSelect-and', name: 'cardTypes'          , headerTitle: '種別' },
+    { isButton: false, manip: '',                name: 'cost'               , headerTitle: 'コスト' },
+    { isButton: false, manip: '',                name: 'VP'                 , headerTitle: 'VP' },
+    { isButton: false, manip: '',                name: 'drawCard'           , headerTitle: '+card' },
+    { isButton: false, manip: '',                name: 'action'             , headerTitle: '+action' },
+    { isButton: false, manip: '',                name: 'buy'                , headerTitle: '+buy' },
+    { isButton: false, manip: '',                name: 'coin'               , headerTitle: '+coin' },
+    { isButton: false, manip: '',                name: 'VPtoken'            , headerTitle: '+VPtoken' },
+    { isButton: false, manip: 'select',          name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
+    { isButton: false, manip: 'select',          name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
   ];
 
 

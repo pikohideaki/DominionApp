@@ -49,6 +49,8 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
     { id: 'Tunnel'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
     { id: 'Dame_Josephine'  , maxNumber:  1, display: true, displayWhen: 'KnightsIsInSupply' },
     { id: 'Overgrown_Estate', maxNumber:  1, display: true, displayWhen: 'DarkAges' },
+    { id: 'Mill'            , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
+    { id: 'Cemetery'        , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
 
     { id: 'Gardens'         , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
     { id: 'Duke'            , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
@@ -57,6 +59,7 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
     { id: 'Silk_Road'       , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
     { id: 'Feodum'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
     { id: 'Distant_Lands'   , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
+    { id: 'Pasture'         , maxNumber: 12, display: true, displayWhen: 'ShepherdIsInSupply' },
 
     { id: 'Humble_Castle'   , maxNumber:  2, display: true, displayWhen: 'CastlesIsInSupply' },
     { id: 'Crumbling_Castle', maxNumber:  1, display: true, displayWhen: 'CastlesIsInSupply' },
@@ -112,8 +115,6 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
       .skip(1)
       .takeWhile( () => this.alive )
       .subscribe( () => this.resetNumbers() );
-
-    // this.resetNumbers();
   }
 
   ngOnDestroy() {
@@ -134,13 +135,14 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
       selectedCardsAll.map( e => this.cardPropertyList[e].cardID ).includes( cardID );
 
     this.VictoryCards.forEach( e => { switch ( e.displayWhen ) {
-      case 'always'            : e.display = true;  break;
-      case 'isInSupply'        : e.display = isInSupply( e.id );  break;
-      case 'Prosperity'        : e.display = this.selectedCards.Prosperity;  break;
-      case 'DarkAges'          : e.display = this.selectedCards.DarkAges;  break;
-      case 'KnightsIsInSupply' : e.display = isInSupply( 'Knights' );  break;
-      case 'CastlesIsInSupply' : e.display = isInSupply( 'Castles' );  break;
-      default                  : e.display = true;  break;
+      case 'always'             : e.display = true;  break;
+      case 'isInSupply'         : e.display = isInSupply( e.id );  break;
+      case 'Prosperity'         : e.display = this.selectedCards.Prosperity;  break;
+      case 'DarkAges'           : e.display = this.selectedCards.DarkAges;  break;
+      case 'KnightsIsInSupply'  : e.display = isInSupply( 'Knights' );  break;
+      case 'CastlesIsInSupply'  : e.display = isInSupply( 'Castles' );  break;
+      case 'ShepherdIsInSupply' : e.display = isInSupply( 'Shepherd' );  break;
+      default                   : e.display = true;  break;
     } });
 
     this.OtherSettings.forEach( e => e.display = isInSupply( e.displayIfExists ) );

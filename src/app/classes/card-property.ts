@@ -20,6 +20,15 @@ type CardType = (
       |'Gather'
       |'EventCards'
       |'LandmarkCards'
+      |'Spirit'
+      |'Night'
+      |'Fate'
+      |'Doom'
+      |'Heirloom'
+      |'Zombie'
+      |'Boon'
+      |'Hex'
+      |'State'
     );
 
 export class CardProperty {
@@ -96,13 +105,13 @@ export class CardProperty {
       name_jp                : this.name_jp,
       name_jp_yomi           : this.name_jp_yomi,
       name_eng               : this.name_eng,
-      expansionName          : transform( 'expansionName', this.expansionName ),
+      expansionName          : this.expansionName.join('，'),
       cost_coin              : this.cost.coin,
       cost_potion            : this.cost.potion,
       cost_debt              : this.cost.debt,
       costStr                : transform( 'cost', this.cost ),
       category               : this.category,
-      cardTypesStr           : transform( 'cardTypes', this.cardTypes ),
+      cardTypesStr           : this.cardTypes.map( e => transform( 'cardTypes', e ) ).join('，'),
       cardTypes              : this.cardTypes,
       VP                     : this.VP,
       drawCard               : this.drawCard,
@@ -125,29 +134,27 @@ export function transform( property: string, value ) {
   switch ( property ) {
 
     case 'cardTypes' :
-      return value.map( e => {
-        switch (e) {
-          case 'Curse' :         return '呪い';
-          case 'Action' :        return 'アクション';
-          case 'Treasure' :      return '財宝';
-          case 'Victory' :       return '勝利点';
-          case 'Attack' :        return 'アタック';
-          case 'Reaction' :      return 'リアクション';
-          case 'Duration' :      return '持続';
-          case 'Ruins' :         return '廃墟';
-          case 'Prize' :         return '褒賞';
-          case 'Looter' :        return '略奪者';
-          case 'Shelter' :       return '避難所';
-          case 'Knights' :       return '騎士';
-          case 'Reserve' :       return 'リザーブ';
-          case 'Traveller' :     return 'トラベラー';
-          case 'Castle' :        return '城';
-          case 'Gather' :        return '集合';
-          case 'EventCards' :    return 'イベント';
-          case 'LandmarkCards' : return 'ランドマーク';
-          default: return '';
-        }
-      } );
+      switch (value) {
+        case 'Curse'         : return '呪い';
+        case 'Action'        : return 'アクション';
+        case 'Treasure'      : return '財宝';
+        case 'Victory'       : return '勝利点';
+        case 'Attack'        : return 'アタック';
+        case 'Reaction'      : return 'リアクション';
+        case 'Duration'      : return '持続';
+        case 'Ruins'         : return '廃墟';
+        case 'Prize'         : return '褒賞';
+        case 'Looter'        : return '略奪者';
+        case 'Shelter'       : return '避難所';
+        case 'Knights'       : return '騎士';
+        case 'Reserve'       : return 'リザーブ';
+        case 'Traveller'     : return 'トラベラー';
+        case 'Castle'        : return '城';
+        case 'Gather'        : return '集合';
+        case 'EventCards'    : return 'イベント';
+        case 'LandmarkCards' : return 'ランドマーク';
+        default              : return value;
+      }
 
     case 'cost' :
       return value.toStr();

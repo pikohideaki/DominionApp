@@ -2,17 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
-import { ColumnSetting } from '../../my-own-library/data-table/data-table2.component';
+import { ColumnSetting } from '../../my-own-library/data-table/data-table.component';
 
 
 @Component({
   selector: 'app-scoring-table',
   template: `
     <div class="bodyWithPadding">
-      <app-data-table2
+      <app-data-table
           [data$]='scoringTableForView$'
           [columnSettings]='columnSettings' >
-      </app-data-table2>
+      </app-data-table>
       <app-waiting-spinner [done]="receiveDataDone$ | async"></app-waiting-spinner>
     </div>
   `,

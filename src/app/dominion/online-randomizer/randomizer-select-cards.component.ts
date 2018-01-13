@@ -23,7 +23,7 @@ import { CardPropertyDialogComponent } from '../sub-components/card-property-dia
       [isSelectedExpansions]="isSelectedExpansions"
       (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )"
       [selectedCards]="selectedCards"
-      (selectedCardsChange)="selectedCardsOnChange( $event )"
+      (selectedCardsChange)="selectedCardsChanged( $event )"
       (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange( $event )"
       showSelectedCardsCheckbox="true"
       [selectedCardsCheckbox]="selectedCardsCheckbox"
@@ -113,9 +113,39 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
 
 
 
+  selectedCardsOnChange( selectedCards: SelectedCards ) {
+    this.selectedCards = new SelectedCards( selectedCards );
+    this.myRandomizerGroup.setSelectedCards( this.selectedCards );
+    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
+    this.myRandomizerGroup.resetVPCalculator();
+  }
+
+  private restoreFromHistory( index: number ) {
+    this.selectedCardsOnChange( this.selectedCardsHistory[ index ].selectedCards );
+    const BlackMarketPileShuffled
+      = this.selectedCards.BlackMarketPile.map( e => ({ cardIndex: e, faceUp: false }) );
+    this.myRandomizerGroup.setBlackMarketPileShuffled( BlackMarketPileShuffled );
+  }
+
+
+
+  /* react to app-randomizer */
+
   resetClicked() {
     this.historyRefIndexSource.next( this.selectedCardsHistory.length );
     this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
+  }
+
+  undo() {
+    const newIndex = this.historyRefIndexSource.value - 1;
+    this.historyRefIndexSource.next( newIndex );
+    this.restoreFromHistory( newIndex );
+  }
+
+  redo() {
+    const newIndex = this.historyRefIndexSource.value + 1;
+    this.historyRefIndexSource.next( newIndex );
+    this.restoreFromHistory( newIndex );
   }
 
   randomizerButtonLockedOnChange( lock: boolean ) {
@@ -126,10 +156,8 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
     this.myRandomizerGroup.setIsSelectedExpansions( value.index, value.checked );
   }
 
-  selectedCardsOnChange( selectedCards: SelectedCards ) {
-    this.selectedCards = new SelectedCards( selectedCards );
-    this.myRandomizerGroup.setSelectedCards( this.selectedCards );
-    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
+  selectedCardsChanged( selectedCards: SelectedCards ) {
+    this.selectedCardsOnChange( selectedCards );
     if ( this.selectedCards.KingdomCards10.length > 0 ) {
       this.myRandomizerGroup.addToSelectedCardsHistory( this.selectedCards );
     }
@@ -149,24 +177,4 @@ export class RandomizerSelectCardsComponent implements OnInit, OnDestroy {
   }
 
 
-  private restoreFromHistory( index: number ) {
-    this.selectedCards = new SelectedCards( this.selectedCardsHistory[ index ].selectedCards );
-    this.myRandomizerGroup.setSelectedCards( this.selectedCards );
-    this.myRandomizerGroup.setBlackMarketPhase( BlackMarketPhase.init );
-    const BlackMarketPileShuffled
-      = this.selectedCards.BlackMarketPile.map( e => ({ cardIndex: e, faceUp: false }) );
-    this.myRandomizerGroup.setBlackMarketPileShuffled( BlackMarketPileShuffled );
-  }
-
-  undo() {
-    const newIndex = this.historyRefIndexSource.value - 1;
-    this.historyRefIndexSource.next( newIndex );
-    this.restoreFromHistory( newIndex );
-  }
-
-  redo() {
-    const newIndex = this.historyRefIndexSource.value + 1;
-    this.historyRefIndexSource.next( newIndex );
-    this.restoreFromHistory( newIndex );
-  }
 }
