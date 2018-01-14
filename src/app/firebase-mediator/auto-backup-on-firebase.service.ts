@@ -32,7 +32,7 @@ export class AutoBackupOnFirebaseService {
   }
 
   private async getLatestBackupDate() {
-    const timeStamp = await this.afdb.object( this.latestBackupDatePath ).valueChanges<number>().first().toPromise();
+    const timeStamp = await this.afdb.object<number>( this.latestBackupDatePath ).valueChanges().first().toPromise();
     return new Date( timeStamp );
   }
 
