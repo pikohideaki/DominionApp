@@ -47,14 +47,19 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
 
   private setSourceDir() {
     if ( this.empty ) {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/empty.png`;
+      this.sourceDir = `${this.CARD_IMAGE_DIR}/empty.jpg`;
       return;
     }
-    if ( this.faceUp ) {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/${this.card.name_eng.replace( / /g , '_' ).replace( /'/g , '' )}.png`;
-    } else {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/BlankCard.png`;
+    if ( !this.faceUp ) {
+      this.sourceDir = `${this.CARD_IMAGE_DIR}/Card_back.jpg`;
+      return;
     }
+    // Card_back_landscape
+    // Boon-back
+    // Hex-back
+    // Stash-back
+    // Randomizer
+    this.sourceDir = `${this.CARD_IMAGE_DIR}/${this.card.name_eng.replace( / /g , '_' )}.jpg`;
   }
 
   setHeight() {

@@ -11,3 +11,8 @@
   justify-content: center;
   text-align: center;
 }
+
+.image-box {
+  border: solid 16px black;
+  border-radius: 16px;
+}
