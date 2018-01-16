@@ -1,0 +1,69 @@
+<div *ngIf="dataIsReady" class="shared-area box-shadow">
+  <div class="BasicCards_KingdomCards">
+    <div class="BasicCards">
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Copper"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Silver"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Gold"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile *ngIf="Prosperity$ | async"
+        [cardIdArray]="BasicCards.Platinum"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Estate"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Duchy"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Province"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+      <app-cards-pile *ngIf="Prosperity$ | async"
+        [cardIdArray]="BasicCards.Colony"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+
+      <app-cards-pile
+        [cardIdArray]="BasicCards.Curse"
+        width='55'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+
+    <div class="KingdomCards">
+      <app-cards-pile *ngFor="let idArray of (KingdomCards$ | async)"
+        [cardIdArray]="idArray"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+  </div>
+
+  <div class="TrashPile" >
+    <app-cards-pile *ngIf="(TrashPile$ | async)?.length > 0"
+      [cardIdArray]="(TrashPile$ | async)"
+      width='70'
+      (cardClicked)="onClick( $event )" >
+    </app-cards-pile>
+  </div>
+</div>

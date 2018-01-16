@@ -95,7 +95,13 @@ export class CardProperty {
 
 
   isWideType(): boolean {
-    return (this.cardTypes.includes('EventCards') || this.cardTypes.includes('LandmarkCards') );
+    return (
+         this.cardTypes.includes('EventCards')
+      || this.cardTypes.includes('LandmarkCards')
+      || this.cardTypes.includes('Boon')
+      || this.cardTypes.includes('Hex')
+      || this.cardTypes.includes('State')
+    );
   }
 
   transformAll(): any {

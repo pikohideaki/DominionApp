@@ -1,0 +1,30 @@
+/* sidebar width == 48px */
+.item {
+  height: 36px;
+  width: 36px;
+  border-radius: 18px;
+  margin: 2px 6px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phase {
+  background-color: green;
+  color: white;
+  border-radius: 9px;
+}
+
+.action {
+  background-color: #FF4081;
+  color: white;
+}
+.buy {
+  background-color: #3F51B5;
+  color: white;
+}
+.coin {
+  background-color: #EBE01D;
+  color: black;
+}

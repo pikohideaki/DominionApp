@@ -1,0 +1,48 @@
+<div class="body-with-padding" >
+  <span class="margined-element">
+    <button mat-raised-button color='primary'
+      [disabled]="formIsInvalid$ | async"
+      (click)="makeNewGameRoom()" >
+      部屋を作成
+    </button>
+  </span>
+
+  <hr>
+
+  <div class="margined-element">
+
+    <div>
+      <span>人数（自分含む）：</span>
+      <button mat-raised-button class="mini-button"
+          [disabled]="(numberOfPlayers$ | async) <= 2"
+          (click)="decrement()">
+        <mat-icon>exposure_neg_1</mat-icon>
+      </button>
+      <span>{{numberOfPlayers$ | async}}人</span>
+      <button mat-raised-button class="mini-button"
+          [disabled]="(numberOfPlayers$ | async) >= 6"
+          (click)="increment()">
+        <mat-icon>exposure_plus_1</mat-icon>
+      </button>
+    </div>
+
+    <div>
+      Memo：{{memo$ | async}}
+      <button mat-icon-button (click)="memoClicked()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <app-randomizer
+      [implementedOnly]="true"
+      [showSelectedCardsCheckbox]="false"
+      [(selectedCards)]="selectedCards"
+      [(BlackMarketPileShuffled)]="BlackMarketPileShuffled"
+      [isSelectedExpansions]="isSelectedExpansions$ | async"
+      (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )" >
+  </app-randomizer>
+</div>

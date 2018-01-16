@@ -380,31 +380,31 @@ export class CloudFirestoreMediatorService {
         const newGameStateObj = this.utils.copyObject( newGameState );
 
         /* convert array to { val: true } object */
-        newGameStateObj.cards = {};
+        // newGameStateObj.cards = {};
 
-        newGameStateObj.cards.BasicCards = {};
-        this.utils.objectForEach( newGameState.cards.BasicCards, (val: number[], key) => {
-          newGameStateObj.cards.BasicCards[key] = {};
-          val.forEach( (id, i) => newGameStateObj.cards.BasicCards[key][id] = i );
-        } );
+        // newGameStateObj.cards.BasicCards = {};
+        // this.utils.objectForEach( newGameState.cards.BasicCards, (val: number[], key) => {
+        //   newGameStateObj.cards.BasicCards[key] = {};
+        //   val.forEach( (id, i) => newGameStateObj.cards.BasicCards[key][id] = i );
+        // } );
 
-        newGameStateObj.cards.KingdomCards = {};
-        newGameState.cards.KingdomCards.forEach( (val: number[], key) => {
-          newGameStateObj.cards.KingdomCards[key] = {};
-          val.forEach( (id, i) => newGameStateObj.cards.KingdomCards[key][id] = i );
-        } );
+        // newGameStateObj.cards.KingdomCards = {};
+        // newGameState.cards.KingdomCards.forEach( (val: number[], key) => {
+        //   newGameStateObj.cards.KingdomCards[key] = {};
+        //   val.forEach( (id, i) => newGameStateObj.cards.KingdomCards[key][id] = i );
+        // } );
 
-        newGameStateObj.cards.playersCards = [];
-        newGameState.cards.playersCards.forEach( (player, playerIndex) => {
-          newGameStateObj.cards.playersCards[playerIndex] = {};
-          this.utils.objectForEach( player, (val: number[], key) => {
-            newGameStateObj.cards.playersCards[playerIndex][key] = {};
-            val.forEach( (id, i) => newGameStateObj.cards.playersCards[playerIndex][key][id] = i );
-          } );
-        });
+        // newGameStateObj.cards.playersCards = [];
+        // newGameState.cards.playersCards.forEach( (player, playerIndex) => {
+        //   newGameStateObj.cards.playersCards[playerIndex] = {};
+        //   this.utils.objectForEach( player, (val: number[], key) => {
+        //     newGameStateObj.cards.playersCards[playerIndex][key] = {};
+        //     val.forEach( (id, i) => newGameStateObj.cards.playersCards[playerIndex][key][id] = i );
+        //   } );
+        // });
 
-        newGameStateObj.cards.TrashPile = {};
-        newGameState.cards.TrashPile.forEach( (id, i) => newGameStateObj.cards.TrashPile[id] = i );
+        // newGameStateObj.cards.TrashPile = {};
+        // newGameState.cards.TrashPile.forEach( (id, i) => newGameStateObj.cards.TrashPile[id] = i );
 
         return this.afdb.list( this.fdPath.onlineGameStateList ).push( newGameStateObj );
       },

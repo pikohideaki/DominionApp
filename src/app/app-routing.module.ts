@@ -10,6 +10,7 @@ import { UserAdminComponent        } from './firebase-mediator/user-admin/user-a
 import { MyPageComponent           } from './firebase-mediator/my-page.component';
 
 
+import { OnlineGameComponent       } from './dominion/online-game/online-game.component';
 import { OnlineRandomizerComponent } from './dominion/online-randomizer/online-randomizer.component';
 import { GameResultComponent       } from './dominion/game-result/game-result.component';
 import { CardPropertyListComponent } from './dominion/card-property-list.component';
@@ -23,6 +24,7 @@ import { RuleBooksComponent        } from './dominion/rule-books.component';
       { component: EditDatabaseComponent,     path: 'edit-database'     },
       { component: UserAdminComponent,        path: 'user-admin'        },
       { component: MyPageComponent,           path: 'my-page'           },
+      { component: OnlineGameComponent,       path: 'online-game'       },
       { component: OnlineRandomizerComponent, path: 'online-randomizer' },
       { component: GameResultComponent,       path: 'game-result'       },
       { component: CardPropertyListComponent, path: 'cardlist'          },

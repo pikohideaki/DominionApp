@@ -9,6 +9,8 @@
       [class.pointer]="isButton"
       (click)="onClicked()">
   <img [src]="sourceDir" [width]='width' [height]='height'
-      class="image-box box-shadow" [style.border-radius.px]="borderRadius">
+      class="image-box box-shadow"
+      [style.border-width.px]="borderWidth"
+      [style.border-radius.px]="borderRadius">
   <div *ngIf="description.length > 0" class="description">{{description}}</div>
 </div>

@@ -6,6 +6,7 @@ import { MyOwnCustomMaterialModule } from '../my-own-custom-material.module';
 import { MyOwnLibraryModule        } from '../my-own-library/my-own-library.module';
 import { SubComponentsModule       } from './sub-components/sub-components.module';
 import { OnlineRandomizerModule    } from './online-randomizer/online-randomizer.module';
+import { OnlineGameModule          } from './online-game/online-game.module';
 
 /* components */
 import { CardPropertyListComponent        } from './card-property-list.component';
@@ -28,6 +29,7 @@ import { GameResultDetailDialogComponent } from './game-result/game-result-list/
     MyOwnLibraryModule,
     SubComponentsModule,
     OnlineRandomizerModule,
+    OnlineGameModule,
   ],
   exports: [
     CardPropertyListComponent,
@@ -38,6 +40,7 @@ import { GameResultDetailDialogComponent } from './game-result/game-result-list/
     GameResultListComponent,
     GameResultDetailDialogComponent,
     OnlineRandomizerModule,
+    OnlineGameModule,
   ],
   declarations: [
     CardPropertyListComponent,

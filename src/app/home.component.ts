@@ -7,7 +7,7 @@ import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
 @Component({
   selector: 'app-home',
   template: `
-    <div class="bodyWithPadding">
+    <div class="body-with-padding">
       <app-list appName="Dominion Apps" [apps$]="apps$" > </app-list>
     </div>
   `,
@@ -27,13 +27,13 @@ export class HomeComponent implements OnInit {
     private myUserInfo: MyUserInfoService
   ) {
     this.apps$ = this.myUserInfo.signedIn$.map( signedIn => [
-        // {
-        //   routerLink: '/online-game',
-        //   inService:  signedIn,
-        //   title:      'Online Game',
-        //   subtitle:   'Dominion オンライン対戦',
-        //   description: ( signedIn ? '' : '（※要ログイン）'),
-        // },
+        {
+          routerLink: '/online-game',
+          inService:  signedIn,
+          title:      'Online Game',
+          subtitle:   'Dominion オンライン対戦',
+          description: ( signedIn ? '' : '（※要ログイン）'),
+        },
         {
           routerLink: '/online-randomizer',
           inService:  signedIn,

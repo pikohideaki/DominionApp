@@ -15,7 +15,7 @@ import { User          } from '../../classes/user';
 @Component({
   selector: 'app-online-victory-points-calculator',
   template: `
-    <div class="bodyWithPadding">
+    <div class="body-with-padding">
       <app-victory-points-calculator *ngIf="!!uid"
         [selectedCards$]="selectedCards$"
         [resetVPCalculator$]="resetVPCalculator$"

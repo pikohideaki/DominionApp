@@ -1,0 +1,47 @@
+<ng-container *ngIf="dataIsReady">
+  <div class="player-area"
+      *ngFor="let playerCards of (playersCards$ | async); let idx = index"
+      [class.turnPlayer]="idx === (turnPlayerIndex$ | async)">
+    <div>{{players[idx]}}</div>
+    <div class="PlayArea_Aside">
+      <div class="CardArea box-shadow PlayArea" *ngIf="playerCards.PlayArea.length > 0">
+        <app-cards-lined-up
+          [cardIdArray]="playerCards.PlayArea"
+          width='40'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-lined-up>
+      </div>
+      <div class="CardArea box-shadow Aside" *ngIf="playerCards.Aside.length > 0">
+        <app-cards-lined-up
+          [cardIdArray]="playerCards.Aside"
+          width='40'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-lined-up>
+      </div>
+    </div>
+
+    <div class="Deck_HandCards_DiscardPile">
+      <div class="CardArea box-shadow Deck">
+        <app-cards-pile
+          [cardIdArray]="playerCards.Deck"
+          width='40'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-pile>
+      </div>
+      <div class="CardArea box-shadow HandCards">
+        <app-cards-lined-up
+          [cardIdArray]="playerCards.HandCards"
+          width='40'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-lined-up>
+      </div>
+      <div class="CardArea box-shadow DiscardPile">
+        <app-cards-pile
+          [cardIdArray]="playerCards.DiscardPile | reverse"
+          width='40'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-pile>
+      </div>
+    </div>
+  </div>
+</ng-container>

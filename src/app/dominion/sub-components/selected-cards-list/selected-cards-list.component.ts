@@ -75,7 +75,7 @@ export class SelectedCardsListComponent implements OnInit, OnDestroy {
   }
 
   cardInfoButtonClicked( cardIndex: number ) {
-    const dialogRef = this.dialog.open( CardPropertyDialogComponent );
+    const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
     dialogRef.componentInstance.card = this.cardPropertyList[cardIndex];
   }
 

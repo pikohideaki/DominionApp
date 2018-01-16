@@ -15,7 +15,7 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
 @Component({
   selector: 'app-card-property-list',
   template: `
-    <div class="bodyWithPadding">
+    <div class="body-with-padding">
       <app-data-table
         [data$]='cardPropertyList$'
         [transform]="transformFunction"
@@ -25,12 +25,6 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
         (onClick)='showDetail( $event.rowIndex )' >
       </app-data-table>
     </div>
-    <app-dominion-card-image
-      *ngFor="let card of cardPropertyList$ | async"
-      [card]='card'
-      [faceUp]='true'
-      width='250'>
-    </app-dominion-card-image>
   `,
 })
 export class CardPropertyListComponent implements OnInit, OnDestroy {
@@ -88,9 +82,7 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
   }
 
   showDetail( dataIndex: number ) {
-    const dialogRef = this.dialog.open( CardPropertyDialogComponent, {
-      autoFocus: false
-    } );
+    const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
     dialogRef.componentInstance.card = this.cardPropertyList[dataIndex];
   }
 }

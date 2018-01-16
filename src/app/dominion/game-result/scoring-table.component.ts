@@ -8,7 +8,7 @@ import { ColumnSetting } from '../../my-own-library/data-table/data-table.compon
 @Component({
   selector: 'app-scoring-table',
   template: `
-    <div class="bodyWithPadding">
+    <div class="body-with-padding">
       <app-data-table
           [data$]='scoringTableForView$'
           [columnSettings]='columnSettings' >

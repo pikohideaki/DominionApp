@@ -1,4 +1,4 @@
-<div class="bodyWithPadding two-column">
+<div class="body-with-padding two-column">
   <div class="randomizerOptions">
     <app-expansions-toggle
         [isSelectedExpansions]="isSelectedExpansions"
@@ -40,7 +40,7 @@
 
   <div>
     <app-selected-cards-list
-      showSelectedCardsCheckbox="true"
+      [showSelectedCardsCheckbox]="showSelectedCardsCheckbox"
       [selectedCards]="selectedCards"
       [selectedCardsCheckbox]="selectedCardsCheckbox"
       (selectedCardsCheckboxPartEmitter)="selectedCardsCheckboxOnChange( $event )">

@@ -13,6 +13,7 @@
 }
 
 .image-box {
-  border: solid 16px black;
-  border-radius: 16px;
+  background-color: black;
+  border-style: solid;
+  border-color: black;
 }

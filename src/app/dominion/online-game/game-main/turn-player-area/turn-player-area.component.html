@@ -1,0 +1,42 @@
+<div *ngIf="dataIsReady" class="turn-player-area">
+  <div class="PlayArea_Aside">
+    <div class="CardArea box-shadow PlayArea">
+      <app-cards-lined-up
+        [cardIdArray]="turnPlayersCards.PlayArea"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+    <div class="CardArea box-shadow Aside">
+      <app-cards-lined-up
+        [cardIdArray]="turnPlayersCards.Aside"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+  </div>
+
+  <div class="Deck_HandCards_DiscardPile">
+    <div class="CardArea box-shadow Deck">
+      <app-cards-pile
+        [cardIdArray]="turnPlayersCards.Deck"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+    <div class="CardArea box-shadow HandCards">
+      <app-cards-lined-up
+        [cardIdArray]="turnPlayersCards.HandCards"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+    <div class="CardArea box-shadow DiscardPile">
+      <app-cards-pile
+        [cardIdArray]="turnPlayersCards.DiscardPile | reverse"
+        width='70'
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+  </div>
+</div>

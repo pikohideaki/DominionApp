@@ -1,4 +1,6 @@
-<app-waiting-spinner [done]="dataIsready"></app-waiting-spinner>
+<div class="margined-element">
+  <app-waiting-spinner [done]="dataIsready"></app-waiting-spinner>
+</div>
 
 <mat-sidenav-container class="sidenavContainer default-background-color"
     *ngIf="dataIsready">

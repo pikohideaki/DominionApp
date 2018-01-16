@@ -28,7 +28,8 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
   @Input() gameResult: GameResult = new GameResult();
   @Input() selectedCards: SelectedCards = new SelectedCards();
 
-  firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
+  // firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
+  firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/dominionapps/data/data/gameResultList/';
 
 
   constructor(

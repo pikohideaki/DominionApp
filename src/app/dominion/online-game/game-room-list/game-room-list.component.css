@@ -1,0 +1,16 @@
+.roomList {
+  padding: 20px;
+}
+
+.roomListItem {
+   margin: 0 0 5px 0;
+}
+
+.roomListItem:hover {
+  cursor: pointer;
+}
+
+.notWaitingForPlayers {
+  background-color: #D2D2D2;
+  color: #737373;
+}

@@ -24,6 +24,7 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
   @Input() private returnValueOnClicked: number = -1;
   @Output() private cardClicked = new EventEmitter<number>();
 
+  public borderWidth: number;
   public borderRadius: number;
 
 
@@ -35,6 +36,7 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
       if ( this.height !== undefined ) this.setWidth();
       if ( this.width  !== undefined ) this.setHeight();
     }
+    this.setBorderWidth();
     this.setBorderRadius();
     if ( changes.faceUp || changes.card || changes.empty ) {
       this.setSourceDir();
@@ -78,12 +80,12 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
     }
   }
 
+  setBorderWidth() {
+    this.borderWidth = (18 / 250) * Math.min( this.width, this.height );
+  }
+
   setBorderRadius() {
-    if ( this.width < this.height ) {
-      this.borderRadius = (18 / 250) * this.width;
-    } else {
-      this.borderRadius = (18 / 250) * this.height;
-    }
+    this.borderRadius = (18 / 250) * Math.min( this.width, this.height );
   }
 
   onClicked() {
