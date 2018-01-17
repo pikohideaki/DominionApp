@@ -19,7 +19,7 @@
         <span>参加中：{{(playersName$ | async).join(', ')}}</span>
       </div>
 
-      <app-selected-expansions [selectedExpansions]="selectedExpansions" >
+      <app-selected-expansions [selectedExpansions]="selectedExpansions$ | async" >
       </app-selected-expansions>
       <app-selected-cards-list [(selectedCards)]="newRoom.selectedCards" >
       </app-selected-cards-list>

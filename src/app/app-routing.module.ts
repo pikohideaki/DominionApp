@@ -9,12 +9,15 @@ import { EditDatabaseComponent     } from './firebase-mediator/edit-database.com
 import { UserAdminComponent        } from './firebase-mediator/user-admin/user-admin.component';
 import { MyPageComponent           } from './firebase-mediator/my-page.component';
 
-
-import { OnlineGameComponent       } from './dominion/online-game/online-game.component';
 import { OnlineRandomizerComponent } from './dominion/online-randomizer/online-randomizer.component';
 import { GameResultComponent       } from './dominion/game-result/game-result.component';
 import { CardPropertyListComponent } from './dominion/card-property-list.component';
 import { RuleBooksComponent        } from './dominion/rule-books.component';
+
+import { OnlineGameComponent       } from './dominion/online-game/online-game.component';
+import { GameMainComponent         } from './dominion/online-game/game-main/game-main.component';
+
+
 
 @NgModule({
   imports: [
@@ -25,6 +28,7 @@ import { RuleBooksComponent        } from './dominion/rule-books.component';
       { component: UserAdminComponent,        path: 'user-admin'        },
       { component: MyPageComponent,           path: 'my-page'           },
       { component: OnlineGameComponent,       path: 'online-game'       },
+      { component: GameMainComponent,         path: 'online-game-main'  },
       { component: OnlineRandomizerComponent, path: 'online-randomizer' },
       { component: GameResultComponent,       path: 'game-result'       },
       { component: CardPropertyListComponent, path: 'cardlist'          },

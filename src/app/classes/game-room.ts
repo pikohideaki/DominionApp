@@ -4,7 +4,7 @@ import {
     permutation,
     shuffle,
     filterRemove,
-    objectMap,
+    objectEntries,
     objectKeysAsNumber,
     seq0,
   } from '../my-own-library/utilities';
@@ -23,7 +23,7 @@ export class GameRoom {
   // set automatically
   databaseKey:    string;
   gameStateID:    string;
-  date:           Date = new Date( Date.now() );
+  date:           Date = new Date();
   playerShuffler: number[] = [];
   playersName:    string[] = [];
   selectedCards:  SelectedCards = new SelectedCards();
@@ -47,7 +47,7 @@ export class GameRoom {
       gameStateID:          string,
       timeStamp:            number,
       playerShuffler:       number[],
-      playersName:          string[],
+      playersName:          Object,
       selectedCards:        SelectedCards,
       initialState:         {
         BasicCards: BasicCards,
@@ -67,7 +67,7 @@ export class GameRoom {
     this.gameStateID    = ( dataObj.gameStateID || '' );
     this.date           = new Date( dataObj.timeStamp || Date.now() );
     this.playerShuffler = ( dataObj.playerShuffler || seq0( this.numberOfPlayers ) );
-    this.playersName    = objectMap( dataObj.playersName, key => dataObj.playersName[key] );
+    this.playersName    = objectEntries( dataObj.playersName );
     this.selectedCards  = new SelectedCards( dataObj.selectedCards );
     this.initialState   = ( dataObj.initialState || {
       BasicCards: new BasicCards(),
@@ -75,14 +75,6 @@ export class GameRoom {
       playersCards: seq0( this.numberOfPlayers ).map( _ => new PlayersCards() ),
       BlackMarketPileShuffled: [],
     } );
-  }
-
-  waitingForNewPlayers(): boolean {
-    return this.playersName.length !== this.numberOfPlayers;
-  }
-
-  initSelectedCards() {
-
   }
 
   initCards( cardPropertyList: CardProperty[] ) {
@@ -136,7 +128,8 @@ export class GameRoom {
   }
 
   initDecks() {
-    this.initialState.playersCards.forEach( (playerCards, index) => {
+    for ( let index = 0; index < this.numberOfPlayers; ++index ) {
+      const playerCards = new PlayersCards();
       /* get 7 Coppers from supply */
       for ( let i = 0; i < 7; ++i ) {
         playerCards.Deck.push( this.initialState.BasicCards.Copper.pop() );
@@ -153,7 +146,13 @@ export class GameRoom {
       }
 
       // this.sortHandCards( index, cardpropertyList );
-    });
+
+      this.initialState.playersCards.push( playerCards );
+    }
+  }
+
+  waitingForNewPlayers(): boolean {
+    return ( this.playersName.length < this.numberOfPlayers );
   }
 }
 

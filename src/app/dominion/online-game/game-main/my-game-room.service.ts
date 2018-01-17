@@ -29,7 +29,7 @@ export class MyGameRoomService {
     this.myIndex$ = Observable.combineLatest(
         this.myGameRoom$.map( e => e.playersName ).distinctUntilChanged(),
         this.myUserInfo.name$,
-        (players, myName) => players.findIndex( e => e === myName ) )
+        (playersName, myName) => playersName.findIndex( e => e === myName ) )
       .first();
   }
 

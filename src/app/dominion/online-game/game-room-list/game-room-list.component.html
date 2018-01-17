@@ -1,26 +1,26 @@
 <div class="body-with-padding" (click)="backgroundClicked()">
   <div *ngFor="let room of gameRoomList | reverse">
     <mat-card class="roomListItem"
-        [class.notWaitingForPlayers]="!room.waitingForPlayers"
+        [class.notWaitingForPlayers]="!room.waitingForNewPlayers()"
         (click)="roomClicked( room.databaseKey )">
 
       <mat-card-header>
         <mat-icon mat-card-avatar>group</mat-icon>
         <mat-card-title> {{room.name}} </mat-card-title>
         <mat-card-subtitle>
-          {{room.players.join(", ")}}<br>
+          {{room.playersName.join(", ")}}<br>
           {{utils.toYMDHMS(room.date)}}
         </mat-card-subtitle>
       </mat-card-header>
 
       <mat-card-content *ngIf="room.databaseKey === selectedRoomID">
-        {{(room.waitingForPlayers ? '参加者募集中' : '対戦中')}}
+        {{(room.waitingForNewPlayers() ? '参加者募集中' : '対戦中')}}
       </mat-card-content>
 
       <mat-card-actions *ngIf="room.databaseKey === selectedRoomID">
         <button mat-raised-button color="primary"
               (click)="signIn( room.databaseKey )"
-              [disabled]="!myName || !room.waitingForPlayers" >
+              [disabled]="!myName || !room.waitingForNewPlayers()" >
           参加
         </button>
       </mat-card-actions>

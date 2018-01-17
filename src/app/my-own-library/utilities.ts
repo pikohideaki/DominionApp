@@ -24,6 +24,10 @@ export function objectMap(
   return Object.keys( object || {} ).map( key => f( object[key], key, object ) );
 }
 
+export function objectEntries( object: Object ) {
+  return objectMap( object, e => e );
+}
+
 export function submatch( target: string, key: string, ignoreCase: boolean = false ): boolean {
   if ( ignoreCase ) {
     return submatch( target.toUpperCase(), key.toUpperCase() );

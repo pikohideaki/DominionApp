@@ -19,7 +19,7 @@
         </div>
       </ng-container>
 
-      <app-turn-info [turnInfo$]="turnInfo$"> </app-turn-info>
+      <!-- <app-turn-info [turnInfo$]="turnInfo$"> </app-turn-info> -->
 
       <div matTooltip="Sort hand cards" matTooltipPosition="after">
         <button mat-button (click)="sortMyHandCards()"> <mat-icon>sort</mat-icon> </button>
@@ -29,7 +29,7 @@
 
   <mat-sidenav-container class="sidenavContainer">
     <mat-sidenav #sidenav class="sidenav" mode="side" [opened]="chatOpened$ | async" disableClose="true">
-      <app-chat [sidenav]="sidenav"> </app-chat>
+      <!-- <app-chat [sidenav]="sidenav"> </app-chat> -->
     </mat-sidenav>
 
     <div class="margined-element">
@@ -38,21 +38,21 @@
     </div>
     <div>
       <div class="shared-area_other-player-area">
-        <app-shared-area class="shared-area"
+        <!-- <app-shared-area class="shared-area"
           (cardClicked)="onCardClicked( $event )">
         </app-shared-area>
         <app-other-player-area
           (cardClicked)="onCardClicked( $event )">
-        </app-other-player-area>
+        </app-other-player-area> -->
       </div>
-      <app-turn-player-area
+      <!-- <app-turn-player-area
         (cardClicked)="onCardClicked( $event )">
-      </app-turn-player-area>
+      </app-turn-player-area> -->
     </div>
-
-<button mat-raised-button (click)="test()">test</button>
-<button mat-raised-button (click)="faceUpCurse()">faceUpCurse</button>
-<button mat-raised-button (click)="faceDownCurse()">faceDownCurse</button>
+<!--
+    <button mat-raised-button (click)="test()">test</button>
+    <button mat-raised-button (click)="faceUpCurse()">faceUpCurse</button>
+    <button mat-raised-button (click)="faceDownCurse()">faceDownCurse</button> -->
 
   </mat-sidenav-container>
 </div>

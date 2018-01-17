@@ -12,9 +12,8 @@ import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 
 import { SelectedCards       } from '../../../classes/selected-cards';
-import { GameRoom            } from '../../../classes/game-room';
-import { GameState           } from '../../../classes/game-state';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
+
 
 
 @Component({
@@ -33,7 +32,7 @@ import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
 export class AddGameGroupComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
 
-  // DOM elements
+  // form elements
   private memoSource = new BehaviorSubject<string>('');
   memo$ = this.memoSource.asObservable();
 
@@ -45,7 +44,7 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
 
   formIsInvalid$: Observable<boolean>
     = Observable.combineLatest( this.numberOfPlayers$, this.isSelectedExpansions$ )
-        .map( val => (2 <= val[0] && val[0] <= 6 ) && val[1].every( e => !e ) );
+        .map( val => ( val[0] < 2 || 6 < val[0] ) || val[1].every( e => !e ) );
 
   // app-randomizer
   selectedCards: SelectedCards = new SelectedCards();
@@ -70,6 +69,7 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
 
     if ( isDevMode() ) {
       this.selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
+      this.isSelectedExpansionsOnChange({ index: 1, checked: true });
     }
   }
 
@@ -100,15 +100,21 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     this.myUserInfo.setOnlineGameIsSelectedExpansions( newValue );
   }
 
-  private openSnackBar( message: string ) {
-    this.snackBar.open( message, undefined, { duration: 3000 } );
+  memoClicked() {
+    const dialogRef = this.dialog.open( SetMemoDialogComponent );
+    dialogRef.componentInstance.memo = this.memoSource.getValue();
+    dialogRef.afterClosed().subscribe( value => {
+      if ( value === undefined ) return;
+      this.memoSource.next( value );
+    });
   }
 
   async makeNewGameRoom() {
-    const newRoom = this.addGameGroupService.init(
+    const newRoom = await this.addGameGroupService.init(
         this.numberOfPlayersSource.getValue(),
         this.isSelectedExpansionsSource.getValue(),
-        this.memoSource.getValue() );
+        this.memoSource.getValue(),
+        this.selectedCards );
 
     // dialog
     const dialogRef = this.dialog.open( SignInToGameRoomDialogComponent );
@@ -127,13 +133,8 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     }
   }
 
-  memoClicked() {
-    const dialogRef = this.dialog.open( SetMemoDialogComponent );
-    dialogRef.componentInstance.memo = this.memoSource.getValue();
-    dialogRef.afterClosed().subscribe( value => {
-      if ( value === undefined ) return;
-      this.memoSource.next( value );
-    });
+  private openSnackBar( message: string ) {
+    this.snackBar.open( message, undefined, { duration: 3000 } );
   }
 
 }

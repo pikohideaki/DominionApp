@@ -98,18 +98,17 @@ export class CloudFirestoreMediatorService {
       member: ( groupId: string, uid: string ) => Promise<void>,
     },
     reset: {
-      selectedCards:         ( groupId: string )                       => Promise<void>,
-      selectedCardsCheckbox: ( groupId: string )                       => Promise<void>,
-      VPCalculator:          ( groupId: string )                       => Promise<void>,
+      selectedCards:         ( groupId: string ) => Promise<void>,
+      selectedCardsCheckbox: ( groupId: string ) => Promise<void>,
+      VPCalculator:          ( groupId: string ) => Promise<void>,
     },
   };
 
   onlineGameRoom: {
-    add:                       ( newGameRoom: GameRoom )              => firebase.database.ThenableReference,
-    remove:                    ( roomId: string )                     => Promise<void>,
-    addMember:                 ( roomId: string, playerName: string ) => firebase.database.ThenableReference,
-    removeMember:              ( roomId: string, uid: string )        => Promise<void>,
-    setWaitingForPlayersValue: ( roomId: string, value: boolean )     => Promise<void>,
+    add:          ( newGameRoom: GameRoom )              => firebase.database.ThenableReference,
+    remove:       ( roomId: string )                     => Promise<void>,
+    addMember:    ( roomId: string, playerName: string ) => firebase.database.ThenableReference,
+    removeMember: ( roomId: string, uid: string )        => Promise<void>,
   };
 
   onlineGameState: {
@@ -365,13 +364,10 @@ export class CloudFirestoreMediatorService {
         this.afdb.list( this.fdPath.onlineGameRoomsList ).remove( roomId ),
 
       addMember: ( roomId: string, playerName: string ) =>
-        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/players` ).push( playerName ),
+        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersName` ).push( playerName ),
 
       removeMember: ( roomId: string, uid: string ) =>
-        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/players` ).remove( uid ),
-
-      setWaitingForPlayersValue: ( roomId: string, value: boolean ) =>
-        this.afdb.object( `${this.fdPath.onlineGameRoomsList}/${roomId}/waitingForPlayers` ).set( value ),
+        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersName` ).remove( uid ),
     };
 
 

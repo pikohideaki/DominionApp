@@ -8,29 +8,27 @@ import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service'
   providers: [],
   selector: 'app-online-game',
   template: `
-    <div *ngIf="!(signedIn$ | async)" >
-      ログインしてください。
-    </div>
-    <div *ngIf="signedIn$ | async" >
+    <div *ngIf="!(signedIn$ | async); then thenBlock; else elseBlock" ></div>
+    <ng-template #thenBlock>ログインしてください。</ng-template>
+    <ng-template #elseBlock>
       <mat-tab-group>
         <mat-tab label="New Game">
           <app-add-game-group></app-add-game-group>
         </mat-tab>
         <mat-tab label="Game Rooms">
-          <!-- <app-game-room-list [myName]="myName"></app-game-room-list> -->
+          <app-game-room-list></app-game-room-list>
         </mat-tab>
       </mat-tab-group>
-    </div>
+    </ng-template>
   `,
   styles: []
 })
 export class OnlineGameComponent implements OnInit {
-  signedIn$: Observable<boolean>;
+  signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
 
   constructor(
     private myUserInfo: MyUserInfoService
   ) {
-    this.signedIn$ = this.myUserInfo.signedIn$;
   }
 
   ngOnInit() {

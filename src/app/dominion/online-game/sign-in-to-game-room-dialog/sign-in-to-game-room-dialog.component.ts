@@ -19,7 +19,8 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   @Input() newRoom: GameRoom;
   @Input() dialogRef;
   playersName$: Observable<string[]>;
-  selectedExpansions: string[] = [];
+  // selectedExpansions: string[] = [];
+  selectedExpansions$: Observable<string[]>;
 
   allPlayersAreReady$: Observable<boolean>;
 
@@ -34,34 +35,38 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
     this.myUserInfo.setOnlineGameRoomID( this.newRoom.databaseKey );
     this.myUserInfo.setOnlineGameStateID( this.newRoom.gameStateID );
 
-    this.playersName$ = this.database.onlineGameRoomList$.map( list =>
-        ( list.find( e => e.databaseKey === this.newRoom.databaseKey ) || new GameRoom() ).playersName )
-      .startWith([]);
-
-    this.allPlayersAreReady$
-      = this.playersName$.map( e => e.length >= this.newRoom.numberOfPlayers );
+    // set Observables
+    this.playersName$
+      = this.database.onlineGameRoomList$
+          .map( list => ( list.find( e => e.databaseKey === this.newRoom.databaseKey )
+                            || new GameRoom() ).playersName )
+          .startWith([]);
 
     const selectingRoomRemoved$
       = this.database.onlineGameRoomList$
           .map( list => list.findIndex( room => room.databaseKey === this.newRoom.databaseKey ) )
           .filter( result => result === -1 );
 
-    // subscriptions
-    this.playersName$
-      .takeWhile( () => this.alive )
-      .subscribe( console.log );
-    this.database.expansionsNameList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.selectedExpansions = val.filter( (_, i) => this.newRoom.isSelectedExpansions[i] ) );
+    this.allPlayersAreReady$
+      = this.playersName$.map( e => e.length >= this.newRoom.numberOfPlayers )
+          .startWith( false );
 
+    this.selectedExpansions$
+      = this.database.expansionsNameList$
+          .map( val => val.filter( (_, i) => this.newRoom.isSelectedExpansions[i] ) )
+          .startWith([]);
+
+
+    // subscriptions
     selectingRoomRemoved$
       .takeWhile( () => this.alive )
       .subscribe( () => this.dialogRef.close() );
 
     this.allPlayersAreReady$
+      .filter( e => e )
       .takeWhile( () => this.alive )
       .subscribe( () => {
-        this.database.onlineGameRoom.setWaitingForPlayersValue( this.newRoom.databaseKey, false );
+        // this.database.onlineGameRoom.setWaitingForPlayersValue( this.newRoom.databaseKey, false );
         setTimeout( () => {
           this.router.navigate( ['/online-game-main'] );
           this.dialogRef.close();

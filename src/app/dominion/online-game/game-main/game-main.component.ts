@@ -13,8 +13,6 @@ import { CardProperty } from '../../../classes/card-property';
 import {
     GameRoom,
     TurnInfo,
-    CommonCardData$$,
-    CardDataForPlayer$$,
     PlayersCards,
     BasicCards,
     KingdomCards,
@@ -34,26 +32,27 @@ import {
 })
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
-  receiveDataDone$: Observable<boolean>;
-
-  myIndex$: Observable<number>;
-  myIndex: number;
+  receiveDataDone$: Observable<boolean> = Observable.from([true]);
 
   cardPropertyList$ = this.database.cardPropertyList$;
-  chatOpened$:  Observable<boolean> = this.myUserInfo.onlineGame.chatOpened$;
-  myGameRoom$:  Observable<GameRoom>;
+  myGameRoom$: Observable<GameRoom> = this.myGameRoomService.myGameRoom$;
+
+  myIndex$: Observable<number> = this.myGameRoomService.myIndex$;
+  myIndex: number;
+
+  // chatOpened$:  Observable<boolean> = this.myUserInfo.onlineGame.chatOpened$;
   turnInfo$:    Observable<TurnInfo>;
-  itsMyTurn$:   Observable<boolean>;
+  // itsMyTurn$:   Observable<boolean>;
 
-  commonCardData$$:  CommonCardData$$;
-  cardDataForMe$$:   CardDataForPlayer$$;
+  // commonCardData$$:  CommonCardData$$;
+  // cardDataForMe$$:   CardDataForPlayer$$;
 
-  turnPlayersCards$: Observable<PlayersCards>;
-  playersCards$:     Observable<PlayersCards[]>;
-  BasicCards$:       Observable<BasicCards>;
-  KingdomCards$:     Observable<KingdomCards>;
-  TrashPile$:        Observable<number[]>;
-  turnPlayerIndex$:  Observable<number>;
+  // turnPlayersCards$: Observable<PlayersCards>;
+  // playersCards$:     Observable<PlayersCards[]>;
+  // BasicCards$:       Observable<BasicCards>;
+  // KingdomCards$:     Observable<KingdomCards>;
+  // TrashPile$:        Observable<number[]>;
+  // turnPlayerIndex$:  Observable<number>;
 
 
   constructor(
@@ -68,36 +67,33 @@ export class GameMainComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.myGameRoom$ = this.myGameRoomService.myGameRoom$;
-    this.myIndex$    = this.myGameRoomService.myIndex$;
+    // this.turnInfo$         = this.myGameStateService.turnInfo$;
+    // this.commonCardData$$  = this.myGameStateService.commonCardData$$;
+    // this.cardDataForMe$$   = this.myGameStateService.cardDataForMe$$;
+    // this.turnPlayersCards$ = this.myGameStateService.turnPlayersCards$;
+    // this.playersCards$     = this.myGameStateService.playersCards$;
+    // this.BasicCards$       = this.myGameStateService.BasicCards$;
+    // this.KingdomCards$     = this.myGameStateService.KingdomCards$;
+    // this.TrashPile$        = this.myGameStateService.TrashPile$;
+    // this.turnPlayerIndex$  = this.myGameStateService.turnPlayerIndex$;
 
-    this.turnInfo$         = this.myGameStateService.turnInfo$;
-    this.commonCardData$$  = this.myGameStateService.commonCardData$$;
-    this.cardDataForMe$$   = this.myGameStateService.cardDataForMe$$;
-    this.turnPlayersCards$ = this.myGameStateService.turnPlayersCards$;
-    this.playersCards$     = this.myGameStateService.playersCards$;
-    this.BasicCards$       = this.myGameStateService.BasicCards$;
-    this.KingdomCards$     = this.myGameStateService.KingdomCards$;
-    this.TrashPile$        = this.myGameStateService.TrashPile$;
-    this.turnPlayerIndex$  = this.myGameStateService.turnPlayerIndex$;
+    // this.itsMyTurn$ = Observable.combineLatest(
+    //     this.turnPlayerIndex$, this.myIndex$,
+    //     (turnPlayerIndex, myIndex) => (turnPlayerIndex === myIndex) )
+    //   .distinctUntilChanged()
+    //   .startWith( false );
 
-    this.itsMyTurn$ = Observable.combineLatest(
-        this.turnPlayerIndex$, this.myIndex$,
-        (turnPlayerIndex, myIndex) => (turnPlayerIndex === myIndex) )
-      .distinctUntilChanged()
-      .startWith( false );
+    // this.itsMyTurn$.filter( e => e === true )
+    //   .takeWhile( () => this.alive )
+    //   .subscribe( () => this.gameLoopService.startMyTurn() );
 
-    this.itsMyTurn$.filter( e => e === true )
-      .takeWhile( () => this.alive )
-      .subscribe( () => this.gameLoopService.startMyTurn() );
-
-    this.receiveDataDone$
-      = Observable.combineLatest(
-            this.myGameRoomService.myGameRoom$,
-            this.database.cardPropertyList$,
-            this.myIndex$,
-            () => true ).first().delay( new Date( Date.now() + 500 ) )
-        .startWith(false);
+    // this.receiveDataDone$
+    //   = Observable.combineLatest(
+    //         this.myGameRoomService.myGameRoom$,
+    //         this.database.cardPropertyList$,
+    //         this.myIndex$,
+    //         () => true ).first().delay( new Date( Date.now() + 500 ) )
+    //     .startWith(false);
   }
 
   ngOnDestroy() {
@@ -107,29 +103,29 @@ export class GameMainComponent implements OnInit, OnDestroy {
 
 
   async toggleSideNav( sidenav ) {
-    this.myUserInfo.setOnlineGameChatOpened( (await sidenav.toggle()).type === 'open' );
+  //   this.myUserInfo.setOnlineGameChatOpened( (await sidenav.toggle()).type === 'open' );
   }
 
   sortMyHandCards() {
-    this.manipCard.sortHandCards( this.myIndex );
+  //   this.manipCard.sortHandCards( this.myIndex );
   }
 
   onCardClicked( value ) {
-    this.gameLoopService.clickedCardIdSource.next( value );
+  //   this.gameLoopService.clickedCardIdSource.next( value );
   }
 
   goToNextPhase() {
-    this.gameLoopService.clickedCardIdSource.next( this.gameLoopService.GO_TO_NEXT_PHASE_ID );
+  //   this.gameLoopService.clickedCardIdSource.next( this.gameLoopService.GO_TO_NEXT_PHASE_ID );
   }
 
   goToNextPlayer() {
-    this.gameLoopService.clickedCardIdSource.next( this.gameLoopService.GO_TO_NEXT_PLAYER_ID );
-    this.gameLoopService.goToNextPlayerState = true;
+  //   this.gameLoopService.clickedCardIdSource.next( this.gameLoopService.GO_TO_NEXT_PLAYER_ID );
+  //   this.gameLoopService.goToNextPlayerState = true;
   }
 
 
 
-  test() { this.gameLoopService.test(); }
-  faceUpCurse() { this.gameLoopService.faceUpCurse(); }
-  faceDownCurse() { this.gameLoopService.faceDownCurse(); }
+  // test() { this.gameLoopService.test(); }
+  // faceUpCurse() { this.gameLoopService.faceUpCurse(); }
+  // faceDownCurse() { this.gameLoopService.faceDownCurse(); }
 }
