@@ -1,5 +1,10 @@
-  import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { Observable, Subject } from 'rxjs/Rx';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+
+import { Observable      } from 'rxjs/Observable';
+import { Subject         } from 'rxjs/Subject';
+import 'rxjs/add/operator/skip';
+import 'rxjs/add/operator/takeWhile';
+
 
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { VictoryPointsCalculatorService } from './victory-points-calculator.service';
@@ -131,8 +136,8 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   private async displayOnlyThoseInSelectedCards() {
     await this.dataIsReady.cardPropertyList.asObservable().toPromise();
     const selectedCardsAll = this.selectedCards.concatAllCards();
-    const isInSupply = cardID =>
-      selectedCardsAll.map( e => this.cardPropertyList[e].cardID ).includes( cardID );
+    const isInSupply = cardId =>
+      selectedCardsAll.map( e => this.cardPropertyList[e].cardId ).includes( cardId );
 
     this.VictoryCards.forEach( e => { switch ( e.displayWhen ) {
       case 'always'             : e.display = true;  break;
@@ -149,26 +154,26 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   }
 
 
-  cardProperty( cardID ) {
-    const index = toListIndex( this.cardPropertyList, cardID );
+  cardProperty( cardId ) {
+    const index = toListIndex( this.cardPropertyList, cardId );
     if ( index < 0 ) return;
     return this.cardPropertyList[ index ];
   }
 
 
-  VPperCard( cardID: string ) {
-    return this.calc.VPperCard( cardID, this.numberOfVictoryCards );
+  VPperCard( cardId: string ) {
+    return this.calc.VPperCard( cardId, this.numberOfVictoryCards );
   }
 
 
-  decrement( VictoryCardID: string, by: number = 1 ) {
-    if ( this.numberOfVictoryCards[ VictoryCardID ] <= 0 ) return;
-    this.numberOfVictoryCards[ VictoryCardID ] -= by;
+  decrement( VictoryCardId: string, by: number = 1 ) {
+    if ( this.numberOfVictoryCards[ VictoryCardId ] <= 0 ) return;
+    this.numberOfVictoryCards[ VictoryCardId ] -= by;
 
-    this.numberOfVictoryCards[ VictoryCardID ]
-     = Math.max( 0, this.numberOfVictoryCards[ VictoryCardID ] );
+    this.numberOfVictoryCards[ VictoryCardId ]
+     = Math.max( 0, this.numberOfVictoryCards[ VictoryCardId ] );
 
-    if ( VictoryCardID === 'Distant_Lands' ) {
+    if ( VictoryCardId === 'Distant_Lands' ) {
       this.numberOfVictoryCards.Distant_Lands_on_TavernMat
         = Math.min( this.numberOfVictoryCards.Distant_Lands,
                     this.numberOfVictoryCards.Distant_Lands_on_TavernMat );
@@ -176,17 +181,17 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
     this.updateVPtotal();
   }
 
-  increment( VictoryCardID: string, by: number = 1 ) {
-    this.numberOfVictoryCards[ VictoryCardID ] += by;
+  increment( VictoryCardId: string, by: number = 1 ) {
+    this.numberOfVictoryCards[ VictoryCardId ] += by;
 
-    const VictoryCardID__ = ( VictoryCardID === 'Distant_Lands_on_TavernMat' ? 'Distant_Lands' : VictoryCardID );
+    const VictoryCardId__ = ( VictoryCardId === 'Distant_Lands_on_TavernMat' ? 'Distant_Lands' : VictoryCardId );
     const max = [].concat( this.VictoryCards,
                            this.OtherVictoryPoints,
                            this.OtherSettings )
-                  .find( e => e.id === VictoryCardID__ ).maxNumber;
-    this.numberOfVictoryCards[ VictoryCardID ]
-     = Math.min( max, this.numberOfVictoryCards[ VictoryCardID ] );
-    if ( VictoryCardID === 'Distant_Lands_on_TavernMat' ) {
+                  .find( e => e.id === VictoryCardId__ ).maxNumber;
+    this.numberOfVictoryCards[ VictoryCardId ]
+     = Math.min( max, this.numberOfVictoryCards[ VictoryCardId ] );
+    if ( VictoryCardId === 'Distant_Lands_on_TavernMat' ) {
       this.numberOfVictoryCards.Distant_Lands
         = Math.max( this.numberOfVictoryCards.Distant_Lands,
                     this.numberOfVictoryCards.Distant_Lands_on_TavernMat );
@@ -194,8 +199,8 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
     this.updateVPtotal();
   }
 
-  setValue( VictoryCardID, value ) {
-    this.numberOfVictoryCards[ VictoryCardID ] = value;
+  setValue( VictoryCardId, value ) {
+    this.numberOfVictoryCards[ VictoryCardId ] = value;
     this.updateVPtotal();
   }
 

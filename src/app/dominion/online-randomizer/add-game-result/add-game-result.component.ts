@@ -1,7 +1,10 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
-import { Observable, Subject } from 'rxjs/Rx';
 
+import { Observable      } from 'rxjs/Observable';
+import { Subject         } from 'rxjs/Subject';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -52,7 +55,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
   nextMissingNumber: number = 1;
   turnOrderFilled: boolean;
   newGameResultDialogOpened: boolean;
-  myID: string = '';
+  myId: string = '';
 
 
   constructor(
@@ -99,7 +102,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     /* subscriptions */
     this.myUserInfo.uid$
       .takeWhile( () => this.alive )
-      .subscribe( val => this.myID = val );
+      .subscribe( val => this.myId = val );
 
     playerResults$
       .takeWhile( () => this.alive )
@@ -243,7 +246,7 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     this.myRandomizerGroup.setNewGameResultDialogOpened(true);
     const dialogRef = this.dialog.open( SubmitGameResultDialogComponent );
 
-    const indexToID = cardIndex => this.cardPropertyList[cardIndex].cardID;
+    const indexToId = cardIndex => this.cardPropertyList[cardIndex].cardId;
 
     const newGameResult = new GameResult( null, {
       no         : 0,
@@ -251,15 +254,15 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
       place      : this.place,
       memo       : this.memo,
       selectedExpansions : this.selectedExpansions,
-      selectedCardsID : {
+      selectedCardsId : {
         Prosperity      : this.selectedCards.Prosperity,
         DarkAges        : this.selectedCards.DarkAges,
-        KingdomCards10  : this.selectedCards.KingdomCards10 .map( indexToID ),
-        BaneCard        : this.selectedCards.BaneCard       .map( indexToID ),
-        EventCards      : this.selectedCards.EventCards     .map( indexToID ),
-        Obelisk         : this.selectedCards.Obelisk        .map( indexToID ),
-        LandmarkCards   : this.selectedCards.LandmarkCards  .map( indexToID ),
-        BlackMarketPile : this.selectedCards.BlackMarketPile.map( indexToID ),
+        KingdomCards10  : this.selectedCards.KingdomCards10 .map( indexToId ),
+        BaneCard        : this.selectedCards.BaneCard       .map( indexToId ),
+        EventCards      : this.selectedCards.EventCards     .map( indexToId ),
+        Obelisk         : this.selectedCards.Obelisk        .map( indexToId ),
+        LandmarkCards   : this.selectedCards.LandmarkCards  .map( indexToId ),
+        BlackMarketPile : this.selectedCards.BlackMarketPile.map( indexToId ),
       },
       players : this.selectedPlayers.map( pl => ({
                 name      : pl.name,

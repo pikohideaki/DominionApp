@@ -1,5 +1,10 @@
 import { Component, OnInit, OnDestroy, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
+
+import { Observable      } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/debounceTime';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../utilities.service';
 
@@ -36,6 +41,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   private filteredData$: Observable<any[]>;
   filteredDataLength: number;
+  @Output() filteredDataOnChange = new EventEmitter<any[]>();
 
   @Input() columnSettings: ColumnSetting[] = [];
   private columnSettingsChange = new EventEmitter<void>();
@@ -53,7 +59,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
   @Input() transform = ((columnName: string, value) => value);  // transform cell data at printing
   transformedPagenatedData: any[] = [];
 
-  @Output() onClick = new EventEmitter<{ rowIndex: number, columnName: string }>();
+  @Output() onClick = new EventEmitter<{
+      rowIndex: number,
+      rowIndexFiltered: number,
+      columnName: string
+    }>();
 
 
 
@@ -143,7 +153,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     this.filteredData$
       .takeWhile( () => this.alive )
-      .subscribe( _ => this.selectedPageIndexSource.next(0) );
+      .subscribe( val => {
+        this.selectedPageIndexSource.next(0);
+        this.filteredDataOnChange.emit( val );
+      });
   }
 
   ngOnDestroy() {
@@ -170,6 +183,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
        = this.itemsPerPageSource.value * this.selectedPageIndexSource.value + rowIndexOnThisPage;
     this.onClick.emit({
       rowIndex: this.indexOnRawData( rowIndexOnFilteredData ),
+      rowIndexFiltered: rowIndexOnFilteredData,
       columnName: columnName
     });
   }

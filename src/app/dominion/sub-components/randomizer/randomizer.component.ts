@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 import { MatDialog } from '@angular/material';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';

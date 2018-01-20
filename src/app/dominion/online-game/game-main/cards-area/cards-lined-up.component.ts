@@ -1,97 +1,70 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Observable';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
-import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyGameStateService } from '../my-game-state.service';
 
 import { CardProperty } from '../../../../classes/card-property';
-import {
-    CommonCardData,
-    CommonCardData$$,
-    CardDataForPlayer,
-    CardDataForPlayer$$,
-  } from '../../../../classes/game-room';
+import { DCard } from '../../../../classes/game-state';
+import { GameStateService } from '../game-state.service';
+import { MyGameRoomService } from '../my-game-room.service';
 
 
 @Component({
   selector: 'app-cards-lined-up',
   template: `
-    <ng-container *ngIf="receiveDataDone$ | async">
-      <app-dominion-card-image *ngFor="let cardID of cardIdArray"
-        [card]="cardPropertyList[ commonCardData.cardListIndex[ cardID ] ]"
-        [width]="width"
-        [faceUp]="cardDataForMe.faceUp[ cardID ]"
-        [isButton]="cardDataForMe.isButton[ cardID ]"
-        [returnValueOnClicked]="cardID"
-        [description]="cardID.toString()"
-        (cardClicked)="onClicked( cardID, $event )" >
-      </app-dominion-card-image>
+    <ng-container *ngIf="{
+          cardPropertyList: cardPropertyList$ | async,
+          myIndex: myIndex$ | async
+        } as data">
+      <ng-container *ngIf="data?.cardPropertyList?.length > 0">
+        <ng-container
+            *ngIf="!DCardArray || DCardArray.length === 0
+                    then emptyCard; else Card">
+        </ng-container>
+        <ng-template #emptyCard>
+          <app-dominion-card-image
+            [card]="data.cardPropertyList[0]"
+            [width]="width"
+            [empty]="true"
+            (cardClicked)="onClicked()" >
+          </app-dominion-card-image>
+        </ng-template>
+        <ng-template #Card>
+          <app-dominion-card-image *ngFor="let DCard of DCardArray"
+            [card]="data.cardPropertyList[ DCard.cardListIndex ]"
+            [width]="width"
+            [faceUp]="DCard.faceUp[ data.myIndex ]"
+            [isButton]="DCard.isButton[ data.myIndex ]"
+            [description]="DCard.id.toString()"
+            (cardClicked)="onClicked( DCard )" >
+          </app-dominion-card-image>
+        </ng-template>
+      </ng-container>
     </ng-container>
   `,
   styles: []
 })
-export class CardsLinedUpComponent implements OnInit, OnDestroy {
-  private alive: boolean = true;
+export class CardsLinedUpComponent implements OnInit {
 
-  receiveDataDone$: Observable<boolean>;
+  cardPropertyList$ = this.database.cardPropertyList$;
+  myIndex$ = this.myGameRoomService.myIndex$;
 
-  cardPropertyList: CardProperty[] = [];
-  commonCardData: CommonCardData = new CommonCardData();
-  cardDataForMe: CardDataForPlayer = new CardDataForPlayer();
-
-  @Input() cardIdArray: number[] = [];
+  @Input() DCardArray: DCard[] = [];
   @Input() width: number;
-  @Output() private cardClicked = new EventEmitter<number>();
+  @Output() cardClicked = new EventEmitter<DCard>();
 
 
   constructor(
-    private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
-    private myGameStateService: MyGameStateService,
+    private myGameRoomService: MyGameRoomService
   ) {
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.cardPropertyList = val );
-
-    this.myGameStateService.commonCardData$$.cardListIndex$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.commonCardData.cardListIndex = val );
-
-    this.myGameStateService.commonCardData$$.cardListIndex$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.commonCardData.cardListIndex = val );
-
-    this.myGameStateService.cardDataForMe$$.faceUp$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.cardDataForMe.faceUp = val );
-
-    this.myGameStateService.cardDataForMe$$.isButton$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.cardDataForMe.isButton = val );
-
   }
 
   ngOnInit() {
-
-    this.receiveDataDone$ = Observable.combineLatest(
-        this.database.cardPropertyList$,
-        this.myGameStateService.commonCardData$$.cardListIndex$,
-        this.myGameStateService.cardDataForMe$$.faceUp$,
-        this.myGameStateService.cardDataForMe$$.isButton$,
-        () => true )
-      .first()
-      .startWith( false );
   }
 
-  ngOnDestroy() {
-    this.alive = false;
-  }
-
-
-  onClicked( cardID: number, value: number ) {
-    if ( this.cardDataForMe.isButton[cardID] ) {
-      this.cardClicked.emit( value );
+  onClicked( card: DCard ) {
+    if ( card.isButton ) {
+      this.cardClicked.emit( card );
     }
   }
 }

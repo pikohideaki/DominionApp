@@ -1,6 +1,8 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../my-own-library/utilities.service';
 import { ColumnSetting } from '../my-own-library/data-table/data-table.component';
@@ -22,7 +24,8 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
         [columnSettings]='columnSettings'
         [itemsPerPageOptions]='[ 25, 50, 100, 200 ]'
         [itemsPerPage]='50'
-        (onClick)='showDetail( $event.rowIndex )' >
+        (onClick)='showDetail( $event )'
+        (filteredDataOnChange)="filteredDataOnChange( $event )" >
       </app-data-table>
     </div>
   `,
@@ -34,6 +37,7 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
   private cardPropertyList: CardProperty[] = [];
   cardPropertyList$: Observable<CardProperty[]>;
 
+  private filteredList = this.cardPropertyList;
 
 
   columnSettings: ColumnSetting[] = [
@@ -67,7 +71,10 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
     /* subscriptions */
     this.database.cardPropertyList$
       .takeWhile( () => this.alive )
-      .subscribe( list => this.cardPropertyList = list );
+      .subscribe( list => {
+        this.cardPropertyList = list;
+        this.filteredList = list;
+      });
   }
 
   ngOnInit() {
@@ -81,8 +88,14 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
     return transform( property, value );
   }
 
-  showDetail( dataIndex: number ) {
+  async showDetail( position ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    dialogRef.componentInstance.card = this.cardPropertyList[dataIndex];
+    // dialogRef.componentInstance.card = this.cardPropertyList[dataIndex];
+    dialogRef.componentInstance.cards = this.filteredList;
+    dialogRef.componentInstance.indexSource.next( position.rowIndexFiltered );
+  }
+
+  filteredDataOnChange( list ) {
+    this.filteredList = list;
   }
 }

@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
+
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
@@ -13,12 +16,12 @@ import { PlayerResult          } from '../../classes/player-result';
 
 @Injectable()
 export class MyRandomizerGroupService {
-  private myRandomizerGroupID: string = '';
+  private myRandomizerGroupId: string = '';
 
   private myRandomizerGroup$: Observable<RandomizerGroup>
    = Observable.combineLatest(
       this.database.randomizerGroupList$,
-      this.myUserInfo.randomizerGroupID$,
+      this.myUserInfo.randomizerGroupId$,
       (list, id) => (list.find( e => e.databaseKey === id ) || new RandomizerGroup() ) );
       // .do( val => console.log('myRandomizerGroup changed', val) );
 
@@ -52,8 +55,8 @@ export class MyRandomizerGroupService {
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    this.myUserInfo.randomizerGroupID$
-      .subscribe( val => this.myRandomizerGroupID = val );
+    this.myUserInfo.randomizerGroupId$
+      .subscribe( val => this.myRandomizerGroupId = val );
   }
 
 
@@ -65,7 +68,7 @@ export class MyRandomizerGroupService {
   async addToSelectedCardsHistory( newSelectedCards: SelectedCards ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-      .add.selectedCardsHistory( this.myRandomizerGroupID, {
+      .add.selectedCardsHistory( this.myRandomizerGroupId, {
               selectedCards: newSelectedCards,
               timeStamp: Date.now(),
             } );
@@ -75,100 +78,100 @@ export class MyRandomizerGroupService {
   async setRandomizerButtonLocked( locked: boolean ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.randomizerButtonLocked( this.myRandomizerGroupID, locked );
+            .set.randomizerButtonLocked( this.myRandomizerGroupId, locked );
   }
 
   async setIsSelectedExpansions( index: number, value: boolean ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.isSelectedExpansions( this.myRandomizerGroupID, index, value );
+            .set.isSelectedExpansions( this.myRandomizerGroupId, index, value );
   }
 
   async setSelectedCards( newSelectedCards: SelectedCards ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.selectedCards( this.myRandomizerGroupID, newSelectedCards );
+            .set.selectedCards( this.myRandomizerGroupId, newSelectedCards );
   }
 
   async setSelectedCardsCheckbox( arrayName: string, index: number, value: boolean ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.selectedCardsCheckbox( this.myRandomizerGroupID, arrayName, index, value );
+            .set.selectedCardsCheckbox( this.myRandomizerGroupId, arrayName, index, value );
   }
 
   async resetSelectedCards() {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .reset.selectedCards( this.myRandomizerGroupID );
+            .reset.selectedCards( this.myRandomizerGroupId );
   }
 
   async resetSelectedCardsCheckbox() {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .reset.selectedCardsCheckbox( this.myRandomizerGroupID );
+            .reset.selectedCardsCheckbox( this.myRandomizerGroupId );
   }
 
   async setBlackMarketPileShuffled( BlackMarketPileShuffled: BlackMarketPileCard[] ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.BlackMarketPileShuffled( this.myRandomizerGroupID, BlackMarketPileShuffled );
+            .set.BlackMarketPileShuffled( this.myRandomizerGroupId, BlackMarketPileShuffled );
   }
 
   async setBlackMarketPhase( BlackMarketPhase: number ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.BlackMarketPhase( this.myRandomizerGroupID, BlackMarketPhase );
+            .set.BlackMarketPhase( this.myRandomizerGroupId, BlackMarketPhase );
   }
 
   async resetVPCalculator() {
     await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup.reset.VPCalculator( this.myRandomizerGroupID );
+    return this.database.randomizerGroup.reset.VPCalculator( this.myRandomizerGroupId );
   }
 
   async setLastTurnPlayerName( value: string ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.lastTurnPlayerName( this.myRandomizerGroupID, value );
+            .set.lastTurnPlayerName( this.myRandomizerGroupId, value );
   }
 
   async setNewGameResultPlayerSelected( uid: string, value: boolean ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResult.players.selected( this.myRandomizerGroupID, uid, value );
+            .set.newGameResult.players.selected( this.myRandomizerGroupId, uid, value );
   }
 
   async setNewGameResultPlayerVP( uid: string, value: number ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResult.players.VP( this.myRandomizerGroupID, uid, value );
+            .set.newGameResult.players.VP( this.myRandomizerGroupId, uid, value );
   }
 
   async setNewGameResultPlayerTurnOrder( uid: string, value: number ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResult.players.turnOrder( this.myRandomizerGroupID, uid, value );
+            .set.newGameResult.players.turnOrder( this.myRandomizerGroupId, uid, value );
   }
 
   async setNewGameResultPlace( value: string ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResult.place( this.myRandomizerGroupID, value );
+            .set.newGameResult.place( this.myRandomizerGroupId, value );
   }
 
   async setNewGameResultMemo( value: string ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResult.memo( this.myRandomizerGroupID, value );
+            .set.newGameResult.memo( this.myRandomizerGroupId, value );
   }
 
   async setNewGameResultDialogOpened( value: boolean ) {
     await this.signedIn$.first().toPromise();
     return this.database.randomizerGroup
-            .set.newGameResultDialogOpened( this.myRandomizerGroupID, value );
+            .set.newGameResultDialogOpened( this.myRandomizerGroupId, value );
   }
 
 
-  async addMember( groupID: string, uid: string, name: string ) {
+  async addMember( groupId: string, uid: string, name: string ) {
     await this.signedIn$.first().toPromise();
     const value = new PlayerResult( uid, {
               name      : name,
@@ -176,13 +179,13 @@ export class MyRandomizerGroupService {
               VP        : 0,
               turnOrder : 0,
             });
-    return this.database.randomizerGroup.add.member( groupID, uid, value );
+    return this.database.randomizerGroup.add.member( groupId, uid, value );
   }
 
 
-  async removeMember( groupID: string, uid: string ) {
+  async removeMember( groupId: string, uid: string ) {
     await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup.remove.member( groupID, uid );
+    return this.database.randomizerGroup.remove.member( groupId, uid );
   }
 
 

@@ -16,7 +16,7 @@
     </app-data-table--pagenation>
     <app-data-table--reset-buttons (click)='reset()' >
     </app-data-table--reset-buttons>
-    <span>{{filteredDataLength}} items</span>
+    <div>{{filteredDataLength}} items</div>
   </div>
 
 
@@ -132,6 +132,6 @@
         [selectedPageIndex]='selectedPageIndexSource.value'
         (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
     </app-data-table--pagenation>
-    <span>{{filteredDataLength}} items</span>
+    <div>{{filteredDataLength}} items</div>
   </div>
 </ng-container>

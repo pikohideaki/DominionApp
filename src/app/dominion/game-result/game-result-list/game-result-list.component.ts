@@ -1,5 +1,10 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
+
+import { Observable      } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/takeWhile';
+import 'rxjs/add/operator/combineLatest';
+
 import { MatDialog } from '@angular/material';
 
 import { ItemsPerPageComponent              } from '../../../my-own-library/data-table/items-per-page.component';

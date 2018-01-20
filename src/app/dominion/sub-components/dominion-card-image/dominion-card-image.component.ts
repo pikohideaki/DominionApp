@@ -14,33 +14,33 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
   sourceDir: string;
 
   @Input() private card: CardProperty = new CardProperty();
-  @Input() public  faceUp: boolean;
-  @Input() public  width: number;
-  @Input() public  height: number;
-  @Input() public  isButton: boolean = false;
-  @Input() public  description: string = '';
-  @Input() public  empty: boolean = false;
+  @Input() faceUp:      boolean;
+  @Input() width:       number;
+  @Input() height:      number;
+  @Input() isButton:    boolean = false;
+  @Input() description: string = '';
+  @Input() empty:       boolean = false;
 
-  @Input() private returnValueOnClicked: number = -1;
-  @Output() private cardClicked = new EventEmitter<number>();
+  @Output() private cardClicked = new EventEmitter<void>();
 
-  public borderWidth: number;
-  public borderRadius: number;
+  borderWidth: number;
+  borderRadius: number;
+
+  /* 設定されたもののうち一方からもう一方を計算．
+     Input要素の書き換えを避けるためコピー． */
+  widthDerived:  number;
+  heightDerived: number;
 
 
   constructor(
   ) { }
 
   ngOnChanges( changes ) {
-    if ( changes.width || changes.height ) {
-      if ( this.height !== undefined ) this.setWidth();
-      if ( this.width  !== undefined ) this.setHeight();
-    }
+    if ( this.width  !== undefined ) this.setHeight();
+    if ( this.height !== undefined ) this.setWidth();
     this.setBorderWidth();
     this.setBorderRadius();
-    if ( changes.faceUp || changes.card || changes.empty ) {
-      this.setSourceDir();
-    }
+    this.setSourceDir();
   }
 
   ngOnInit() {
@@ -49,7 +49,7 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
 
   private setSourceDir() {
     if ( this.empty ) {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/empty.jpg`;
+      this.sourceDir = `assets/img/blank.png`;
       return;
     }
     if ( !this.faceUp ) {
@@ -65,32 +65,34 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
   }
 
   setHeight() {
-    if ( !this.faceUp || !this.card.isWideType() ) {
-      this.height = this.width * (23 / 15);
+    this.widthDerived = this.width;
+    if ( this.faceUp && this.card.isWideType() ) {
+      this.heightDerived = this.widthDerived * (15 / 23);
     } else {
-      this.height = this.width * (15 / 23);  // wide
+      this.heightDerived = this.widthDerived * (23 / 15);
     }
   }
 
   setWidth() {
-    if ( !this.faceUp || !this.card.isWideType() ) {
-      this.width = this.height * (15 / 23);
+    this.heightDerived = this.height;
+    if ( this.faceUp && this.card.isWideType() ) {
+      this.widthDerived = this.heightDerived * (23 / 15);
     } else {
-      this.width = this.height * (23 / 15);  // wide
+      this.widthDerived = this.heightDerived * (15 / 23);
     }
   }
 
   setBorderWidth() {
-    this.borderWidth = (18 / 250) * Math.min( this.width, this.height );
+    this.borderWidth = (18 / 250) * Math.min( this.widthDerived, this.heightDerived );
   }
 
   setBorderRadius() {
-    this.borderRadius = (18 / 250) * Math.min( this.width, this.height );
+    this.borderRadius = (18 / 250) * Math.min( this.widthDerived, this.heightDerived );
   }
 
   onClicked() {
     if ( this.isButton ) {
-      this.cardClicked.emit( this.returnValueOnClicked );
+      this.cardClicked.emit();
     }
   }
 

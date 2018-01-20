@@ -33,7 +33,7 @@ type CardType = (
 
 export class CardProperty {
   no:                     number = 0;
-  cardID:                 string = '';
+  cardId:                 string = '';
   name_jp:                string = '';
   name_jp_yomi:           string = '';
   name_eng:               string = '';
@@ -53,7 +53,7 @@ export class CardProperty {
 
   constructor( initObj?: {
     no:                     number,
-    cardID:                 string,
+    cardId:                 string,
     name_jp:                string,
     name_jp_yomi:           string,
     name_eng:               string,
@@ -74,7 +74,7 @@ export class CardProperty {
     if ( !initObj ) return;
 
     this.no                     = ( initObj.no            || 0 );
-    this.cardID                 = ( initObj.cardID        || '' );
+    this.cardId                 = ( initObj.cardId        || '' );
     this.name_jp                = ( initObj.name_jp       || '' );
     this.name_jp_yomi           = ( initObj.name_jp_yomi  || '' );
     this.name_eng               = ( initObj.name_eng      || '' );
@@ -107,7 +107,7 @@ export class CardProperty {
   transformAll(): any {
     return {
       no                     : this.no,
-      cardID                 : this.cardID,
+      cardId                 : this.cardId,
       name_jp                : this.name_jp,
       name_jp_yomi           : this.name_jp_yomi,
       name_eng               : this.name_eng,
@@ -172,7 +172,7 @@ export function transform( property: string, value ) {
       return ( value ?  '〇' : '×' );
 
     case 'no' :
-    case 'cardID' :
+    case 'cardId' :
     case 'expansionName' :
     case 'name_jp' :
     case 'name_jp_yomi' :
@@ -223,8 +223,8 @@ export class CardCost {
 
 }
 
-export function toListIndex( cardPropertyList: CardProperty[], cardID: string ) {
-  return cardPropertyList.findIndex( e => e.cardID === cardID );
+export function toListIndex( cardPropertyList: CardProperty[], cardId: string ) {
+  return cardPropertyList.findIndex( e => e.cardId === cardId );
 }
 
 
@@ -234,7 +234,7 @@ export function numberToPrepare(
     numberOfPlayer: number,
     DarkAges: boolean
   ): number {
-  switch ( cardPropertyList[cardIndex].cardID ) {
+  switch ( cardPropertyList[cardIndex].cardId ) {
     case 'Copper'  : return 60;
     case 'Silver'  : return 40;
     case 'Gold'    : return 30;
@@ -243,7 +243,7 @@ export function numberToPrepare(
     case 'Curse'   : return ( numberOfPlayer - 1 ) * 10;
     default : break;
   }
-  if ( cardPropertyList[cardIndex].cardID === 'Estate' ) {
+  if ( cardPropertyList[cardIndex].cardId === 'Estate' ) {
     if ( DarkAges ) return ( numberOfPlayer > 2 ? 12 : 8 );
     return numberOfPlayer * 3 + ( numberOfPlayer > 2 ? 12 : 8 );
   }

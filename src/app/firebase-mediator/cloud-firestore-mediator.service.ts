@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
 
 import { AngularFirestore    } from 'angularfire2/firestore';
 import { AngularFireDatabase } from 'angularfire2/database';
@@ -18,31 +20,32 @@ import { GameState             } from '../classes/game-state';
 import { BlackMarketPileCard   } from '../classes/black-market-pile-card';
 import { ChatMessage           } from '../classes/chat-message';
 import { PlayerResult          } from '../classes/player-result';
+import { GameCommunication, MoveInGame } from '../classes/game-room-communication';
 
 
 @Injectable()
 export class CloudFirestoreMediatorService {
   fdPath = {
-    expansionsNameList  : '/data/expansionsNameList',
-    cardPropertyList    : '/data/cardPropertyList',
-    users               : '/users',
-    userInfoList        : '/userInfoList',
-    scoringTable        : '/data/scoreTable',
-    gameResultList      : '/data/gameResultList',
-    randomizerGroupList : '/randomizerGroupList',
-    onlineGameStateList : '/onlineGameStateList',
-    onlineGameRoomsList : '/onlineGameRoomsList',
+    expansionsNameList          : '/data/expansionsNameList',
+    cardPropertyList            : '/data/cardPropertyList',
+    users                       : '/users',
+    userInfoList                : '/userInfoList',
+    scoringTable                : '/data/scoreTable',
+    gameResultList              : '/data/gameResultList',
+    randomizerGroupList         : '/randomizerGroupList',
+    onlineGameRoomsList         : '/onlineGameRooms',
+    onlineGameCommunicationList : '/onlineGameCommunicationList',
   };
 
 
-  expansionsNameList$:  Observable<string[]>;
-  cardPropertyList$:    Observable<CardProperty[]>;
-  users$:               Observable<User[]>;
-  scoringTable$:        Observable<number[][]>;
-  gameResultList$:      Observable<GameResult[]>;
-  randomizerGroupList$: Observable<RandomizerGroup[]>;
-  onlineGameRoomList$:  Observable<GameRoom[]>;
-
+  expansionsNameList$:          Observable<string[]>;
+  cardPropertyList$:            Observable<CardProperty[]>;
+  users$:                       Observable<User[]>;
+  scoringTable$:                Observable<number[][]>;
+  gameResultList$:              Observable<GameResult[]>;
+  randomizerGroupList$:         Observable<RandomizerGroup[]>;
+  onlineGameRooms$:             Observable<GameRoom[]>;
+  onlineGameCommunicationList$: Observable<GameCommunication[]>;
 
 
   /* methods */
@@ -56,7 +59,7 @@ export class CloudFirestoreMediatorService {
         isSelectedExpansions: ( uid: string, value: boolean[] ) => Promise<void>,
         numberOfPlayers:      ( uid: string, value: number    ) => Promise<void>,
         roomId:               ( uid: string, value: string    ) => Promise<void>,
-        gameStateId:          ( uid: string, value: string    ) => Promise<void>,
+        communicationId:      ( uid: string, value: string    ) => Promise<void>,
         chatOpened:           ( uid: string, value: boolean   ) => Promise<void>,
       }
     }
@@ -111,18 +114,12 @@ export class CloudFirestoreMediatorService {
     removeMember: ( roomId: string, uid: string )        => Promise<void>,
   };
 
-  onlineGameState: {
-    add:        ( gameState: GameState )                         => firebase.database.ThenableReference,
-    remove:     ( gameStateId: string )                          => Promise<void>,
-    addMessage: ( gameStateId: string, newMessage: ChatMessage ) => firebase.database.ThenableReference,
-    update:     ( gameStateId: string, object: Object )          => Promise<void>,
-    set: {
-      turnCounter: ( gameStateId: string, value: number ) => Promise<void>,
-      turnInfo:    ( gameStateId: string, value )         => Promise<void>,
-      phase:       ( gameStateId: string, value )         => Promise<void>,
-    },
+  onlineGameCommunication: {
+    add:        ( newGameComm: GameCommunication )       => firebase.database.ThenableReference,
+    remove:     ( roomId: string )                       => Promise<void>,
+    addMessage: ( roomId: string, message: ChatMessage ) => firebase.database.ThenableReference,
+    addMove:    ( roomId: string, move: MoveInGame )     => firebase.database.ThenableReference,
   };
-
 
 
 
@@ -166,9 +163,13 @@ export class CloudFirestoreMediatorService {
       = this.afdb.list( this.fdPath.randomizerGroupList ).snapshotChanges()
           .map( actions => actions.map( action => new RandomizerGroup( action.key, action.payload.val() ) ) );
 
-    this.onlineGameRoomList$
+    this.onlineGameRooms$
       = this.afdb.list( this.fdPath.onlineGameRoomsList ).snapshotChanges()
           .map( actions => actions.map( action => new GameRoom( action.key, action.payload.val() ) ) );
+
+    this.onlineGameCommunicationList$
+      = this.afdb.list( this.fdPath.onlineGameCommunicationList ).snapshotChanges()
+          .map( actions => actions.map( action => new GameCommunication( action.key, action.payload.val() ) ) );
 
 
     /*** methods ***/
@@ -193,7 +194,7 @@ export class CloudFirestoreMediatorService {
           userSetProperty( uid, 'name_yomi', value ),
 
         randomizerGroupId: ( uid: string, value: string ) =>
-          userSetProperty( uid, 'randomizerGroupID', value ),
+          userSetProperty( uid, 'randomizerGroupId', value ),
 
         onlineGame: {
           isSelectedExpansions: ( uid: string, value: boolean[] ) =>
@@ -203,10 +204,10 @@ export class CloudFirestoreMediatorService {
             userSetProperty( uid, 'onlineGame/numberOfPlayers', value ),
 
           roomId: ( uid: string, value: string ) =>
-            userSetProperty( uid, 'onlineGame/roomID', value ),
+            userSetProperty( uid, 'onlineGame/roomId', value ),
 
-          gameStateId: ( uid: string, value: string ) =>
-            userSetProperty( uid, 'onlineGame/gameStateID', value ),
+          communicationId: ( uid: string, value: string ) =>
+            userSetProperty( uid, 'onlineGame/communicationId', value ),
 
           chatOpened: ( uid: string, value: boolean ) =>
             userSetProperty( uid, 'onlineGame/chatOpened', value ),
@@ -371,64 +372,17 @@ export class CloudFirestoreMediatorService {
     };
 
 
-    this.onlineGameState = {
-      add: ( newGameState: GameState ) => {
-        const newGameStateObj = this.utils.copyObject( newGameState );
-
-        /* convert array to { val: true } object */
-        // newGameStateObj.cards = {};
-
-        // newGameStateObj.cards.BasicCards = {};
-        // this.utils.objectForEach( newGameState.cards.BasicCards, (val: number[], key) => {
-        //   newGameStateObj.cards.BasicCards[key] = {};
-        //   val.forEach( (id, i) => newGameStateObj.cards.BasicCards[key][id] = i );
-        // } );
-
-        // newGameStateObj.cards.KingdomCards = {};
-        // newGameState.cards.KingdomCards.forEach( (val: number[], key) => {
-        //   newGameStateObj.cards.KingdomCards[key] = {};
-        //   val.forEach( (id, i) => newGameStateObj.cards.KingdomCards[key][id] = i );
-        // } );
-
-        // newGameStateObj.cards.playersCards = [];
-        // newGameState.cards.playersCards.forEach( (player, playerIndex) => {
-        //   newGameStateObj.cards.playersCards[playerIndex] = {};
-        //   this.utils.objectForEach( player, (val: number[], key) => {
-        //     newGameStateObj.cards.playersCards[playerIndex][key] = {};
-        //     val.forEach( (id, i) => newGameStateObj.cards.playersCards[playerIndex][key][id] = i );
-        //   } );
-        // });
-
-        // newGameStateObj.cards.TrashPile = {};
-        // newGameState.cards.TrashPile.forEach( (id, i) => newGameStateObj.cards.TrashPile[id] = i );
-
-        return this.afdb.list( this.fdPath.onlineGameStateList ).push( newGameStateObj );
-      },
-
-      remove: ( id: string ) =>
-        this.afdb.list( this.fdPath.onlineGameStateList ).remove( id ),
-
-      addMessage: ( gameStateId: string, newMessage: ChatMessage ) =>
-        this.afdb.list( `${this.fdPath.onlineGameStateList}/${gameStateId}/chatList` ).push( newMessage ),
-
-      update: ( gameStateId: string, object: Object ) =>
-        this.afdb.object(`${this.fdPath.onlineGameStateList}/${gameStateId}`).update( object ),
-
-      set: {
-        turnCounter: ( gameStateId: string, value: number ) =>
-          this.afdb.object(`${this.fdPath.onlineGameStateList}/${gameStateId}/turnCounter`)
-            .set( value ),
-
-        turnInfo: ( gameStateId: string, value ) =>
-          this.afdb.object(`${this.fdPath.onlineGameStateList}/${gameStateId}/turnInfo`)
-            .set( value ),
-
-        phase: ( gameStateId: string, value ) =>
-          this.afdb.object(`${this.fdPath.onlineGameStateList}/${gameStateId}/turnInfo/phase`)
-            .set( value ),
-
-      }
+    this.onlineGameCommunication = {
+      add:        ( newGameComm: GameCommunication ) =>
+        this.afdb.list( this.fdPath.onlineGameCommunicationList ).push( newGameComm ),
+      remove:     ( roomId: string ) =>
+        this.afdb.list( this.fdPath.onlineGameCommunicationList ).remove( roomId ),
+      addMessage: ( roomId: string, message: ChatMessage ) =>
+        this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList` ).push( message ),
+      addMove:    ( roomId: string, move: MoveInGame ) =>
+        this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/moves` ).push( move ),
     };
-  }
 
+
+  }
 }

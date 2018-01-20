@@ -1,6 +1,11 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { isDevMode } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs/Rx';
+
+import { Observable      } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
+
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
@@ -43,8 +48,11 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
   isSelectedExpansions$ = this.isSelectedExpansionsSource.asObservable();
 
   formIsInvalid$: Observable<boolean>
-    = Observable.combineLatest( this.numberOfPlayers$, this.isSelectedExpansions$ )
-        .map( val => ( val[0] < 2 || 6 < val[0] ) || val[1].every( e => !e ) );
+    = Observable.combineLatest(
+          this.numberOfPlayers$, this.isSelectedExpansions$,
+          (numberOfPlayers, isSelectedExpansions) =>
+            (numberOfPlayers < 2 || 6 < numberOfPlayers)
+             || isSelectedExpansions.every( e => !e ) );
 
   // app-randomizer
   selectedCards: SelectedCards = new SelectedCards();
@@ -70,6 +78,7 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     if ( isDevMode() ) {
       this.selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
       this.isSelectedExpansionsOnChange({ index: 1, checked: true });
+      console.log('selected test 10 KingdomCards');
     }
   }
 
@@ -122,12 +131,15 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     dialogRef.componentInstance.dialogRef = dialogRef;
     dialogRef.disableClose = true;
 
+    await this.utils.sleep(2);
+    await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
+    console.log('added testPlayer');
+
     const result = await dialogRef.afterClosed().toPromise();
 
-    // this.newRoom.players = [];  // reset members
     if ( result === 'Cancel Clicked' ) {
       this.database.onlineGameRoom.remove( newRoom.databaseKey );
-      this.database.onlineGameState.remove( newRoom.gameStateID );
+      this.database.onlineGameCommunication.remove( newRoom.gameRoomCommunicationId );
     } else {
       this.openSnackBar('Successfully signed in!');
     }

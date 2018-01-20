@@ -1,44 +1,48 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { TurnInfo } from '../../../../classes/game-room';
+import { TurnInfo } from '../../../../classes/game-state';
+import { GameStateService } from '../game-state.service';
+
 
 @Component({
   selector: 'app-turn-info',
   templateUrl: './turn-info.component.html',
   styleUrls: ['./turn-info.component.css']
 })
-export class TurnInfoComponent implements OnInit, OnDestroy {
-  private alive: boolean = true;
+export class TurnInfoComponent implements OnInit {
 
-  @Input() private turnInfo$: Observable<TurnInfo>;
-  turnInfo: TurnInfo = new TurnInfo();
+  turnInfo$: Observable<TurnInfo>;
 
-  phaseCharacter: string;
+  phaseCharacter$:  Observable<string>;
+  turnInfo_Action$: Observable<number>;
+  turnInfo_Buy$:    Observable<number>;
+  turnInfo_Coin$:   Observable<number>;
 
-  constructor() { }
+  constructor(
+    private gameStateService: GameStateService
+  ) {
+    this.turnInfo$ = this.gameStateService.turnInfo$;
+  }
 
 
   ngOnInit() {
-    this.turnInfo$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.turnInfo = val;
-        switch ( this.turnInfo.phase ) {
-          case 'action'  : this.phaseCharacter = 'A';  break;
-          case 'action*' : this.phaseCharacter = 'A*'; break;
-          case 'buy'     : this.phaseCharacter = 'B';  break;
-          case 'buy*'    : this.phaseCharacter = 'B*'; break;
-          case 'buyCard' : this.phaseCharacter = `B'`; break;
-          case 'cleanUp' : this.phaseCharacter = 'C';  break;
-          case ''        : this.phaseCharacter = '';   break;
-          default :
-            throw new Error(`unknown phase name '${this.turnInfo.phase}'`);
-        }
+    this.phaseCharacter$  = this.turnInfo$.map( e => {
+          switch ( e.phase ) {
+            case ''        : return '';
+            case 'Action'  : return 'A';
+            case 'Action*' : return 'A*';
+            case 'Buy'     : return 'B';
+            case 'Buy*'    : return 'B*';
+            case 'BuyCard' : return `B'`;
+            case 'Night'   : return 'N';
+            case 'CleanUp' : return 'C';
+            default :
+              throw new Error(`unknown phase name '${e.phase}'`);
+          }
       });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
+    this.turnInfo_Action$ = this.turnInfo$.map( e => e.action );
+    this.turnInfo_Buy$    = this.turnInfo$.map( e => e.buy    );
+    this.turnInfo_Coin$   = this.turnInfo$.map( e => e.coin   );
   }
 }

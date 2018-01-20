@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { ColumnSetting } from '../../my-own-library/data-table/data-table.component';

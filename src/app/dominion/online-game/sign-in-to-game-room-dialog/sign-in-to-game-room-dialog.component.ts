@@ -1,6 +1,9 @@
 import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/takeWhile';
+
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { MyUserInfoService             } from '../../../firebase-mediator/my-user-info.service';
@@ -19,7 +22,6 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   @Input() newRoom: GameRoom;
   @Input() dialogRef;
   playersName$: Observable<string[]>;
-  // selectedExpansions: string[] = [];
   selectedExpansions$: Observable<string[]>;
 
   allPlayersAreReady$: Observable<boolean>;
@@ -32,18 +34,19 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.myUserInfo.setOnlineGameRoomID( this.newRoom.databaseKey );
-    this.myUserInfo.setOnlineGameStateID( this.newRoom.gameStateID );
+    this.myUserInfo.setOnlineGameRoomId( this.newRoom.databaseKey );
+    this.myUserInfo.setOnlineGameStateId( this.newRoom.gameRoomCommunicationId );
 
+  console.log(this.newRoom);
     // set Observables
     this.playersName$
-      = this.database.onlineGameRoomList$
+      = this.database.onlineGameRooms$
           .map( list => ( list.find( e => e.databaseKey === this.newRoom.databaseKey )
                             || new GameRoom() ).playersName )
           .startWith([]);
 
     const selectingRoomRemoved$
-      = this.database.onlineGameRoomList$
+      = this.database.onlineGameRooms$
           .map( list => list.findIndex( room => room.databaseKey === this.newRoom.databaseKey ) )
           .filter( result => result === -1 );
 

@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 
+import 'rxjs/add/operator/takeWhile';
+
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { GameResult    } from '../../../../classes/game-result';
@@ -42,21 +44,21 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.firebasePath += this.gameResult.databaseKey;
 
-    const toIndex = ( cardID => this.cardPropertyList.findIndex( e => e.cardID === cardID ) );
+    const toIndex = ( cardId => this.cardPropertyList.findIndex( e => e.cardId === cardId ) );
 
     this.database.cardPropertyList$
       .takeWhile( () => this.alive )
       .subscribe( val => {
         this.cardPropertyList = val;
 
-        this.selectedCards.Prosperity      = this.gameResult.selectedCardsID.Prosperity;
-        this.selectedCards.DarkAges        = this.gameResult.selectedCardsID.DarkAges;
-        this.selectedCards.KingdomCards10  = (this.gameResult.selectedCardsID.KingdomCards10  || []).map( toIndex );
-        this.selectedCards.BaneCard        = (this.gameResult.selectedCardsID.BaneCard        || []).map( toIndex );
-        this.selectedCards.EventCards      = (this.gameResult.selectedCardsID.EventCards      || []).map( toIndex );
-        this.selectedCards.Obelisk         = (this.gameResult.selectedCardsID.Obelisk         || []).map( toIndex );
-        this.selectedCards.LandmarkCards   = (this.gameResult.selectedCardsID.LandmarkCards   || []).map( toIndex );
-        this.selectedCards.BlackMarketPile = (this.gameResult.selectedCardsID.BlackMarketPile || []).map( toIndex );
+        this.selectedCards.Prosperity      = this.gameResult.selectedCardsId.Prosperity;
+        this.selectedCards.DarkAges        = this.gameResult.selectedCardsId.DarkAges;
+        this.selectedCards.KingdomCards10  = (this.gameResult.selectedCardsId.KingdomCards10  || []).map( toIndex );
+        this.selectedCards.BaneCard        = (this.gameResult.selectedCardsId.BaneCard        || []).map( toIndex );
+        this.selectedCards.EventCards      = (this.gameResult.selectedCardsId.EventCards      || []).map( toIndex );
+        this.selectedCards.Obelisk         = (this.gameResult.selectedCardsId.Obelisk         || []).map( toIndex );
+        this.selectedCards.LandmarkCards   = (this.gameResult.selectedCardsId.LandmarkCards   || []).map( toIndex );
+        this.selectedCards.BlackMarketPile = (this.gameResult.selectedCardsId.BlackMarketPile || []).map( toIndex );
       });
 
   }

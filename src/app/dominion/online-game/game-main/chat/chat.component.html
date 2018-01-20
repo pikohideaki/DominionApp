@@ -1,30 +1,42 @@
 <div class="body">
   <div class="message-list">
-    <div class="balloon6"  *ngFor="let message of chatList$ | async">
+    <div id="chat-list">
+      <ng-container *ngIf="{
+            myName:   myName$   | async,
+            chatList: chatList$ | async
+          } as data">
+      <ng-container *ngIf="data?.myName && data?.chatList">
+        <div class="balloon6 chat-list-element" *ngFor="let message of chatList">
 
-      <div *ngIf="message.playerName === (myName$ | async); else otherPlayer" class="mycomment">
-        <p>{{message.content}}</p>
-        <!-- <p>{{message.date | date:'shortTime'}}</p> -->
-      </div>
-      <ng-template #otherPlayer >
-        <div class="faceicon">
-          <mat-icon>account_circle</mat-icon>{{message.playerName}}
-        </div>
-        <div class="chatting">
-          <div class="says"> <p>{{message.content}}</p> </div>
-        </div>
-        <!-- <p>{{message.date | date:'shortTime'}}</p> -->
-      </ng-template>
+          <div *ngIf="message.playerName === data.myName; then me; else otherPlayer" ></div>
+          <ng-template #me>
+            <div class="mycomment">
+              <p>{{message.content}}</p>
+            </div>
+          </ng-template>
+          <ng-template #otherPlayer>
+            <div class="player-name">{{message.playerName}}</div>
+            <div class="faceicon">
+              <mat-icon>account_circle</mat-icon>
+            </div>
+            <div class="chatting">
+              <div class="says"> <p>{{message.content}}</p> </div>
+            </div>
+          </ng-template>
 
+        </div>
+      </ng-container></ng-container>
     </div>
   </div>
-
   <div class="new-message">
     <mat-input-container class="new-message-input-box">
-      <input mdInput [(ngModel)]="newMessage" placeholder="メッセージを入力">
+      <input matInput
+          [value]="newMessage || ''"
+          (input)="messageOnChange( $event.target.value )"
+          placeholder="メッセージを入力">
     </mat-input-container>
     <button mat-raised-button class="send-button" color="primary"
-        [disabled]="disableSubmitButton" (click)="submitMessage()" >
+        [disabled]="disableSubmitButton || !newMessage" (click)="submitMessage()" >
       <mat-icon>send</mat-icon>
     </button>
   </div>

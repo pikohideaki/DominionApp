@@ -1,38 +1,70 @@
-<h1 mat-dialog-title>
-  {{card.name_jp}} ({{card.name_eng}})
-</h1>
-
-<div mat-dialog-content>
-  <div class="flex-content">
-    <div class="image">
-      <app-dominion-card-image
-        [card]='card'
-        [faceUp]='true'
-        width='250'>
-      </app-dominion-card-image>
-    </div>
-    <div class="description">
-      <table class='data-table small-table data-table--shadow3px data-table--vertical-line'>
-        <tbody>
-          <tr *ngFor="let item of items">
-            <td>{{item.name}}</td>
-            <td>{{cardForView[item.memberName]}}</td>
-          </tr>
-          <tr *ngIf="card.linkId >= 0">
-            <td></td>
-            <td>
-              <a mat-raised-button [href]="cardListLinkPath( card.linkId )" target="_blank">
-                カードリスト
-              </a>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
+<ng-container *ngIf="{
+      card:        card$        | async,
+      cardForView: cardForView$ | async,
+      index:       index$       | async
+    } as data">
+<ng-container *ngIf="data && data.card && data.cardForView && data.index >= 0">
+  <div mat-dialog-title class="title-bar">
+    <span> {{data.card.name_jp}} ({{data.card.name_eng}}) </span>
+    <span class="spacer"></span>
+    <span *ngIf="cards.length > 0" class="margined-element">
+      <button mat-raised-button class="navigationButton"
+          (click)='goToPreviousCard()'
+          [disabled]='data.index <= 0' >
+        <mat-icon>chevron_left</mat-icon>
+      </button>
+      <button mat-raised-button class="navigationButton"
+          (click)='goToNextCard()'
+          [disabled]='data.index >= cards.length - 1' >
+        <mat-icon>chevron_right</mat-icon>
+      </button>
+    </span>
   </div>
-</div>
 
-<div mat-dialog-actions class="actionButtons">
-  <button mat-raised-button color='primary' class='actionButton' (click)="dialogRef.close()">OK</button>
-</div>
+  <div mat-dialog-content>
+    <div class="flex-content">
+      <div class="image">
+        <app-dominion-card-image
+          [card]='data.card'
+          [faceUp]='true'
+          width='250'>
+        </app-dominion-card-image>
+      </div>
+      <div class="description">
+        <table class='data-table small-table data-table--shadow3px data-table--vertical-line'>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>{{item.name}}</td>
+              <td class="fixed-width" >{{data.cardForView[item.memberName]}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td>
+                <div *ngIf="data.card.linkId >= 0; then link; else dummy"></div>
+                <ng-template #link>
+                  <a mat-raised-button
+                      [href]="cardListLinkPath( data.card.linkId )"
+                      target="_blank">
+                    カードリスト
+                  </a>
+                </ng-template>
+                <ng-template #dummy>
+                  <a mat-button></a>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="actionButtons">
+    <button mat-raised-button color='primary' class='actionButton'
+        (click)="dialogRef.close()">
+      OK
+    </button>
+  </div>
+</ng-container>
+</ng-container>

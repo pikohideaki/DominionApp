@@ -1,6 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
 
 import { ConfirmDialogComponent } from '../../../my-own-library/confirm-dialog.component';
 

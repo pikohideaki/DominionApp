@@ -32,14 +32,8 @@
 
 .sidenav {
   max-width: 400px;
-  /* background-color: rgb(216, 238, 255); */
 }
 
-.sidenav-toggle {
-  position: absolute;
-  left: 20px;
-  top: 10px;
-}
 
 /*****************************************************/
 

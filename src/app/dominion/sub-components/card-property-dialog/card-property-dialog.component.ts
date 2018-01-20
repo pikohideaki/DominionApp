@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef } from '@angular/material';
 
+import { Observable } from 'rxjs/Observable';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 import { CardProperty } from '../../../classes/card-property';
 
 
@@ -15,8 +18,7 @@ import { CardProperty } from '../../../classes/card-property';
 export class CardPropertyDialogComponent implements OnInit {
 
   card: CardProperty;
-  cardForView: any;
-
+  // cardForView: Object;
 
   items = [
     { memberName: 'no'            , name: 'Card No.' },
@@ -39,18 +41,37 @@ export class CardPropertyDialogComponent implements OnInit {
   ];
 
 
+  card$: Observable<CardProperty>;
+  cardForView$: Observable<Object>;
+
+  // option（Dialogを開いたまま次のカード情報を見る）
+  cards: CardProperty[] = [];
+  indexSource = new BehaviorSubject<number>(0);
+  private index$ = this.indexSource.asObservable();
+
 
   constructor(
     public dialogRef: MatDialogRef<CardPropertyDialogComponent>,
-  ) {}
+  ) {
+    this.card$ = this.index$.map( idx =>
+          ( this.cards.length > 0 ? this.cards[ idx ] : this.card ) );
+    this.cardForView$ = this.card$.map( e => e.transformAll() );
+  }
 
   ngOnInit() {
-    this.cardForView = this.card.transformAll();
   }
 
 
   cardListLinkPath( linkId: number ) {
     return `http://suka.s5.xrea.com/dom/list.cgi?mode=show&id=${linkId}`;
+  }
+
+  goToNextCard() {
+    this.indexSource.next( this.indexSource.getValue() + 1 );
+  }
+
+  goToPreviousCard() {
+    this.indexSource.next( this.indexSource.getValue() - 1 );
   }
 
   /**

@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { MatSnackBar } from '@angular/material';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
 import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';

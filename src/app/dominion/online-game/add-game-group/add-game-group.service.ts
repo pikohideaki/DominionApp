@@ -6,9 +6,10 @@ import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-
 
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';
 import { SelectedCards } from '../../../classes/selected-cards';
-import { GameRoom, PlayerData, PlayersCards, CardDataForPlayer } from '../../../classes/game-room';
-import { GameState } from '../../../classes/game-state';
+import { GameRoom } from '../../../classes/game-room';
+import { GameCommunication } from '../../../classes/game-room-communication';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
+import { ChatMessage } from '../../../classes/chat-message';
 
 
 
@@ -36,30 +37,29 @@ export class AddGameGroupService {
     memo: string,
     selectCards: SelectedCards
   ) {
+
     const newRoom = new GameRoom();
     {
-      newRoom.numberOfPlayers = numberOfPlayers;
+      newRoom.numberOfPlayers      = numberOfPlayers;
       newRoom.isSelectedExpansions = isSelectedExpansions;
-      newRoom.memo = memo;
-      newRoom.playerShuffler = this.utils.permutation( numberOfPlayers );
-      newRoom.selectedCards = selectCards;
+      newRoom.memo                 = memo;
+      newRoom.playerShuffler       = this.utils.permutation( numberOfPlayers );
+      newRoom.selectedCards        = selectCards;
       newRoom.initCards( this.cardPropertyList );
       newRoom.initDecks();
+      newRoom.initialState.setNumberOfPlayers( numberOfPlayers );
     }
 
-    // make new GameState object
-    const newGameState = new GameState();
-
     {
-      const result = await this.database.onlineGameState.add( newGameState );
-      newRoom.gameStateID = result.key;
+      const newComm = new GameCommunication();
+      const result = await this.database.onlineGameCommunication.add( newComm );
+      newRoom.gameRoomCommunicationId = result.key;
     }
 
     // make new GameRoom object
     {
       const result = await this.database.onlineGameRoom.add( newRoom );
-      const newRoomID = result.key;
-      newRoom.databaseKey = newRoomID;
+      newRoom.databaseKey = result.key;
     }
 
     // add me to GameRoom object

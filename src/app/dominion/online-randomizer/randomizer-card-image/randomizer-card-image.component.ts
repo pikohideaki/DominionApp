@@ -1,5 +1,9 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
+
 import { MatDialog } from '@angular/material';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';

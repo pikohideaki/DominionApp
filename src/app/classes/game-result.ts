@@ -21,7 +21,7 @@ class PlayerResultRanked {
   }
 }
 
-class SelectedCardsID {
+class SelectedCardsId {
   Prosperity:       boolean  = false;
   DarkAges:         boolean  = false;
   KingdomCards10:   string[] = [];
@@ -64,7 +64,7 @@ export class GameResult {
   players:            PlayerResultRanked[] = [];
   memo:               string = '';
   selectedExpansions: string[] = [];
-  selectedCardsID:    SelectedCardsID = new SelectedCardsID();
+  selectedCardsId:    SelectedCardsId = new SelectedCardsId();
   lastTurnPlayerName: string = '';
 
   constructor( databaseKey?: string, initObj?: {
@@ -74,7 +74,7 @@ export class GameResult {
     players:            PlayerResultRanked[],
     memo:               string,
     selectedExpansions: string[],
-    selectedCardsID:    SelectedCardsID,
+    selectedCardsId:    SelectedCardsId,
     lastTurnPlayerName: string,
   }) {
     this.databaseKey        = databaseKey;
@@ -86,7 +86,7 @@ export class GameResult {
     this.players            = ( initObj.players || [] ).map( e => new PlayerResultRanked(e) );
     this.memo               = ( initObj.memo || '' );
     this.selectedExpansions = ( initObj.selectedExpansions || [] );
-    this.selectedCardsID    = new SelectedCardsID( initObj.selectedCardsID );
+    this.selectedCardsId    = new SelectedCardsId( initObj.selectedCardsId );
     this.lastTurnPlayerName = ( initObj.lastTurnPlayerName || '' );
 
     this.rankPlayers();

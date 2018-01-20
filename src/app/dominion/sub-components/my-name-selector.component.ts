@@ -1,5 +1,7 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/takeWhile';
 
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';

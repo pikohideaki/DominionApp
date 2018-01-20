@@ -1,10 +1,9 @@
-import { Component, OnInit, OnDestroy, Inject, Input, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
-import { MyGameStateService } from '../my-game-state.service';
+import { Observable } from 'rxjs/Observable';
 
-import { CardProperty } from '../../../../classes/card-property';
-import { PlayersCards } from '../../../../classes/game-room';
+import { PlayerCards } from '../../../../classes/game-state';
+import { GameStateService } from '../game-state.service';
 
 
 @Component({
@@ -12,29 +11,17 @@ import { PlayersCards } from '../../../../classes/game-room';
   templateUrl: './turn-player-area.component.html',
   styleUrls: ['./turn-player-area.component.css']
 })
-export class TurnPlayerAreaComponent implements OnInit, OnDestroy {
-  private alive: boolean = true;
-  dataIsReady = false;
-  turnPlayersCards: PlayersCards = new PlayersCards();
-  @Output() private cardClicked = new EventEmitter<any>();
-
+export class TurnPlayerAreaComponent implements OnInit {
+  turnPlayerCards$: Observable<PlayerCards>;
+  @Output() cardClicked = new EventEmitter<any>();
 
   constructor(
-    private myGameStateService: MyGameStateService,
+    private gameStateService: GameStateService
   ) {
-    this.myGameStateService.turnPlayersCards$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.turnPlayersCards = val;
-        this.dataIsReady = true;
-      });
+    this.turnPlayerCards$ = this.gameStateService.turnPlayerCards$;
   }
 
   ngOnInit() {
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 
   onClick( value ) {

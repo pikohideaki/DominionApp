@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { MatSnackBar } from '@angular/material';
-import { Observable } from 'rxjs/Rx';
+import { Observable } from 'rxjs/Observable';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -70,12 +70,12 @@ export class SignUpComponent implements OnInit {
           new User( afUser.uid, {
             name:              this.name,
             name_yomi:         this.name_yomi,
-            randomizerGroupID: '',
+            randomizerGroupId: '',
             onlineGame: {
               isSelectedExpansions: [],
               numberOfPlayers:       2,
-              roomID:               '',
-              gameStateID:          '',
+              roomId:               '',
+              communicationId:          '',
               chatOpened:           true,
             }
           } ) );

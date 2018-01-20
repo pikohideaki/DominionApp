@@ -3,31 +3,31 @@ export class User {
 
   name:              string = '';
   name_yomi:         string = '';
-  randomizerGroupID: string = '';
+  randomizerGroupId: string = '';
 
   onlineGame: {
     isSelectedExpansions: boolean[],
     numberOfPlayers:      number,
-    roomID:               string,
-    gameStateID:          string,
+    roomId:               string,
+    communicationId:      string,
     chatOpened:           boolean,
   } = {
     isSelectedExpansions: [],
     numberOfPlayers:      2,
-    roomID:               '',
-    gameStateID:          '',
+    roomId:               '',
+    communicationId:      '',
     chatOpened:           true,
   };
 
   constructor( databaseKey?: string, initObj?: {
       name:              string,
       name_yomi:         string,
-      randomizerGroupID: string,
+      randomizerGroupId: string,
       onlineGame: {
         isSelectedExpansions: boolean[],
         numberOfPlayers:      number,
-        roomID:               string,
-        gameStateID:          string,
+        roomId:               string,
+        communicationId:      string,
         chatOpened:           boolean,
       }
   }) {
@@ -36,12 +36,12 @@ export class User {
     if ( !initObj ) return;
     this.name                            = ( initObj.name || '' );
     this.name_yomi                       = ( initObj.name_yomi || '' );
-    this.randomizerGroupID               = ( initObj.randomizerGroupID || '' );
+    this.randomizerGroupId               = ( initObj.randomizerGroupId || '' );
     if ( !initObj.onlineGame ) return;
     this.onlineGame.isSelectedExpansions = ( initObj.onlineGame.isSelectedExpansions || [] );
     this.onlineGame.numberOfPlayers      = ( initObj.onlineGame.numberOfPlayers      || 2  );
-    this.onlineGame.roomID               = ( initObj.onlineGame.roomID               || '' );
-    this.onlineGame.gameStateID          = ( initObj.onlineGame.gameStateID          || '' );
+    this.onlineGame.roomId               = ( initObj.onlineGame.roomId               || '' );
+    this.onlineGame.communicationId      = ( initObj.onlineGame.communicationId      || '' );
     this.onlineGame.chatOpened           = !!initObj.onlineGame.chatOpened;
   }
 }

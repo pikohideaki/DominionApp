@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/takeWhile';
 
 import { DominionCardImageComponent    } from '../sub-components/dominion-card-image/dominion-card-image.component';
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';

@@ -1,18 +1,16 @@
 import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyGameStateService } from '../my-game-state.service';
 
 import { CardProperty } from '../../../../classes/card-property';
-import {
-    CommonCardData,
-    CommonCardData$$,
-    CardDataForPlayer,
-    CardDataForPlayer$$,
-  } from '../../../../classes/game-room';
+import { GameStateService } from '../game-state.service';
+import { DCard } from '../../../../classes/game-state';
+import { MyGameRoomService } from '../my-game-room.service';
 
 
 @Component({
@@ -25,90 +23,63 @@ import {
       [description]="description"
       [card]="card"
       [empty]="empty"
-      [returnValueOnClicked]="returnValueOnClicked"
-      (cardClicked)="onClicked( $event )" >
+      (cardClicked)="onClicked()" >
     </app-dominion-card-image>
   `,
   styles: [],
 })
-export class CardsPileComponent implements OnInit, OnDestroy, OnChanges {
+export class CardsPileComponent implements OnChanges, OnInit, OnDestroy {
   private alive: boolean = true;
 
-  private dataIsReady = {
-    ngOnInit:         new Subject(),
+  private isReady = {
+    inputValues:      new Subject(),
+    myIndex:          new Subject(),
     cardPropertyList: new Subject(),
-    commonCardData: {
-      cardListIndex: new Subject(),
-    },
-    cardDataForMe: {
-      faceUp: new Subject(),
-      isButton: new Subject(),
-    },
   };
 
-  private receiveDataDone$: Observable<boolean>;
-
   private cardPropertyList: CardProperty[] = [];
-  private commonCardData: CommonCardData = new CommonCardData();
-  private cardDataForMe: CardDataForPlayer = new CardDataForPlayer();
+  private myIndex: number = 0;
 
-  faceUp: boolean;
+  @Input() DCardArray: DCard[] = [];
+  @Input() width: number;
+  @Output() cardClicked = new EventEmitter<DCard>();
+
+  faceUp:   boolean;
   isButton: boolean;
-  empty: boolean;
+  empty:    boolean;
 
   card: CardProperty;
-  returnValueOnClicked = -1;
-
-  @Input() private cardIdArray: number[] = [];
-  @Input() width: number;
-  @Input() description: string = '';
-  @Output() private cardClicked = new EventEmitter<number>();
+  description: string = '';
 
 
   constructor(
     private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
-    private myGameStateService: MyGameStateService,
+    private gameStateService: GameStateService,
+    private myGameRoomService: MyGameRoomService
   ) {
+    this.myGameRoomService.myIndex$
+      .takeWhile( () => this.alive )
+      .subscribe( val => {
+        this.myIndex = val;
+        this.isReady.myIndex.complete();
+      });
 
     this.database.cardPropertyList$
       .takeWhile( () => this.alive )
       .subscribe( val => {
         this.cardPropertyList = val;
-        this.dataIsReady.cardPropertyList.complete();
-      });
-
-    this.myGameStateService.commonCardData$$.cardListIndex$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.commonCardData.cardListIndex = val;
-        this.dataIsReady.commonCardData.cardListIndex.complete();
-      });
-
-    this.myGameStateService.cardDataForMe$$.faceUp$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardDataForMe.faceUp = val;
-        this.dataIsReady.cardDataForMe.faceUp.complete();
-        this.update();
-      });
-
-    this.myGameStateService.cardDataForMe$$.isButton$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardDataForMe.isButton = val;
-        this.dataIsReady.cardDataForMe.isButton.complete();
-        this.update();
+        this.isReady.cardPropertyList.complete();
       });
   }
 
 
   ngOnChanges( changes: SimpleChanges ) {
-    if ( changes.cardIdArray !== undefined ) this.update();
+    if ( changes.DCardArray !== undefined ) this.update();
   }
 
   ngOnInit() {
-    this.dataIsReady.ngOnInit.complete();
+    this.isReady.inputValues.complete();
   }
 
   ngOnDestroy() {
@@ -117,35 +88,32 @@ export class CardsPileComponent implements OnInit, OnDestroy, OnChanges {
 
 
   async update() {
-    // console.log('cards-pile::update', this.cardIdArray )
-    await this.dataIsReady.ngOnInit.asObservable().toPromise();
-    await this.dataIsReady.cardPropertyList.asObservable().toPromise();
-    await this.dataIsReady.commonCardData.cardListIndex.asObservable().toPromise();
-    await this.dataIsReady.cardDataForMe.faceUp.asObservable().toPromise();
-    await this.dataIsReady.cardDataForMe.isButton.asObservable().toPromise();
+    await this.isReady.inputValues.asObservable().toPromise();
+    await this.isReady.cardPropertyList.asObservable().toPromise();
 
-    this.card = this.cardPropertyList[0];  // default
-    this.faceUp = true;
-    this.empty = false;
+    // default values
+    this.card = this.cardPropertyList[0];
+    this.faceUp   = true;
+    this.isButton = false;
+    this.empty    = false;
 
     // there is no cards
-    if ( !this.cardIdArray || this.cardIdArray.length === 0 ) {
+    if ( !this.DCardArray || this.DCardArray.length === 0 ) {
       this.faceUp = false;
-      this.empty = true;
+      this.empty  = true;
       return;
     }
 
-    const topCardID = this.cardIdArray[0];
-    this.returnValueOnClicked = topCardID;
-    this.card = this.cardPropertyList[ this.commonCardData.cardListIndex[ topCardID ] ];
-    this.faceUp = this.cardDataForMe.faceUp[ topCardID ];
-    this.isButton = this.cardDataForMe.isButton[ topCardID ];
-    this.description = topCardID.toString();
+    const topCard    = this.DCardArray[0];
+    this.card        = this.cardPropertyList[ topCard.cardListIndex ];
+    this.faceUp      = topCard.faceUp  [ this.myIndex ];
+    this.isButton    = topCard.isButton[ this.myIndex ];
+    this.description = topCard.id.toString();
   }
 
-  onClicked( value: number ) {
-    if ( this.isButton ) {
-      this.cardClicked.emit( value );
-    }
+  onClicked() {
+    if ( !this.isButton ) return;
+    if ( !this.DCardArray || this.DCardArray.length === 0 ) return;
+    this.cardClicked.emit( this.DCardArray[0] );
   }
 }

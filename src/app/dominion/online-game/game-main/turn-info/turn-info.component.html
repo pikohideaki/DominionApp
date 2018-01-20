@@ -1,14 +1,14 @@
 <div class="center">
-  <div class="item phase"  mdTooltip="Phase"  mdTooltipPosition="after">
-    {{phaseCharacter}}
+  <div class="item phase"  matTooltip="Phase"  matTooltipPosition="after">
+    {{phaseCharacter$ | async}}
   </div>
-  <div class="item action" mdTooltip="Action" mdTooltipPosition="after">
-    {{turnInfo.action}}
+  <div class="item action" matTooltip="Action" matTooltipPosition="after">
+    {{turnInfo_Action$ | async}}
   </div>
-  <div class="item buy"    mdTooltip="Buy"    mdTooltipPosition="after">
-    {{turnInfo.buy   }}
+  <div class="item buy"    matTooltip="Buy"    matTooltipPosition="after">
+    {{turnInfo_Buy$ | async}}
   </div>
-  <div class="item coin"   mdTooltip="Coin"   mdTooltipPosition="after">
-    {{turnInfo.coin  }}
+  <div class="item coin"   matTooltip="Coin"   matTooltipPosition="after">
+    {{turnInfo_Coin$ | async}}
   </div>
 </div>

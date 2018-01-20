@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/takeWhile';
 
 
 @Component({

@@ -1,5 +1,10 @@
 import { Component, OnInit, Inject, OnDestroy, EventEmitter } from '@angular/core';
-import { Observable, Subject, BehaviorSubject } from 'rxjs/Rx';
+import { Observable      } from 'rxjs/Observable';
+import { Subject         } from 'rxjs/Subject';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import 'rxjs/add/operator/distinctUntilChanged';
+import 'rxjs/add/observable/combineLatest';
+import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';

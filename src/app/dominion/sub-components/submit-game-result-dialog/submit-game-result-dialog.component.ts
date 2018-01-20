@@ -1,5 +1,7 @@
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 
+import 'rxjs/add/operator/takeWhile';
+
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameResult } from '../../../classes/game-result';

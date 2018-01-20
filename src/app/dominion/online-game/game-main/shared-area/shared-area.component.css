@@ -8,11 +8,15 @@
 }
 
 
+.BasicCards,.KingdomCards {
+  margin: 5px;
+}
+
 .BasicCards_KingdomCards {
   flex: 1;
 }
 
-.TrashPile {
+.trashPile {
   height : 160px;
   width: 100px;
   margin: 5px;

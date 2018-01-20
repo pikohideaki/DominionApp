@@ -89,6 +89,10 @@ export class UtilitiesService {
     return Object.keys( object || {} ).map( key => f( object[key], key, object ) );
   }
 
+  objectEntries( object: Object ) {
+    return this.objectMap( object, e => e );
+  }
+
   copyObject( object: Object ) {
     return JSON.parse( JSON.stringify( object || {} ) );
   }
