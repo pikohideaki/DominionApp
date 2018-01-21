@@ -13,8 +13,8 @@ import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  signedIn: boolean;
-  myName: string;
+  signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
+  myName$:   Observable<string>  = this.myUserInfo.name$;
 
 
   constructor(
@@ -23,11 +23,6 @@ export class AppComponent {
     private myUserInfo: MyUserInfoService,
     private autoBackup: AutoBackupOnFirebaseService,
   ) {
-    myUserInfo.name$
-      .subscribe( val => this.myName = val );
-    this.myUserInfo.signedIn$
-      .subscribe( val => this.signedIn = val );
-
     this.autoBackup.checkAndExecuteBackup();
   }
 

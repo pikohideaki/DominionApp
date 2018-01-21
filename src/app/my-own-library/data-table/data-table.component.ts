@@ -34,13 +34,11 @@ export class ColumnSetting {
 })
 export class DataTableComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
-  ready: boolean = false;
 
-  @Input() private data$: Observable<any[]>;
-  private data: Object[] = [];
+  @Input() data$: Observable<any[]>;
 
   private filteredData$: Observable<any[]>;
-  filteredDataLength: number;
+  filteredDataLength$: Observable<number>;
   @Output() filteredDataOnChange = new EventEmitter<any[]>();
 
   @Input() columnSettings: ColumnSetting[] = [];
@@ -51,13 +49,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
   @Input() itemsPerPageOptions: number[];
 
   @Input() private itemsPerPage: number = 100;
-  itemsPerPageSource = new BehaviorSubject<number>( 100 );
-  selectedPageIndexSource = new BehaviorSubject<number>(0);
+  private itemsPerPageSource = new BehaviorSubject<number>( 100 );
+  itemsPerPage$ = this.itemsPerPageSource.asObservable();
 
-  pagenatedData$: Observable<any[]>;
+  private selectedPageIndexSource = new BehaviorSubject<number>(0);
+  selectedPageIndex$ = this.selectedPageIndexSource.asObservable();
+
+  private pagenatedData$: Observable<any[]>;
 
   @Input() transform = ((columnName: string, value) => value);  // transform cell data at printing
-  transformedPagenatedData: any[] = [];
+  transformedPagenatedData$: Observable<any[]>;
 
   @Output() onClick = new EventEmitter<{
       rowIndex: number,
@@ -121,7 +122,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
                   itemsPerPage,
                   selectedPageIndex ) );
 
-    const transformedPagenatedData$
+    this.transformedPagenatedData$
       = this.pagenatedData$.map( data => data.map( line => {
           const transformed = {};
           Object.keys( line ).forEach( key => {
@@ -134,22 +135,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
           return transformed;
         }) );
 
+    this.filteredDataLength$ = this.filteredData$.map( e => e.length );
+
 
     /* subscriptions */
     this.data$.first()
-      .subscribe( data => {
-        this.data = data;
-        this.columnSettingsChange.emit();  // 最初に1回
-        this.ready = true;
-      });
-
-    transformedPagenatedData$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.transformedPagenatedData = val );
-
-    this.filteredData$.map( e => e.length )
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.filteredDataLength = val );
+      .subscribe( data => this.columnSettingsChange.emit() );  // 最初に1回
 
     this.filteredData$
       .takeWhile( () => this.alive )
@@ -164,7 +155,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
 
-  /* view */
+
   itemsPerPageOnChange( value ) {
     this.itemsPerPageSource.next( value );
   }
@@ -178,11 +169,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.columnSettingsChange.emit();
   }
 
-  cellClicked( rowIndexOnThisPage: number, columnName: string ) {
+  cellClicked( rawData, rowIndexOnThisPage: number, columnName: string ) {
     const rowIndexOnFilteredData
        = this.itemsPerPageSource.value * this.selectedPageIndexSource.value + rowIndexOnThisPage;
     this.onClick.emit({
-      rowIndex: this.indexOnRawData( rowIndexOnFilteredData ),
+      rowIndex: this.indexOnRawData( rawData, rowIndexOnFilteredData ),
       rowIndexFiltered: rowIndexOnFilteredData,
       columnName: columnName
     });
@@ -196,8 +187,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.columnSettingsChange.emit();
   }
 
-
-  /* view models */
 
   private filterFunction( lineOfData: any ): boolean {
     const validSettings = this.columnSettings.filter( column => column.manipState !== undefined );
@@ -239,14 +228,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
 
-  private indexOnRawData( indexOnFilteredData: number ): number {
+  private indexOnRawData( rawData, indexOnFilteredData: number ): number {
     let filteredDataNum = 0;
-    for ( let i = 0; i < this.data.length; ++i ) {
-      if ( this.filterFunction( this.data[i] ) ) filteredDataNum++;
+    for ( let i = 0; i < rawData.length; ++i ) {
+      if ( this.filterFunction( rawData[i] ) ) filteredDataNum++;
       if ( filteredDataNum > indexOnFilteredData ) return i;
     }
-    return this.data.length - 1;
+    return rawData.length - 1;
   }
-
-
 }

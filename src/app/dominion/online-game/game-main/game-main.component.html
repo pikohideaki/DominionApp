@@ -22,9 +22,9 @@
 
       <span class="spacer"></span>
 
-      <ng-container *ngIf="data?.receiveDataDone">
+      <ng-container *ngIf="data.receiveDataDone">
 
-        <ng-container *ngIf="data?.isMyTurn">
+        <ng-container *ngIf="data.isMyTurn">
           <button mat-button (click)="goToNextPhase()"
               matTooltip="Go to next phase" matTooltipPosition="after">
             <mat-icon class="goToNextPhaseIcon">file_download</mat-icon>
@@ -46,12 +46,12 @@
 
     <mat-sidenav-container class="sidenavContainer">
       <mat-sidenav #sidenav class="sidenav" mode="side" disableClose="true"
-            [opened]="data?.chatOpened" >
+            [opened]="data.chatOpened" >
         <app-chat [autoScroll]="autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
       <div class="margined-element">
-        <app-waiting-spinner [done]="data?.receiveDataDone">
+        <app-waiting-spinner [done]="data.receiveDataDone">
         </app-waiting-spinner>
       </div>
       <div>

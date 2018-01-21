@@ -1,9 +1,8 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import { Observable      } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 
@@ -15,31 +14,16 @@ import { GameResult } from '../../../classes/game-result';
   templateUrl: './game-result-of-player.component.html',
   styleUrls: [ '../../../my-own-library/data-table/data-table.component.css' ]
 })
-export class GameResultOfPlayerComponent implements OnInit, OnDestroy {
-  private alive = true;
+export class GameResultOfPlayerComponent implements OnInit {
 
   @Input() private gameResultListFiltered$: Observable<GameResult[]>;
-
-  gameResultOfEachPlayerForView;
+  gameResultOfEachPlayerForView$;
 
   private sortKeySource = new BehaviorSubject<string>('scoreAverage');
   private sortKey$ = this.sortKeySource.asObservable();
 
-  rankOptions: boolean[] = [true, true, true, true, true, false, false ];
-
-  headerSettings = [
-    { key: 'rank',         show: true,                isButton: false, title: '順位' },
-    { key: 'name',         show: true,                isButton: false, title: '名前' },
-    { key: 'scoreAverage', show: true,                isButton: true,  title: '平均得点' },
-    { key: 'scoreSum',     show: true,                isButton: true,  title: '総得点' },
-    { key: 'count',        show: true,                isButton: true,  title: '総対戦回数' },
-    { key: 'countRank1',   show: true,                isButton: true,  title: '1位回数' },
-    { key: 'countRank2',   show: true,                isButton: true,  title: '2位回数' },
-    { key: 'countRank3',   show: this.rankOptions[3], isButton: true,  title: '3位回数' },
-    { key: 'countRank4',   show: this.rankOptions[4], isButton: true,  title: '4位回数' },
-    { key: 'countRank5',   show: this.rankOptions[5], isButton: true,  title: '5位回数' },
-    { key: 'countRank6',   show: this.rankOptions[6], isButton: true,  title: '6位回数' },
-  ];
+  rankOptions$: Observable<boolean[]>;
+  headerSettings$;
 
 
   constructor(
@@ -49,7 +33,7 @@ export class GameResultOfPlayerComponent implements OnInit, OnDestroy {
 
 
   ngOnInit() {
-    const gameResultOfEachPlayerForView$
+    this.gameResultOfEachPlayerForView$
       = Observable.combineLatest(
         this.gameResultListFiltered$, this.sortKey$,
         (grList, sortKey) => {
@@ -57,27 +41,33 @@ export class GameResultOfPlayerComponent implements OnInit, OnDestroy {
           return this.toGameResultOfEachPlayerForView( result, sortKey );
         } );
 
-    gameResultOfEachPlayerForView$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.gameResultOfEachPlayerForView = val );
+    this.rankOptions$
+      = this.gameResultListFiltered$
+          .map( list => {
+            const maxNumberOfPlayers
+              = this.utils.maxOfArray( list.map( e => e.players.length ) );
+            return this.utils.seq0(7).map( (_, i) => i < maxNumberOfPlayers + 1 );
+          })
+          .startWith( [true, true, true, true, true, false, false] );
 
-    this.gameResultListFiltered$
-      .takeWhile( () => this.alive )
-      .subscribe( gameResultListFiltered => {
-        const maxNumberOfPlayers = this.utils.maxOfArray( gameResultListFiltered.map( e => e.players.length ) );
-        this.rankOptions = Array.from( new Array(7) ).fill(true).fill( false, maxNumberOfPlayers + 1 );
-      });
+    this.headerSettings$ = this.rankOptions$.map( rankOptions => [
+      { key: 'rank',         show: true,           isButton: false, title: '順位' },
+      { key: 'name',         show: true,           isButton: false, title: '名前' },
+      { key: 'scoreAverage', show: true,           isButton: true,  title: '平均得点' },
+      { key: 'scoreSum',     show: true,           isButton: true,  title: '総得点' },
+      { key: 'count',        show: true,           isButton: true,  title: '総対戦回数' },
+      { key: 'countRank1',   show: true,           isButton: true,  title: '1位回数' },
+      { key: 'countRank2',   show: true,           isButton: true,  title: '2位回数' },
+      { key: 'countRank3',   show: rankOptions[3], isButton: true,  title: '3位回数' },
+      { key: 'countRank4',   show: rankOptions[4], isButton: true,  title: '4位回数' },
+      { key: 'countRank5',   show: rankOptions[5], isButton: true,  title: '5位回数' },
+      { key: 'countRank6',   show: rankOptions[6], isButton: true,  title: '6位回数' },
+    ] );
   }
-
-  ngOnDestroy() {
-    this.alive = false;
-  }
-
 
   setSortKey( sortKey: string ) {
     this.sortKeySource.next( sortKey );
   }
-
 
 
   getGameResultOfEachPlayer( gameResultListFiltered: GameResult[] ) {

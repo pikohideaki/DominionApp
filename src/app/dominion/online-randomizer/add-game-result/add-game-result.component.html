@@ -1,136 +1,145 @@
-<div class='body-with-padding'>
+<ng-container *ngIf="{
+      playerResults:     playerResults$             | async,
+      places:            places$                    | async,
+      numberOfPlayersOK: numberOfPlayersOK$         | async,
+      dialogOpened:      newGameResultDialogOpened$ | async,
+      turnOrderFilled:   turnOrderFilled$           | async
+    } as data">
 
-  <ng-container data-comment="場所"></ng-container>
-  <span class="margined-element">
-    <mat-form-field *ngIf="!!places">
-      <input type="text" placeholder="場所"
-          matInput
-          [value]="place || '' "
-          (input)="changePlace( $event.target.value )"
-          [matAutocomplete]="auto">
-      <mat-autocomplete #auto="matAutocomplete"
-          (optionSelected)="changePlace( $event.option.value )" >
-        <mat-option *ngFor="let placeOption of places" [value]="placeOption" >
-          {{ placeOption }}
-        </mat-option>
-      </mat-autocomplete>
-    </mat-form-field>
-  </span>
+  <div class='body-with-padding'>
+
+    <ng-container data-comment="場所"></ng-container>
+    <span class="margined-element">
+      <mat-form-field *ngIf="!!data.places">
+        <input type="text" placeholder="場所"
+            matInput
+            [value]="place || '' "
+            (input)="changePlace( $event.target.value )"
+            [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete"
+            (optionSelected)="changePlace( $event.option.value )" >
+          <mat-option *ngFor="let placeOption of data.places" [value]="placeOption" >
+            {{ placeOption }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </span>
 
 
 
-  <ng-container data-comment="プレイヤー"></ng-container>
-  <div class="margined-element">
+    <ng-container data-comment="プレイヤー"></ng-container>
+    <div class="margined-element">
 
-    <app-waiting-spinner [done]="!!playerResults"></app-waiting-spinner>
+      <app-waiting-spinner [done]="!!data.playerResults"></app-waiting-spinner>
 
-    <div *ngIf="playerResults">
-      <mat-list class="player-list" dense>
-        <h3 mat-subheader>参加者を選択（2~6人）：</h3>
-        <mat-list-item *ngFor="let player of playerResults">
-          <mat-checkbox class="playerChbox"
-              [checked]="player.selected"
-              (change)="changePlayersResultSelected( player.uid, $event.checked )" >
-            {{player.name}}
-          </mat-checkbox>
-        </mat-list-item>
-      </mat-list>
+      <div *ngIf="data.playerResults">
+        <mat-list class="player-list" dense>
+          <h3 mat-subheader>参加者を選択（2~6人）：</h3>
+          <mat-list-item *ngFor="let player of data.playerResults">
+            <mat-checkbox class="playerChbox"
+                [checked]="player.selected"
+                (change)="changePlayersResultSelected( player.uid, $event.checked )" >
+              {{player.name}}
+            </mat-checkbox>
+          </mat-list-item>
+        </mat-list>
+      </div>
     </div>
-  </div>
 
-  <div class="margined-element" *ngIf="selectedPlayers">
-    <mat-radio-group [value]="lastTurnPlayerName">
-    <table class='data-table data-table--shadow3px data-table--vertical-line'>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>
-            <button mat-button class="mini-button"
-                (click)="shuffleTurnOrders()">
-              <mat-icon>shuffle</mat-icon>
-            </button>
-            <button *ngIf="turnOrderFilled"
-                mat-button class="mini-button"
-                (click)="rotateAtRandom()">
-              <mat-icon>import_export</mat-icon>
-            </button>
-            <button *ngIf="turnOrderFilled"
-                mat-button class="mini-button"
-                (click)="rotateTurnOrders()">
-              <mat-icon>refresh</mat-icon>
-            </button>
-            <button mat-button class="mini-button"
-                (click)="resetTurnOrders()">
-              <mat-icon>clear</mat-icon>
-            </button>
-          </th>
-          <th>Last Turn</th>
-          <th>VP</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let player of selectedPlayers; let idx = index">
-          <td> {{player.name}} </td>
-          <td>
-            <ng-container *ngIf="player.turnOrder !== 0">
-              {{player.turnOrder}}
-            </ng-container>
-            <ng-container *ngIf="player.turnOrder === 0">
-              <button mat-raised-button
-                  (click)="setEmptyTurnOrder( idx )">
-                this is {{nextMissingNumber}}
+    <div class="margined-element" *ngIf="selectedPlayers">
+      <mat-radio-group [value]="lastTurnPlayerName">
+      <table class='data-table data-table--shadow3px data-table--vertical-line'>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>
+              <button mat-button class="mini-button"
+                  (click)="shuffleTurnOrders()">
+                <mat-icon>shuffle</mat-icon>
               </button>
-            </ng-container>
-          </td>
-          <td>
-            <mat-radio-button
-                [value]="player.name"
-                (change)="changeLastTurnPlayerName( player.name )">
-            </mat-radio-button>
-          </td>
-          <td>
-            <button mat-button (click)="VPClicked( player.uid )">
-              {{player.VP}}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    </mat-radio-group>
+              <button *ngIf="data.turnOrderFilled"
+                  mat-button class="mini-button"
+                  (click)="rotateAtRandom()">
+                <mat-icon>import_export</mat-icon>
+              </button>
+              <button *ngIf="data.turnOrderFilled"
+                  mat-button class="mini-button"
+                  (click)="rotateTurnOrders()">
+                <mat-icon>refresh</mat-icon>
+              </button>
+              <button mat-button class="mini-button"
+                  (click)="resetTurnOrders()">
+                <mat-icon>clear</mat-icon>
+              </button>
+            </th>
+            <th>Last Turn</th>
+            <th>VP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let player of selectedPlayers; let idx = index">
+            <td> {{player.name}} </td>
+            <td>
+              <ng-container *ngIf="player.turnOrder !== 0">
+                {{player.turnOrder}}
+              </ng-container>
+              <ng-container *ngIf="player.turnOrder === 0">
+                <button mat-raised-button
+                    (click)="setEmptyTurnOrder( idx )">
+                  this is {{nextMissingNumber}}
+                </button>
+              </ng-container>
+            </td>
+            <td>
+              <mat-radio-button
+                  [value]="player.name"
+                  (change)="changeLastTurnPlayerName( player.name )">
+              </mat-radio-button>
+            </td>
+            <td>
+              <button mat-button (click)="VPClicked( player.uid )">
+                {{player.VP}}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      </mat-radio-group>
+    </div>
+
+
+    <ng-container data-comment="メモ"></ng-container>
+    <div>
+      Memo：{{memo}}
+      <button mat-icon-button (click)="memoClicked()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </div>
+
+
+    <ng-container data-comment="登録ボタン"></ng-container>
+    <div class="margined-element">
+      <button mat-raised-button color='primary'
+          [disabled]=" data.dialogOpened ||
+                      !data.numberOfPlayersOK ||
+                      !data.turnOrderFilled ||
+                      !lastTurnPlayerName"
+          (click)='submitGameResult()' >
+        Submit
+      </button>
+      <p *ngIf="data.dialogOpened">
+        結果登録中…
+      </p>
+      <p *ngIf="!data.numberOfPlayersOK">
+        プレイヤー数は2～6人にしてください。
+      </p>
+      <p *ngIf="!data.turnOrderFilled">
+        手番が未入力です。
+      </p>
+      <p *ngIf="!lastTurnPlayerName">
+        最終手番のプレイヤーが未選択です。
+      </p>
+    </div>
+
   </div>
-
-
-  <ng-container data-comment="メモ"></ng-container>
-  <div>
-    Memo：{{memo}}
-    <button mat-icon-button (click)="memoClicked()">
-      <mat-icon>edit</mat-icon>
-    </button>
-  </div>
-
-
-  <ng-container data-comment="登録ボタン"></ng-container>
-  <div class="margined-element">
-    <button mat-raised-button color='primary'
-        [disabled]=" newGameResultDialogOpened ||
-                    !numberOfPlayersOK ||
-                    !turnOrderFilled ||
-                    !lastTurnPlayerName"
-        (click)='submitGameResult()' >
-      Submit
-    </button>
-    <p *ngIf="newGameResultDialogOpened">
-      結果登録中…
-    </p>
-    <p *ngIf="!numberOfPlayersOK">
-      プレイヤー数は2～6人にしてください。
-    </p>
-    <p *ngIf="!turnOrderFilled">
-      手番が未入力です。
-    </p>
-    <p *ngIf="!lastTurnPlayerName">
-      最終手番のプレイヤーが未選択です。
-    </p>
-  </div>
-
-</div>
+</ng-container>

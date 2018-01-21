@@ -1,71 +1,79 @@
-<div class="body-with-padding" >
-  <app-waiting-spinner [done]="receiveDataDone"></app-waiting-spinner>
+<ng-container *ngIf="{
+      selectedCards: selectedCards$    | async,
+      cardList:      cardPropertyList$ | async
+    } as data">
+  <div class="body-with-padding" >
+    <app-waiting-spinner [done]="!!data.selectedCards && !!data.cardList"></app-waiting-spinner>
 
-  <ng-container *ngIf="receiveDataDone">
-    <div class="CardArea KingdomCards10" *ngIf="selectedCards.KingdomCards10.length > 0">
-      <app-dominion-card-image *ngFor="let cardIndex of selectedCards.KingdomCards10"
-          [isButton]="true"
-          [faceUp]="true"
-          [height]="longSideLength"
-          [card]="cardPropertyList[cardIndex]"
-          (click)="cardInfoButtonClicked( cardIndex )" >
-      </app-dominion-card-image>
-    </div>
-
-    <div class="CardArea BaneCard__Obelisk"
-        *ngIf="selectedCards.BaneCard.length + selectedCards.Obelisk.length > 0">
-      <app-dominion-card-image *ngFor="let cardIndex of selectedCards.BaneCard"
-          [isButton]="true"
-          [faceUp]="true"
-          [height]="longSideLength"
-          [card]="cardPropertyList[cardIndex]"
-          (click)="cardInfoButtonClicked( cardIndex )" >
-      </app-dominion-card-image>
-
-      <app-dominion-card-image *ngFor="let cardIndex of selectedCards.Obelisk"
-          [isButton]="true"
-          [faceUp]="true"
-          [height]="longSideLength"
-          [card]="cardPropertyList[cardIndex]"
-          (click)="cardInfoButtonClicked( cardIndex )" >
-      </app-dominion-card-image>
-    </div>
-
-
-    <div class="CardArea EventCards__LandmarkCards"
-        *ngIf="selectedCards.EventCards.length + selectedCards.LandmarkCards.length > 0">
-      <ng-container *ngFor="let cardIndex of selectedCards.EventCards" >
-        <app-dominion-card-image
-            [isButton]="true"
-            [faceUp]="true"
-            [width]="longSideLength"
-            [card]="cardPropertyList[cardIndex]"
-            (click)="cardInfoButtonClicked( cardIndex )" >
-        </app-dominion-card-image>
-      </ng-container>
-
-      <ng-container *ngFor="let cardIndex of selectedCards.LandmarkCards" >
-        <app-dominion-card-image
-            [isButton]="true"
-            [faceUp]="true"
-            [width]="longSideLength"
-            [card]="cardPropertyList[cardIndex]"
-            (click)="cardInfoButtonClicked( cardIndex )" >
-        </app-dominion-card-image>
-      </ng-container>
-    </div>
-
-    <div class="CardArea BlackMarketPile" *ngIf="selectedCards.BlackMarketPile.length > 0">
-      <ng-container *ngFor="let cardIndex of selectedCards.BlackMarketPile" >
-        <app-dominion-card-image
+    <ng-container *ngIf="!!data.selectedCards && !!data.cardList">
+      <div class="CardArea KingdomCards10"
+          *ngIf="data.selectedCards.KingdomCards10.length > 0">
+        <app-dominion-card-image *ngFor="let cardIndex of data.selectedCards.KingdomCards10"
             [isButton]="true"
             [faceUp]="true"
             [height]="longSideLength"
-            [card]="cardPropertyList[cardIndex]"
+            [card]="data.cardList[cardIndex]"
             (click)="cardInfoButtonClicked( cardIndex )" >
         </app-dominion-card-image>
-      </ng-container>
-    </div>
+      </div>
 
-  </ng-container>
-</div>
+      <div class="CardArea BaneCard__Obelisk"
+          *ngIf="data.selectedCards.BaneCard.length + data.selectedCards.Obelisk.length > 0">
+        <app-dominion-card-image *ngFor="let cardIndex of data.selectedCards.BaneCard"
+            [isButton]="true"
+            [faceUp]="true"
+            [height]="longSideLength"
+            [card]="data.cardList[cardIndex]"
+            (click)="cardInfoButtonClicked( cardIndex )" >
+        </app-dominion-card-image>
+
+        <app-dominion-card-image *ngFor="let cardIndex of data.selectedCards.Obelisk"
+            [isButton]="true"
+            [faceUp]="true"
+            [height]="longSideLength"
+            [card]="data.cardList[cardIndex]"
+            (click)="cardInfoButtonClicked( cardIndex )" >
+        </app-dominion-card-image>
+      </div>
+
+
+      <div class="CardArea EventCards__LandmarkCards"
+          *ngIf="data.selectedCards.EventCards.length
+                  + data.selectedCards.LandmarkCards.length > 0">
+        <ng-container *ngFor="let cardIndex of data.selectedCards.EventCards" >
+          <app-dominion-card-image
+              [isButton]="true"
+              [faceUp]="true"
+              [width]="longSideLength"
+              [card]="data.cardList[cardIndex]"
+              (click)="cardInfoButtonClicked( cardIndex )" >
+          </app-dominion-card-image>
+        </ng-container>
+
+        <ng-container *ngFor="let cardIndex of data.selectedCards.LandmarkCards" >
+          <app-dominion-card-image
+              [isButton]="true"
+              [faceUp]="true"
+              [width]="longSideLength"
+              [card]="data.cardList[cardIndex]"
+              (click)="cardInfoButtonClicked( cardIndex )" >
+          </app-dominion-card-image>
+        </ng-container>
+      </div>
+
+      <div class="CardArea BlackMarketPile"
+          *ngIf="data.selectedCards.BlackMarketPile.length > 0">
+        <ng-container *ngFor="let cardIndex of data.selectedCards.BlackMarketPile" >
+          <app-dominion-card-image
+              [isButton]="true"
+              [faceUp]="true"
+              [height]="longSideLength"
+              [card]="data.cardList[cardIndex]"
+              (click)="cardInfoButtonClicked( cardIndex )" >
+          </app-dominion-card-image>
+        </ng-container>
+      </div>
+
+    </ng-container>
+  </div>
+</ng-container>

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -28,12 +28,10 @@ import { Component, OnInit, Input } from '@angular/core';
   styles: [` .actionButtons { justify-content: center; } `]
 })
 export class ConfirmDialogComponent implements OnInit {
-
-  @Input() message: string;
+  message: string;  // input
 
   constructor() {}
 
   ngOnInit() {
   }
-
 }

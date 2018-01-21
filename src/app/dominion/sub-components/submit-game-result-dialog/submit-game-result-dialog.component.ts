@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import 'rxjs/add/operator/takeWhile';
 
@@ -18,7 +18,7 @@ import { GameResult } from '../../../classes/game-result';
 export class SubmitGameResultDialogComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
 
-  @Input() newGameResult: GameResult;
+  newGameResult: GameResult;  // input
 
 
   constructor(

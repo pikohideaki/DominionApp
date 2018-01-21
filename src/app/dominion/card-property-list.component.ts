@@ -1,8 +1,8 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/takeWhile';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { UtilitiesService } from '../my-own-library/utilities.service';
 import { ColumnSetting } from '../my-own-library/data-table/data-table.component';
@@ -30,14 +30,10 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
     </div>
   `,
 })
-export class CardPropertyListComponent implements OnInit, OnDestroy {
+export class CardPropertyListComponent implements OnInit {
 
-  private alive: boolean = true;
-
-  private cardPropertyList: CardProperty[] = [];
-  cardPropertyList$: Observable<CardProperty[]>;
-
-  private filteredList = this.cardPropertyList;
+  cardPropertyList$ = this.database.cardPropertyList$;
+  private filteredListSource = new BehaviorSubject<CardProperty[]>([]);
 
 
   columnSettings: ColumnSetting[] = [
@@ -66,22 +62,9 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private database: CloudFirestoreMediatorService,
   ) {
-    this.cardPropertyList$ = this.database.cardPropertyList$;
-
-    /* subscriptions */
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( list => {
-        this.cardPropertyList = list;
-        this.filteredList = list;
-      });
   }
 
   ngOnInit() {
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 
   transformFunction( property: string, value ) {
@@ -90,12 +73,11 @@ export class CardPropertyListComponent implements OnInit, OnDestroy {
 
   async showDetail( position ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    // dialogRef.componentInstance.card = this.cardPropertyList[dataIndex];
-    dialogRef.componentInstance.cards = this.filteredList;
+    dialogRef.componentInstance.cards = this.filteredListSource.getValue();
     dialogRef.componentInstance.indexSource.next( position.rowIndexFiltered );
   }
 
   filteredDataOnChange( list ) {
-    this.filteredList = list;
+    this.filteredListSource.next( list );
   }
 }

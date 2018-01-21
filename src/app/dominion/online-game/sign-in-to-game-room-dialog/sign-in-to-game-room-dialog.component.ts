@@ -19,8 +19,9 @@ import { GameRoom } from '../../../classes/game-room';
 export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
 
-  @Input() newRoom: GameRoom;
-  @Input() dialogRef;
+  newRoom: GameRoom;  // input
+  dialogRef;  // input
+
   playersName$: Observable<string[]>;
   selectedExpansions$: Observable<string[]>;
 
@@ -69,7 +70,6 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
       .filter( e => e )
       .takeWhile( () => this.alive )
       .subscribe( () => {
-        // this.database.onlineGameRoom.setWaitingForPlayersValue( this.newRoom.databaseKey, false );
         setTimeout( () => {
           this.router.navigate( ['/online-game-main'] );
           this.dialogRef.close();

@@ -1,103 +1,109 @@
-<div *ngIf="receiveDataDone">
-  <app-data-table--items-per-page
-    [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
-    [itemsPerPage]='itemsPerPage'
-    [selectedPageIndex]='selectedPageIndex'
-    (itemsPerPageChange)="changeItemsPerPage( $event )">
-  </app-data-table--items-per-page>
+<ng-container *ngIf="{
+      itemsPerPage:      itemsPerPage$      | async,
+      selectedPageIndex: selectedPageIndex$ | async,
+      currentPageData:   currentPageData$   | async
+    } as data">
+  <div *ngIf="receiveDataDone">
+    <app-data-table--items-per-page
+      [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
+      [itemsPerPage]='data.itemsPerPage'
+      [selectedPageIndex]='data.selectedPageIndex'
+      (itemsPerPageChange)="changeItemsPerPage( $event )">
+    </app-data-table--items-per-page>
 
-  <app-data-table--pagenation
-    [selectedPageIndex]='selectedPageIndex'
-    [itemsPerPage]='itemsPerPage'
-    [dataSize]='gameResultListFiltered.length'
-    (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
-  </app-data-table--pagenation>
-
-
-  <p>{{gameResultListFiltered.length}} Games</p>
-  <div class='clear'></div>
-
-
-  <table class='data-table  data-table--shadow3px'>
-    <thead>
-      <tr>
-        <th>No.</th>
-        <th>日付</th>
-        <th>場所</th>
-        <th>スコア</th>
-        <th>メモ</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor='let line of currentPageData'>
-        <td class='data-table--cell-numeric'>{{line.no}}</td>
-        <td> {{line.date.getFullYear()}}/{{line.date.getMonth() + 1}}/{{line.date.getDate()}} </td>
-        <td> {{line.place}}</td>
-        <td>
-          <table class='data-table  small-table' >
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Name</th>
-                <th>VP</th>
-                <th>Score</th>
-                <th *ngIf="line.players[0].turnOrder <= 6">Order</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor='let playerResult of line.players'>
-                <td class='small-table--narrow-cell'>
-                  {{playerResult.rank}}
-                </td>
-                <td class='small-table--normal-cell'>
-                  {{playerResult.name}}
-                </td>
-                <td class='small-table--narrow-cell'>
-                  {{playerResult.VP}}
-                </td>
-                <td class='small-table--narrow-cell'>
-                  {{playerResult.score}}
-                </td>
-                <td *ngIf="playerResult.turnOrder <= 6"
-                    class='small-table--narrow-cell'>
-                  <span *ngIf="playerResult.name !== line.lastTurnPlayerName">
-                    {{playerResult.turnOrder}}
-                  </span>
-                  <span *ngIf="playerResult.name === line.lastTurnPlayerName"
-                      matTooltip="[]で囲まれている手番が最終手番です">
-                    [{{playerResult.turnOrder}}]
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </td>
-        <td>
-          <mat-icon *ngIf="!!line.memo" [matTooltip]="line.memo">description</mat-icon>
-          <button mat-icon-button (click)="memoClicked( line.no )">
-            <mat-icon>edit</mat-icon>
-          </button>
-        </td>
-        <td>
-          <button mat-raised-button color='primary' (click)='getDetail( line.no )'>Detail</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <app-data-table--pagenation
+      [selectedPageIndex]='data.selectedPageIndex'
+      [itemsPerPage]='data.itemsPerPage'
+      [dataSize]='gameResultListFiltered.length'
+      (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
+    </app-data-table--pagenation>
 
 
-  <app-data-table--items-per-page
-    [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
-    [itemsPerPage]='itemsPerPage'
-    [selectedPageIndex]='selectedPageIndex'
-    (itemsPerPageChange)="changeItemsPerPage( $event )">
-  </app-data-table--items-per-page>
+    <p>{{gameResultListFiltered.length}} Games</p>
+    <div class='clear'></div>
 
-  <app-data-table--pagenation
-    [selectedPageIndex]='selectedPageIndex'
-    [itemsPerPage]='itemsPerPage'
-    [dataSize]='gameResultListFiltered.length'
-    (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
-  </app-data-table--pagenation>
-</div>
+
+    <table class='data-table  data-table--shadow3px'>
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>日付</th>
+          <th>場所</th>
+          <th>スコア</th>
+          <th>メモ</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor='let line of data.currentPageData'>
+          <td class='data-table--cell-numeric'>{{line.no}}</td>
+          <td> {{line.date.getFullYear()}}/{{line.date.getMonth() + 1}}/{{line.date.getDate()}} </td>
+          <td> {{line.place}}</td>
+          <td>
+            <table class='data-table  small-table' >
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>VP</th>
+                  <th>Score</th>
+                  <th *ngIf="line.players[0].turnOrder <= 6">Order</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor='let playerResult of line.players'>
+                  <td class='small-table--narrow-cell'>
+                    {{playerResult.rank}}
+                  </td>
+                  <td class='small-table--normal-cell'>
+                    {{playerResult.name}}
+                  </td>
+                  <td class='small-table--narrow-cell'>
+                    {{playerResult.VP}}
+                  </td>
+                  <td class='small-table--narrow-cell'>
+                    {{playerResult.score}}
+                  </td>
+                  <td *ngIf="playerResult.turnOrder <= 6"
+                      class='small-table--narrow-cell'>
+                    <span *ngIf="playerResult.name !== line.lastTurnPlayerName">
+                      {{playerResult.turnOrder}}
+                    </span>
+                    <span *ngIf="playerResult.name === line.lastTurnPlayerName"
+                        matTooltip="[]で囲まれている手番が最終手番です">
+                      [{{playerResult.turnOrder}}]
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+          <td>
+            <mat-icon *ngIf="!!line.memo" [matTooltip]="line.memo">description</mat-icon>
+            <button mat-icon-button (click)="memoClicked( line.no )">
+              <mat-icon>edit</mat-icon>
+            </button>
+          </td>
+          <td>
+            <button mat-raised-button color='primary' (click)='getDetail( line.no )'>Detail</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+
+    <app-data-table--items-per-page
+      [itemsPerPageOptions]='[ 25, 50, 100, 200, 400 ]'
+      [itemsPerPage]='data.itemsPerPage'
+      [selectedPageIndex]='data.selectedPageIndex'
+      (itemsPerPageChange)="changeItemsPerPage( $event )">
+    </app-data-table--items-per-page>
+
+    <app-data-table--pagenation
+      [selectedPageIndex]='data.selectedPageIndex'
+      [itemsPerPage]='data.itemsPerPage'
+      [dataSize]='gameResultListFiltered.length'
+      (selectedPageIndexChange)="changeSelectedPageIndex( $event )">
+    </app-data-table--pagenation>
+  </div>
+</ng-container>

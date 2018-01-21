@@ -5,8 +5,8 @@
             myName:   myName$   | async,
             chatList: chatList$ | async
           } as data">
-      <ng-container *ngIf="data?.myName && data?.chatList">
-        <div class="balloon6 chat-list-element" *ngFor="let message of chatList">
+      <ng-container *ngIf="data.myName && data.chatList">
+        <div class="balloon6 chat-list-element" *ngFor="let message of data.chatList">
 
           <div *ngIf="message.playerName === data.myName; then me; else otherPlayer" ></div>
           <ng-template #me>

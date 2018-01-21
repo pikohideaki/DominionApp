@@ -24,11 +24,12 @@ import { CardPropertyDialogComponent } from '../../sub-components/card-property-
 })
 export class RandomizerCardImageComponent implements OnInit, OnDestroy {
   private alive = true;
-  receiveDataDone: boolean = false;
 
   @Input() longSideLength = 180;
-  cardPropertyList: CardProperty[] = [];
-  selectedCards: SelectedCards = new SelectedCards();
+  selectedCards$: Observable<SelectedCards>;
+  cardPropertyList$: Observable<CardProperty[]>;
+
+  private cardPropertyList: CardProperty[] = [];
 
 
   constructor(
@@ -37,19 +38,11 @@ export class RandomizerCardImageComponent implements OnInit, OnDestroy {
     private database: CloudFirestoreMediatorService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
-    Observable.combineLatest(
-        this.database.cardPropertyList$,
-        this.myRandomizerGroup.selectedCards$,
-        (cardPropertyList, selectedCards) => ({
-          cardPropertyList : cardPropertyList,
-          selectedCards    : selectedCards
-        }) )
+    this.selectedCards$ = this.myRandomizerGroup.selectedCards$;
+    this.cardPropertyList$ = this.database.cardPropertyList$;
+    this.cardPropertyList$
       .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardPropertyList = val.cardPropertyList;
-        this.selectedCards    = val.selectedCards;
-        this.receiveDataDone = true;
-      });
+      .subscribe( val => this.cardPropertyList = val );
   }
 
 

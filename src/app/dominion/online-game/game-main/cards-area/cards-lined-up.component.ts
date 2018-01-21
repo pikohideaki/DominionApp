@@ -15,7 +15,7 @@ import { MyGameRoomService } from '../my-game-room.service';
           cardPropertyList: cardPropertyList$ | async,
           myIndex: myIndex$ | async
         } as data">
-      <ng-container *ngIf="data?.cardPropertyList?.length > 0">
+      <ng-container *ngIf="data.cardPropertyList?.length > 0">
         <ng-container
             *ngIf="!DCardArray || DCardArray.length === 0
                     then emptyCard; else Card">

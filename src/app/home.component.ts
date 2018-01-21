@@ -27,13 +27,13 @@ export class HomeComponent implements OnInit {
     private myUserInfo: MyUserInfoService
   ) {
     this.apps$ = this.myUserInfo.signedIn$.map( signedIn => [
-        {
-          routerLink: '/online-game',
-          inService:  signedIn,
-          title:      'Online Game',
-          subtitle:   'Dominion オンライン対戦',
-          description: ( signedIn ? '' : '（※要ログイン）'),
-        },
+        // {
+        //   routerLink: '/online-game',
+        //   inService:  signedIn,
+        //   title:      'Online Game',
+        //   subtitle:   'Dominion オンライン対戦',
+        //   description: ( signedIn ? '' : '（※要ログイン）'),
+        // },
         {
           routerLink: '/online-randomizer',
           inService:  signedIn,

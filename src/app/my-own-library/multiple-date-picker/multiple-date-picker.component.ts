@@ -22,12 +22,12 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
   @Input() initialDateList$: Observable<Date[]>;
 
   dayStrings: string[];
-  weeks: {date: Date, selected: boolean}[][] = [];
+  weeks$: Observable<{ date: Date, selected: boolean }[][]>;
 
   private currentYearSource  = new BehaviorSubject<number>( (new Date()).getFullYear() );
   private currentMonthSource = new BehaviorSubject<number>( (new Date()).getMonth() );
-  currentYear:  number;
-  currentMonth: number;
+  currentYear$:  Observable<number>;
+  currentMonth$: Observable<number>;
 
   private selectedDateValuesSource = new BehaviorSubject<number[]>([]);
   @Output() selectedDatesChange = new EventEmitter<Date[]>();
@@ -36,12 +36,11 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
   constructor(
     private utils: UtilitiesService
   ) {
-    const currentYear$  = this.currentYearSource .asObservable();
-    const currentMonth$ = this.currentMonthSource.asObservable();
-    const weeks$: Observable<{date: Date, selected: boolean}[][]>
-      = Observable.combineLatest(
-        currentYear$,
-        currentMonth$,
+    this.currentYear$  = this.currentYearSource .asObservable();
+    this.currentMonth$ = this.currentMonthSource.asObservable();
+    this.weeks$ = Observable.combineLatest(
+        this.currentYear$,
+        this.currentMonth$,
         this.selectedDateValuesSource.asObservable(),
         (year, month, selectedDates) => {
           const weeks: { date: Date, selected: boolean }[][] = [];
@@ -63,19 +62,6 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
       = this.selectedDateValuesSource.asObservable()
             .map( list => list.map( e => new Date(e) )
                               .sort( (a, b) => this.utils.compareDates(a, b) ) );
-
-    currentYear$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.currentYear = val );
-
-    currentMonth$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.currentMonth = val );
-
-    weeks$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.weeks = val );
-
     selectedDates$
       .takeWhile( () => this.alive )
       .subscribe( val => this.selectedDatesChange.emit( val ) );
@@ -108,20 +94,20 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
 
 
   goToPreviousMonth() {
-    if ( this.currentMonthSource.value > 0 ) {
-      this.currentMonthSource.next( this.currentMonthSource.value - 1 );
+    if ( this.currentMonthSource.getValue() > 0 ) {
+      this.currentMonthSource.next( this.currentMonthSource.getValue() - 1 );
     } else {
       this.currentMonthSource.next( 11 );
-      this.currentYearSource.next( this.currentYearSource.value - 1 );
+      this.currentYearSource.next( this.currentYearSource.getValue() - 1 );
     }
   }
 
   goToNextMonth() {
-    if ( this.currentMonthSource.value < 11 ) {
-      this.currentMonthSource.next( this.currentMonthSource.value + 1 );
+    if ( this.currentMonthSource.getValue() < 11 ) {
+      this.currentMonthSource.next( this.currentMonthSource.getValue() + 1 );
     } else {
       this.currentMonthSource.next( 0 );
-      this.currentYearSource.next( this.currentYearSource.value + 1 );
+      this.currentYearSource.next( this.currentYearSource.getValue() + 1 );
     }
   }
 
@@ -143,7 +129,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
   dateOnSelectToggle( date: Date ) {
     if ( !date ) return;
     if ( !this.filterFunction( date ) ) return;
-    const current = this.selectedDateValuesSource.value;
+    const current = this.selectedDateValuesSource.getValue();
     if ( current.includes( date.valueOf() ) ) {
       this.utils.removeValue( current, date.valueOf() );
     } else {
@@ -153,9 +139,9 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
   }
 
   selectToggleDayColumn( dayIndex: number ) {
-    const current = this.selectedDateValuesSource.value;
-    const month = this.currentMonthSource.value;
-    const year  = this.currentYearSource.value;
+    const current = this.selectedDateValuesSource.getValue();
+    const month = this.currentMonthSource.getValue();
+    const year  = this.currentYearSource.getValue();
 
     const datesInColumn
       = this.utils.getAllDatesIn( year, month )

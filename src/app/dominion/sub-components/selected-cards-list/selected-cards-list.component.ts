@@ -25,7 +25,6 @@ import { BlackMarketPileCard   } from '../../../classes/black-market-pile-card';
 })
 export class SelectedCardsListComponent implements OnInit, OnDestroy {
   private alive = true;
-  receiveDataDone: boolean = false;
 
   cardPropertyList: CardProperty[] = [];
 
@@ -41,12 +40,12 @@ export class SelectedCardsListComponent implements OnInit, OnDestroy {
 
 
   selectedCardsCategories = [
-    { id: 'KingdomCards10' , title: '王国カード' },
-    { id: 'BaneCard'       , title: '災いカード（魔女娘用）' },
-    { id: 'EventCards'     , title: 'EventCards' },
-    { id: 'LandmarkCards'  , title: 'LandmarkCards' },
-    { id: 'Obelisk'        , title: 'Obelisk 指定カード' },
-    { id: 'BlackMarketPile', title: '闇市場デッキ' },
+    { name: 'KingdomCards10' , title: '王国カード' },
+    { name: 'BaneCard'       , title: '災いカード（魔女娘用）' },
+    { name: 'EventCards'     , title: 'EventCards' },
+    { name: 'LandmarkCards'  , title: 'LandmarkCards' },
+    { name: 'Obelisk'        , title: 'Obelisk 指定カード' },
+    { name: 'BlackMarketPile', title: '闇市場デッキ' },
   ];
 
 
@@ -57,10 +56,7 @@ export class SelectedCardsListComponent implements OnInit, OnDestroy {
   ) {
     this.database.cardPropertyList$
       .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardPropertyList = val;
-        this.receiveDataDone = true;
-      } );
+      .subscribe( val => this.cardPropertyList = val );
   }
 
   ngOnInit() {

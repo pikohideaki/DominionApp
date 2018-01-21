@@ -45,17 +45,17 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
   private cardPropertyList: CardProperty[];
   private selectedCards: SelectedCards = new SelectedCards();
 
-  places: string[];
-  playerResults: PlayerResult[] = [];
+  playerResults$: Observable<PlayerResult[]>;
+  places$: Observable<string[]>;
+  numberOfPlayersOK$: Observable<boolean>;
+  newGameResultDialogOpened$: Observable<boolean>;
+  turnOrderFilled$: Observable<boolean>;
+
   selectedPlayers: PlayerResult[] = [];
-  numberOfPlayersOK: boolean;
   place = '';
   memo = '';
   lastTurnPlayerName: string = '';
   nextMissingNumber: number = 1;
-  turnOrderFilled: boolean;
-  newGameResultDialogOpened: boolean;
-  myId: string = '';
 
 
   constructor(
@@ -67,20 +67,18 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
     /* observables */
-    const playerResults$: Observable<PlayerResult[]>
-      = this.myRandomizerGroup.newGameResult.players$;
-      // .do( val => console.log('playerResult changed', val) );
+    this.playerResults$ = this.myRandomizerGroup.newGameResult.players$;
 
     const selectedPlayers$: Observable<PlayerResult[]>
-      = playerResults$.map( list => list.filter( e => e.selected ) );
+      = this.playerResults$.map( list => list.filter( e => e.selected ) );
 
-    const numberOfPlayersOK$
+    this.numberOfPlayersOK$
       = selectedPlayers$.map( e => e.length ).map( e => ( 2 <= e && e <= 6 ) );
 
-    const newGameResultDialogOpened$
+    this.newGameResultDialogOpened$
       = this.myRandomizerGroup.newGameResultDialogOpened$;
 
-    const places$
+    this.places$
       = this.database.gameResultList$.map( gameResultList =>
           this.utils.uniq( gameResultList.map( e => e.place ).filter( e => e !== '' ) ) );
 
@@ -95,19 +93,11 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     const nextMissingNumber$: Observable<number>
       = selectedPlayers$.map( list => list.filter( e => e.turnOrder !== 0 ).length + 1 );
 
-    const turnOrderFilled$
+    this.turnOrderFilled$
       = selectedPlayers$.map( list => list.every( e => e.turnOrder !== 0 ) );
 
 
     /* subscriptions */
-    this.myUserInfo.uid$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.myId = val );
-
-    playerResults$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.playerResults = val );
-
     this.myRandomizerGroup.selectedCards$
       .takeWhile( () => this.alive )
       .subscribe( val => {
@@ -148,22 +138,6 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     nextMissingNumber$
       .takeWhile( () => this.alive )
       .subscribe( val => this.nextMissingNumber = val );
-
-    turnOrderFilled$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.turnOrderFilled = val );
-
-    numberOfPlayersOK$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.numberOfPlayersOK = val );
-
-    newGameResultDialogOpened$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.newGameResultDialogOpened = val );
-
-    places$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.places = val );
   }
 
 
@@ -231,7 +205,6 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
 
   async setEmptyTurnOrder( playerIndex: number ) {
     // index == 2, turnOrders == [1, 0, 0, 2] -> [1, 0, 3, 2]
-    // console.log(playerIndex, this.selectedPlayers);
     const uid = this.selectedPlayers[ playerIndex ].uid;
     await this.myRandomizerGroup.setNewGameResultPlayerTurnOrder( uid, this.nextMissingNumber );
   }

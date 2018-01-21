@@ -17,8 +17,7 @@ import { CardProperty } from '../../../classes/card-property';
 })
 export class CardPropertyDialogComponent implements OnInit {
 
-  card: CardProperty;
-  // cardForView: Object;
+  card: CardProperty;  // input
 
   items = [
     { memberName: 'no'            , name: 'Card No.' },
@@ -45,9 +44,9 @@ export class CardPropertyDialogComponent implements OnInit {
   cardForView$: Observable<Object>;
 
   // option（Dialogを開いたまま次のカード情報を見る）
-  cards: CardProperty[] = [];
+  cards: CardProperty[] = [];  // input
   indexSource = new BehaviorSubject<number>(0);
-  private index$ = this.indexSource.asObservable();
+  index$ = this.indexSource.asObservable();
 
 
   constructor(

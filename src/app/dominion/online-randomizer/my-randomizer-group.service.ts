@@ -23,17 +23,20 @@ export class MyRandomizerGroupService {
       this.database.randomizerGroupList$,
       this.myUserInfo.randomizerGroupId$,
       (list, id) => (list.find( e => e.databaseKey === id ) || new RandomizerGroup() ) );
-      // .do( val => console.log('myRandomizerGroup changed', val) );
 
   private signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
 
 
   name$                      = this.myRandomizerGroup$.map( e => e.name                      ).distinctUntilChanged();
   randomizerButtonLocked$    = this.myRandomizerGroup$.map( e => e.randomizerButtonLocked    ).distinctUntilChanged();
-  isSelectedExpansions$      = Observable.combineLatest(
-                this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
-                this.myRandomizerGroup$.map( e => e.isSelectedExpansions      ).distinctUntilChanged( this.cmpObj ),
-                (initArray, isSelectedExpansions) => initArray.map( (_, i) => !!isSelectedExpansions[i] ) );
+  isSelectedExpansions$
+    = Observable.combineLatest(
+        this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
+        this.myRandomizerGroup$.map( e => e.isSelectedExpansions )
+                .distinctUntilChanged( this.cmpObj )
+                .startWith([]),
+        (initArray, isSelectedExpansions) =>
+          initArray.map( (_, i) => !!isSelectedExpansions[i] ) );
 
   selectedCards$             = this.myRandomizerGroup$.map( e => e.selectedCards             ).distinctUntilChanged( this.cmpObj );
   selectedCardsCheckbox$     = this.myRandomizerGroup$.map( e => e.selectedCardsCheckbox     ).distinctUntilChanged( this.cmpObj );
@@ -60,7 +63,7 @@ export class MyRandomizerGroupService {
   }
 
 
-  cmpObj( x, y ) {
+  cmpObj(x, y) {
     return JSON.stringify(x) === JSON.stringify(y);
   }
 

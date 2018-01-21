@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-set-vp-dialog',
@@ -31,11 +31,8 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class SetVpDialogComponent implements OnInit {
 
-  @Input()  uid: string;
-  @Input()  VP: number;
-
+  VP: number;  // input
   newVP: number = 0;
-
 
   constructor() { }
 
@@ -46,5 +43,4 @@ export class SetVpDialogComponent implements OnInit {
   changeVP( value ) {
     this.newVP = value;
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-set-memo-dialog',
@@ -31,11 +31,8 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class SetMemoDialogComponent implements OnInit {
 
-  @Input()  uid: string;
-  @Input()  memo: string;
-
+  memo: string;  // input
   newMemo: string = '';
-
 
   constructor() { }
 
@@ -46,5 +43,4 @@ export class SetMemoDialogComponent implements OnInit {
   changeMemo( value ) {
     this.newMemo = value;
   }
-
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 
 import 'rxjs/add/operator/takeWhile';
 
@@ -11,6 +11,8 @@ import { CardProperty  } from '../../../../classes/card-property';
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { ConfirmDialogComponent } from '../../../../my-own-library/confirm-dialog.component';
 
+import { Observable } from 'rxjs/Observable';
+
 import { CardPropertyDialogComponent } from '../../../sub-components/card-property-dialog/card-property-dialog.component';
 
 
@@ -22,13 +24,13 @@ import { CardPropertyDialogComponent } from '../../../sub-components/card-proper
     './game-result-detail-dialog.component.css'
   ]
 })
-export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
-  private alive = true;
+export class GameResultDetailDialogComponent implements OnInit {
+
+  gameResult: GameResult = new GameResult();  // input
 
   cardPropertyList: CardProperty[] = [];
 
-  @Input() gameResult: GameResult = new GameResult();
-  @Input() selectedCards: SelectedCards = new SelectedCards();
+  selectedCards$: Observable<SelectedCards>;
 
   // firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
   firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/dominionapps/data/data/gameResultList/';
@@ -44,29 +46,24 @@ export class GameResultDetailDialogComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.firebasePath += this.gameResult.databaseKey;
 
-    const toIndex = ( cardId => this.cardPropertyList.findIndex( e => e.cardId === cardId ) );
+    const toIndex = ((cardId, cardList) => cardList.findIndex( e => e.cardId === cardId ) );
 
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardPropertyList = val;
-
-        this.selectedCards.Prosperity      = this.gameResult.selectedCardsId.Prosperity;
-        this.selectedCards.DarkAges        = this.gameResult.selectedCardsId.DarkAges;
-        this.selectedCards.KingdomCards10  = (this.gameResult.selectedCardsId.KingdomCards10  || []).map( toIndex );
-        this.selectedCards.BaneCard        = (this.gameResult.selectedCardsId.BaneCard        || []).map( toIndex );
-        this.selectedCards.EventCards      = (this.gameResult.selectedCardsId.EventCards      || []).map( toIndex );
-        this.selectedCards.Obelisk         = (this.gameResult.selectedCardsId.Obelisk         || []).map( toIndex );
-        this.selectedCards.LandmarkCards   = (this.gameResult.selectedCardsId.LandmarkCards   || []).map( toIndex );
-        this.selectedCards.BlackMarketPile = (this.gameResult.selectedCardsId.BlackMarketPile || []).map( toIndex );
-      });
-
+    this.selectedCards$
+      = this.database.cardPropertyList$.map( cardList => {
+          this.cardPropertyList = cardList;
+          const result = new SelectedCards();
+          const ids = this.gameResult.selectedCardsId;
+          result.Prosperity      = ids.Prosperity;
+          result.DarkAges        = ids.DarkAges;
+          result.KingdomCards10  = (ids.KingdomCards10  || []).map( id => toIndex(id, cardList) );
+          result.BaneCard        = (ids.BaneCard        || []).map( id => toIndex(id, cardList) );
+          result.EventCards      = (ids.EventCards      || []).map( id => toIndex(id, cardList) );
+          result.Obelisk         = (ids.Obelisk         || []).map( id => toIndex(id, cardList) );
+          result.LandmarkCards   = (ids.LandmarkCards   || []).map( id => toIndex(id, cardList) );
+          result.BlackMarketPile = (ids.BlackMarketPile || []).map( id => toIndex(id, cardList) );
+          return result;
+        });
   }
-
-  ngOnDestroy() {
-    this.alive = false;
-  }
-
 
   cardInfoButtonClicked( cardIndex: number ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent );

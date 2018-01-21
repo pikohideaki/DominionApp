@@ -1,33 +1,39 @@
-<div class="margined-element">
-  <table class='data-table  data-table--shadow3px'>
-    <thead>
-      <tr>
-        <ng-container *ngFor="let header of headerSettings">
-          <th *ngIf="header.show">
-            <span *ngIf="!header.isButton">
-              {{header.title}}
-            </span>
-            <button mat-button *ngIf="header.isButton" (click)="setSortKey( header.key )">
-              {{header.title}}
-            </button>
-          </th>
-        </ng-container>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let player of gameResultOfEachPlayerForView; let idx = index">
-        <th>{{idx + 1}}</th>
-        <th>{{player.name}}</th>
-        <th>{{player.scoreAverage}}</th>
-        <th>{{player.scoreSum}}</th>
-        <th>{{player.count}}</th>
-        <th>{{player.countRank[1]}}</th>
-        <th>{{player.countRank[2]}}</th>
-        <th *ngIf="rankOptions[3]">{{player.countRank[3]}}</th>
-        <th *ngIf="rankOptions[4]">{{player.countRank[4]}}</th>
-        <th *ngIf="rankOptions[5]">{{player.countRank[5]}}</th>
-        <th *ngIf="rankOptions[6]">{{player.countRank[6]}}</th>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<ng-container *ngIf="{
+      rankOptions:            rankOptions$                   | async,
+      headerSettings:         headerSettings$                | async,
+      gameResultOfEachPlayer: gameResultOfEachPlayerForView$ | async
+    } as data">
+  <div class="margined-element">
+    <table class='data-table  data-table--shadow3px'>
+      <thead>
+        <tr>
+          <ng-container *ngFor="let header of data.headerSettings">
+            <th *ngIf="header.show">
+              <span *ngIf="!header.isButton">
+                {{header.title}}
+              </span>
+              <button mat-button *ngIf="header.isButton" (click)="setSortKey( header.key )">
+                {{header.title}}
+              </button>
+            </th>
+          </ng-container>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let player of data.gameResultOfEachPlayer; let idx = index">
+          <th>{{idx + 1}}</th>
+          <th>{{player.name}}</th>
+          <th>{{player.scoreAverage}}</th>
+          <th>{{player.scoreSum}}</th>
+          <th>{{player.count}}</th>
+          <th>{{player.countRank[1]}}</th>
+          <th>{{player.countRank[2]}}</th>
+          <th *ngIf="data.rankOptions[3]">{{player.countRank[3]}}</th>
+          <th *ngIf="data.rankOptions[4]">{{player.countRank[4]}}</th>
+          <th *ngIf="data.rankOptions[5]">{{player.countRank[5]}}</th>
+          <th *ngIf="data.rankOptions[6]">{{player.countRank[6]}}</th>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</ng-container>

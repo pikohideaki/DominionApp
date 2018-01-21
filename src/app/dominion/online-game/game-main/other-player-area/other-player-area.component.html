@@ -3,7 +3,7 @@
       allPlayersCards: allPlayersCards$ | async,
       turnPlayerIndex: turnPlayerIndex$ | async
     } as data">
-  <ng-container *ngIf="data?.playersName?.length > 0">
+  <ng-container *ngIf="data.playersName?.length > 0">
     <div class="player-area"
         *ngFor="let playerCards of data.allPlayersCards; let idx = index"
         [class.turnPlayer]="idx === data.turnPlayerIndex">
