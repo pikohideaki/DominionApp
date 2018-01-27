@@ -7,7 +7,7 @@
 
     <ng-container *ngIf="!!data.selectedCards && !!data.cardList">
       <div class="CardArea KingdomCards10"
-          *ngIf="data.selectedCards.KingdomCards10.length > 0">
+          *ngIf="!data.selectedCards.isEmpty()">
         <app-dominion-card-image *ngFor="let cardIndex of data.selectedCards.KingdomCards10"
             [isButton]="true"
             [faceUp]="true"

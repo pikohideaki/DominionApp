@@ -3,26 +3,27 @@
       filteredDataLength: filteredDataLength$       | async,
       datalist:           data$                     | async,
       itemsPerPage:       itemsPerPage$             | async,
-      selectedPageIndex:  selectedPageIndex$        | async
+      columnSettings:     columnSettings$           | async
     } as dat">
   <app-waiting-spinner [done]="!!dat.datalist"></app-waiting-spinner>
 
   <ng-container *ngIf="!!dat.datalist">
-    <div *ngIf="itemsPerPageOptions !== undefined" class="pager-wrapper">
+    <div *ngIf="usePagenation && itemsPerPageOptions !== undefined"
+        class="pager-wrapper">
       <app-data-table--items-per-page
           [itemsPerPageOptions]='itemsPerPageOptions'
           [itemsPerPage]='dat.itemsPerPage'
-          (itemsPerPageChange)="itemsPerPageOnChange( $event )"
-          [selectedPageIndex]='dat.selectedPageIndex'>
+          (itemsPerPageChange)="itemsPerPageOnChange( $event )">
       </app-data-table--items-per-page>
       <app-data-table--pagenation
-          [itemsPerPage]='dat.itemsPerPage'
-          [dataSize]='dat.filteredDataLength'
-          [selectedPageIndex]='dat.selectedPageIndex'
+          [itemsPerPage$]='itemsPerPage$'
+          [dataSize$]='filteredDataLength$'
+          [selectedPageIndex$]='selectedPageIndex$'
           (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
       </app-data-table--pagenation>
-      <app-data-table--reset-buttons (click)='reset()' >
-      </app-data-table--reset-buttons>
+      <button class='resetButton' mat-raised-button (click)="resetAll()">
+        Reset All
+      </button>
       <div>{{dat.filteredDataLength}} items</div>
     </div>
 
@@ -31,7 +32,7 @@
     <table class='data-table data-table--shadow3px data-table--vertical-line'>
       <thead>
         <tr>
-          <th *ngFor='let column of columnSettings'
+          <th *ngFor='let column of dat.columnSettings'
               [class.data-table--cell-alignLeft]  ="column.align === 'l' "
               [class.data-table--cell-alignCenter]="column.align === 'c' "
               [class.data-table--cell-alignRight] ="column.align === 'r' " >
@@ -54,7 +55,8 @@
                       [placeholder]="column.headerTitle"
                       [value]="column.manipState || ''"
                       (change)="changeColumnState( column.name, $event.value )" >
-                    <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    <mat-option *ngFor="let option of column.selectOptions"
+                        [value]="option.value">
                       {{option.viewValue}}
                     </mat-option>
                   </mat-select>
@@ -70,7 +72,8 @@
                         [value]="column.manipState"
                         (change)="changeColumnState( column.name, $event.value )"
                         multiple>
-                    <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    <mat-option *ngFor="let option of column.selectOptions"
+                        [value]="option.value">
                       {{option.viewValue}}
                     </mat-option>
                   </mat-select>
@@ -86,7 +89,8 @@
                         [value]="column.manipState"
                         (change)="changeColumnState( column.name, $event.value )"
                         multiple>
-                    <mat-option *ngFor="let option of (column.selectOptions$ | async)" [value]="option.value">
+                    <mat-option *ngFor="let option of column.selectOptions"
+                        [value]="option.value">
                       {{option.viewValue}}
                     </mat-option>
                   </mat-select>
@@ -104,7 +108,7 @@
       </thead>
       <tbody>
         <tr *ngFor='let value of dat.trPagenatedData; let rowIndex = index'>
-          <td *ngFor='let column of columnSettings'
+          <td *ngFor='let column of dat.columnSettings'
               [class.data-table--cell-alignLeft]  ="column.align=='l'"
               [class.data-table--cell-alignCenter]="column.align=='c'"
               [class.data-table--cell-alignRight] ="column.align=='r'" >
@@ -112,7 +116,11 @@
             <div *ngIf="column.isButton; then thenBlock; else elseBlock"></div>
             <ng-template #thenBlock>
               <button mat-button color="primary"
-                    (click)="cellClicked( dat.datalist, rowIndex, column.name )">
+                    (click)="cellClicked(
+                        dat.datalist,
+                        rowIndex,
+                        column.name,
+                        dat.columnSettings )">
                 {{ value[column.name] }}
               </button>
             </ng-template>
@@ -126,17 +134,17 @@
 
 
 
-    <div *ngIf="itemsPerPageOptions !== undefined" class="pager-wrapper">
+    <div *ngIf="usePagenation && itemsPerPageOptions !== undefined"
+        class="pager-wrapper">
       <app-data-table--items-per-page
           [itemsPerPageOptions]='itemsPerPageOptions'
           [itemsPerPage]='dat.itemsPerPage'
-          (itemsPerPageChange)="itemsPerPageOnChange( $event )"
-          [selectedPageIndex]='dat.selectedPageIndex'>
+          (itemsPerPageChange)="itemsPerPageOnChange( $event )">
       </app-data-table--items-per-page>
       <app-data-table--pagenation
-          [itemsPerPage]='dat.itemsPerPage'
-          [dataSize]='dat.filteredDataLength'
-          [selectedPageIndex]='dat.selectedPageIndex'
+          [itemsPerPage$]='itemsPerPage$'
+          [dataSize$]='filteredDataLength$'
+          [selectedPageIndex$]='selectedPageIndex$'
           (selectedPageIndexChange)="selectedPageIndexOnChange( $event )">
       </app-data-table--pagenation>
       <div>{{dat.filteredDataLength}} items</div>

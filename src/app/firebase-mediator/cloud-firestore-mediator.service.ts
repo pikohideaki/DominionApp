@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/observable/combineLatest';
@@ -21,21 +21,32 @@ import { BlackMarketPileCard   } from '../classes/black-market-pile-card';
 import { ChatMessage           } from '../classes/chat-message';
 import { PlayerResult          } from '../classes/player-result';
 import { GameCommunication, MoveInGame } from '../classes/game-room-communication';
+import { NumberOfVictoryCards } from '../classes/number-of-victory-cards';
 
 
 @Injectable()
 export class CloudFirestoreMediatorService {
-  fdPath = {
-    expansionsNameList          : '/data/expansionsNameList',
-    cardPropertyList            : '/data/cardPropertyList',
-    users                       : '/users',
-    userInfoList                : '/userInfoList',
-    scoringTable                : '/data/scoreTable',
-    gameResultList              : '/data/gameResultList',
-    randomizerGroupList         : '/randomizerGroupList',
-    onlineGameRoomsList         : '/onlineGameRooms',
-    onlineGameCommunicationList : '/onlineGameCommunicationList',
-  };
+  fdPath = ( isDevMode() ? {
+    expansionsNameList          : '/dev/data/expansionsNameList',
+    cardPropertyList            : '/dev/data/cardPropertyList',
+    users                       : '/dev/users',
+    userInfoList                : '/dev/userInfoList',
+    scoringTable                : '/dev/data/scoreTable',
+    gameResultList              : '/dev/data/gameResultList',
+    randomizerGroupList         : '/dev/randomizerGroupList',
+    onlineGameRoomsList         : '/dev/onlineGameRooms',
+    onlineGameCommunicationList : '/dev/onlineGameCommunicationList',
+  } : {
+    expansionsNameList          : '/prod/data/expansionsNameList',
+    cardPropertyList            : '/prod/data/cardPropertyList',
+    users                       : '/prod/users',
+    userInfoList                : '/prod/userInfoList',
+    scoringTable                : '/prod/data/scoreTable',
+    gameResultList              : '/prod/data/gameResultList',
+    randomizerGroupList         : '/prod/randomizerGroupList',
+    onlineGameRoomsList         : '/prod/onlineGameRooms',
+    onlineGameCommunicationList : '/prod/onlineGameCommunicationList',
+  } );
 
 
   expansionsNameList$:          Observable<string[]>;
@@ -53,7 +64,7 @@ export class CloudFirestoreMediatorService {
     setUser: ( uid: string, newUser: User ) => Promise<void>,
     set: {
       name:              ( uid: string, value: string ) => Promise<void>,
-      name_yomi:         ( uid: string, value: string ) => Promise<void>,
+      nameYomi:          ( uid: string, value: string ) => Promise<void>,
       randomizerGroupId: ( uid: string, value: string ) => Promise<void>,
       onlineGame: {
         isSelectedExpansions: ( uid: string, value: boolean[] ) => Promise<void>,
@@ -75,33 +86,32 @@ export class CloudFirestoreMediatorService {
     addGroup:    ( newGroup: RandomizerGroup ) => firebase.database.ThenableReference,
     removeGroup: ( groupId: string )           => Promise<void>,
     set: {
-      randomizerButtonLocked:    ( groupId: string, value: boolean )                                   => Promise<void>,
       isSelectedExpansions:      ( groupId: string, index: number, value: boolean )                    => Promise<void>,
-      selectedCards:             ( groupId: string, value: SelectedCards )                             => Promise<void>,
       selectedCardsCheckbox:     ( groupId: string, arrayName: string, index: number, value: boolean ) => Promise<void>,
       BlackMarketPileShuffled:   ( groupId: string, value: BlackMarketPileCard[] )                     => Promise<void>,
       BlackMarketPhase:          ( groupId: string, value: number )                                    => Promise<void>,
-      lastTurnPlayerName:        ( groupId: string, value: string  )                                   => Promise<void>,
-      newGameResultDialogOpened: ( groupId: string, value: boolean )                                   => Promise<void>,
+      selectedIndexInHistory: ( groupId: string, value: number )                                    => Promise<void>,
       newGameResult: {
         players: {
           selected:  ( groupId: string, uid: string, value: boolean ) => Promise<void>,
-          VP:        ( groupId: string, uid: string, value: number  ) => Promise<void>,
           turnOrder: ( groupId: string, uid: string, value: number  ) => Promise<void>,
+          VP:        ( groupId: string, uid: string, value: number  ) => Promise<void>,
+          numberOfVictoryCards: ( groupId: string, uid: string, value: NumberOfVictoryCards ) => Promise<void>,
         },
-        place: ( groupId: string, value: string ) => Promise<void>,
-        memo:  ( groupId: string, value: string ) => Promise<void>,
+        lastTurnPlayerName: ( groupId: string, value: string ) => Promise<void>,
+        place:              ( groupId: string, value: string ) => Promise<void>,
+        memo:               ( groupId: string, value: string ) => Promise<void>,
       },
+      newGameResultDialogOpened: ( groupId: string, value: boolean ) => Promise<void>,
     },
     add: {
       member: ( groupId: string, uid: string, value: PlayerResult ) => Promise<void>,
-      selectedCardsHistory:  ( groupId: string, value ) => firebase.database.ThenableReference,
+      selectedCardsHistory:  ( groupId: string, value: SelectedCards ) => firebase.database.ThenableReference,
     },
     remove: {
       member: ( groupId: string, uid: string ) => Promise<void>,
     },
     reset: {
-      selectedCards:         ( groupId: string ) => Promise<void>,
       selectedCardsCheckbox: ( groupId: string ) => Promise<void>,
       VPCalculator:          ( groupId: string ) => Promise<void>,
     },
@@ -139,7 +149,7 @@ export class CloudFirestoreMediatorService {
               .first();
 
     this.users$
-      = this.afdb.list( this.fdPath.users, ref => ref.orderByChild('name_yomi') ).snapshotChanges()
+      = this.afdb.list( this.fdPath.users, ref => ref.orderByChild('nameYomi') ).snapshotChanges()
           .map( actions => actions.map( action => new User( action.key, action.payload.val() ) ) );
 
     this.scoringTable$
@@ -190,8 +200,8 @@ export class CloudFirestoreMediatorService {
         name: ( uid: string, value: string ) =>
           userSetProperty( uid, 'name', value ),
 
-        name_yomi: ( uid: string, value: string ) =>
-          userSetProperty( uid, 'name_yomi', value ),
+        nameYomi: ( uid: string, value: string ) =>
+          userSetProperty( uid, 'nameYomi', value ),
 
         randomizerGroupId: ( uid: string, value: string ) =>
           userSetProperty( uid, 'randomizerGroupId', value ),
@@ -240,12 +250,18 @@ export class CloudFirestoreMediatorService {
 
 
     const randomizerGroupSetValue = ( groupId: string, pathPrefix: string, value: any ) => {
-      if ( !groupId ) throw new Error('groupId is empty');
+      if ( !groupId ) {
+        throw new Error(`groupId is empty.
+          (groupId = "${groupId}", path="${pathPrefix}", value="${value}")`);
+      }
       return this.afdb.object( `${this.fdPath.randomizerGroupList}/${groupId}/${pathPrefix}` )
                       .set( value );
     };
     const randomizerGroupPushValue = ( groupId: string, pathPrefix: string, value: any ) => {
-      if ( !groupId ) throw new Error('groupId is empty');
+      if ( !groupId ) {
+        throw new Error(`groupId is empty.
+          (groupId = "${groupId}", path="${pathPrefix}", value="${value}")`);
+      }
       return this.afdb.list( `${this.fdPath.randomizerGroupList}/${groupId}/${pathPrefix}` )
                       .push( value );
     };
@@ -269,17 +285,11 @@ export class CloudFirestoreMediatorService {
         this.afdb.list( this.fdPath.randomizerGroupList ).remove( groupId ),
 
       set: {
-        randomizerButtonLocked: ( groupId: string, locked: boolean ) =>
-          randomizerGroupSetValue( groupId, 'randomizerButtonLocked', locked ),
-
         isSelectedExpansions: ( groupId: string, index: number, value: boolean ) =>
           randomizerGroupSetValue( groupId, `isSelectedExpansions/${index}`, value ),
 
-        selectedCards: ( groupId: string, value: SelectedCards ) =>
-          randomizerGroupSetValue( groupId, 'selectedCards', value ),
-
         selectedCardsCheckbox: ( groupId: string, arrayName: string, index: number, value: boolean ) => {
-          switch (arrayName) {
+          switch ( arrayName ) {
             case 'KingdomCards10' :
             case 'BaneCard' :
             case 'EventCards' :
@@ -289,7 +299,8 @@ export class CloudFirestoreMediatorService {
               return randomizerGroupSetValue( groupId, `selectedCardsCheckbox/${arrayName}/${index}`, value );
 
             default :
-              console.error( `at fire-database-mediator.service::randomizerGroup::selectedCardsCheckbox : '${arrayName}' is not allowed `);
+              console.error( `at fire-database-mediator.service::randomizerGroup::selectedCardsCheckbox
+                               : '${arrayName}' is not allowed `);
               return Promise.resolve();
           }
         },
@@ -300,29 +311,35 @@ export class CloudFirestoreMediatorService {
         BlackMarketPhase: ( groupId: string, value: number ) =>
           randomizerGroupSetValue( groupId, 'BlackMarketPhase', value ),
 
-        lastTurnPlayerName: ( groupId: string, value: string ) =>
-          randomizerGroupSetValue( groupId, `lastTurnPlayerName`, value ),
-
-        newGameResultDialogOpened: ( groupId: string, value: boolean ) =>
-          randomizerGroupSetValue( groupId, `newGameResultDialogOpened`, value ),
+        selectedIndexInHistory: ( groupId: string, value: number ) =>
+          randomizerGroupSetValue( groupId, 'selectedIndexInHistory', value ),
 
         newGameResult: {
           players: {
             selected: ( groupId: string, uid: string, value: boolean ) =>
               randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/selected`, value ),
 
+            turnOrder: ( groupId: string, uid: string, value: number ) =>
+              randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/turnOrder`, value ),
+
             VP: ( groupId: string, uid: string, value: number ) =>
               randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/VP`, value ),
 
-            turnOrder: ( groupId: string, uid: string, value: number ) =>
-              randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/turnOrder`, value ),
+            numberOfVictoryCards: ( groupId: string, uid: string, value: NumberOfVictoryCards ) =>
+              randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/numberOfVictoryCards`, value ),
           },
+          lastTurnPlayerName: ( groupId: string, value: string ) =>
+            randomizerGroupSetValue( groupId, `newGameResult/lastTurnPlayerName`, value ),
           place: ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/place`, value ),
           memo:  ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/memo`, value ),
         },
+
+        newGameResultDialogOpened: ( groupId: string, value: boolean ) =>
+          randomizerGroupSetValue( groupId, `newGameResultDialogOpened`, value ),
       },
+
 
       add: {
         member: ( groupId: string, uid: string, value: PlayerResult ) => {
@@ -331,24 +348,24 @@ export class CloudFirestoreMediatorService {
           return randomizerGroupSetValue( groupId, `newGameResult/players/${uid}`, obj );
         },
 
-        selectedCardsHistory:  ( groupId: string, value ) =>
-          randomizerGroupPushValue( groupId, 'selectedCardsHistory', value ),
+        selectedCardsHistory: ( groupId: string, value: SelectedCards ) => {
+          const obj = this.utils.copyObject( value );
+          delete obj.date;
+          obj.timeStamp = value.date.valueOf();
+          return randomizerGroupPushValue( groupId, 'selectedCardsHistory', obj );
+        },
       },
       remove: {
         member: ( groupId: string, uid: string ) =>
           this.afdb.list( `${this.fdPath.randomizerGroupList}/${groupId}/newGameResult/players` ).remove( uid ),
       },
       reset: {
-        selectedCards:         ( groupId: string ) =>
-          randomizerGroupSetValue( groupId, 'selectedCards', new SelectedCards() ),
-
         selectedCardsCheckbox: ( groupId: string ) =>
           randomizerGroupSetValue( groupId, 'selectedCardsCheckbox', new SelectedCardsCheckbox() ),
 
         VPCalculator:          ( groupId: string ) =>
           randomizerGroupSetValue( groupId, 'resetVPCalculator', Date.now() ),
       },
-
     };
 
 
@@ -382,7 +399,6 @@ export class CloudFirestoreMediatorService {
       addMove:    ( roomId: string, move: MoveInGame ) =>
         this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/moves` ).push( move ),
     };
-
 
   }
 }

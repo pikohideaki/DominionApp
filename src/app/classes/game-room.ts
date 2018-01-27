@@ -29,7 +29,7 @@ export class GameRoom {
       timeStamp:               number,
       playerShuffler:          number[],
       playersName:             Object,
-      selectedCards:           SelectedCards,
+      selectedCards:           any,
       initialState:            GameState,
     }
   ) {

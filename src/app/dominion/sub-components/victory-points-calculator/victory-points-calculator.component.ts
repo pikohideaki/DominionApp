@@ -12,6 +12,7 @@ import { VictoryPointsCalculatorService } from './victory-points-calculator.serv
 import { CardProperty, toListIndex } from '../../../classes/card-property';
 import { SelectedCards        } from '../../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
+import { UtilitiesService } from '../../../my-own-library/utilities.service';
 
 
 @Component({
@@ -22,99 +23,119 @@ import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
 })
 export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
-  receiveDataDone: boolean = false;
-  private dataIsReady = {
-    cardPropertyList: new Subject(),
-  };
 
-  @Input() private selectedCards$: Observable<SelectedCards>;  // 存在するもののみ表示
-  @Input() private resetVPCalculator$: Observable<number>;
+  @Input() selectedCards$: Observable<SelectedCards>;  // selectedCardsに存在するもののみ表示
+  @Input() resetVPCalculator$: Observable<number>;
 
-  VPtotal = 0;
   @Output() VPtotalChange = new EventEmitter<number>();
+  VPtotal$ = this.VPtotalChange.asObservable().startWith(0);
 
+  @Output() numberOfVictoryCardsChange = new EventEmitter<NumberOfVictoryCards>();
 
   cardLongSideLength = 180;
-
   numberOfVictoryCards: NumberOfVictoryCards = new NumberOfVictoryCards();
 
+  cardPropertyList$ = this.database.cardPropertyList$;
 
 
-  VictoryCards = [
-    { id: 'Curse'           , maxNumber: 30, display: true, displayWhen: 'always' },
-    { id: 'Estate'          , maxNumber: 12, display: true, displayWhen: 'always' },
-    { id: 'Duchy'           , maxNumber: 12, display: true, displayWhen: 'always' },
-    { id: 'Province'        , maxNumber: 12, display: true, displayWhen: 'always' },
-    { id: 'Colony'          , maxNumber: 12, display: true, displayWhen: 'Prosperity' },
-    { id: 'Great_Hall'      , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Nobles'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Harem'           , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Farmland'        , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Island'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Tunnel'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Dame_Josephine'  , maxNumber:  1, display: true, displayWhen: 'KnightsIsInSupply' },
-    { id: 'Overgrown_Estate', maxNumber:  1, display: true, displayWhen: 'DarkAges' },
-    { id: 'Mill'            , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Cemetery'        , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
+  VictoryCardsFiltered$;
+  otherSettingsFiltered$;
 
-    { id: 'Gardens'         , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Duke'            , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Vineyard'        , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Fairgrounds'     , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Silk_Road'       , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Feodum'          , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Distant_Lands'   , maxNumber: 12, display: true, displayWhen: 'isInSupply' },
-    { id: 'Pasture'         , maxNumber: 12, display: true, displayWhen: 'ShepherdIsInSupply' },
-
-    { id: 'Humble_Castle'   , maxNumber:  2, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Crumbling_Castle', maxNumber:  1, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Small_Castle'    , maxNumber:  2, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Haunted_Castle'  , maxNumber:  1, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Opulent_Castle'  , maxNumber:  2, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Sprawling_Castle', maxNumber:  1, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Grand_Castle'    , maxNumber:  1, display: true, displayWhen: 'CastlesIsInSupply' },
-    { id: 'Kings_Castle'    , maxNumber:  2, display: true, displayWhen: 'CastlesIsInSupply' },
-  ];
-
-  OtherVictoryPoints = [
-    { id: 'VPtoken'         , maxNumber: 999, title: '勝利点トークン' },
-    { id: 'others'          , maxNumber: 999, title: 'その他' },
-    { id: 'othersMinus'     , maxNumber: 999, title: 'その他（マイナス得点）' },
-  ];
-
-  OtherSettings = [
-    { id: 'DeckSize'                     , by: 10, maxNumber: 999, display: true, displayIfExists: 'Gardens'    , title: '山札の枚数（庭園）' },
-    { id: 'numberOfActionCards'          , by:  3, maxNumber: 999, display: true, displayIfExists: 'Vineyard'   , title: 'アクションカードの枚数（ブドウ園）' },
-    { id: 'numberOfDifferentlyNamedCards', by:  5, maxNumber: 999, display: true, displayIfExists: 'Fairgrounds', title: '異なる名前のカード枚数（品評会）' },
-    { id: 'numberOfSilvers'              , by:  3, maxNumber:  40, display: true, displayIfExists: 'Feodum'     , title: '銀貨の枚数（封土）' },
+  otherVictoryPoints = [
+    { id: 'VPtoken'    , maxNumber: 999, title: '勝利点トークン' },
+    { id: 'others'     , maxNumber: 999, title: 'その他' },
+    { id: 'othersMinus', maxNumber: 999, title: 'その他（マイナス得点）' },
   ];
 
 
-  private cardPropertyList: CardProperty[] = [];
-  private selectedCards: SelectedCards;
+  // initializers
+  private VictoryCards = [
+    { id: 'Curse'           , maxNumber: 30, displayWhen: 'always' },
+    { id: 'Estate'          , maxNumber: 12, displayWhen: 'always' },
+    { id: 'Duchy'           , maxNumber: 12, displayWhen: 'always' },
+    { id: 'Province'        , maxNumber: 12, displayWhen: 'always' },
+    { id: 'Colony'          , maxNumber: 12, displayWhen: 'Prosperity' },
+    { id: 'Great_Hall'      , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Nobles'          , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Harem'           , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Farmland'        , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Island'          , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Tunnel'          , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Dame_Josephine'  , maxNumber:  1, displayWhen: 'KnightsIsInSupply' },
+    { id: 'Overgrown_Estate', maxNumber:  1, displayWhen: 'DarkAges' },
+    { id: 'Mill'            , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Cemetery'        , maxNumber: 12, displayWhen: 'isInSupply' },
+
+    { id: 'Gardens'         , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Duke'            , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Vineyard'        , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Fairgrounds'     , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Silk_Road'       , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Feodum'          , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Distant_Lands'   , maxNumber: 12, displayWhen: 'isInSupply' },
+    { id: 'Pasture'         , maxNumber: 12, displayWhen: 'ShepherdIsInSupply' },
+
+    { id: 'Humble_Castle'   , maxNumber:  2, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Crumbling_Castle', maxNumber:  1, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Small_Castle'    , maxNumber:  2, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Haunted_Castle'  , maxNumber:  1, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Opulent_Castle'  , maxNumber:  2, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Sprawling_Castle', maxNumber:  1, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Grand_Castle'    , maxNumber:  1, displayWhen: 'CastlesIsInSupply' },
+    { id: 'Kings_Castle'    , maxNumber:  2, displayWhen: 'CastlesIsInSupply' },
+  ];
+
+  private otherSettings = [
+    { id: 'DeckSize', title: '山札の枚数（庭園）',
+      by: 10, maxNumber: 999, displayIfExists: 'Gardens' },
+    { id: 'numberOfActionCards', title: 'アクションカードの枚数（ブドウ園）',
+      by:  3, maxNumber: 999, displayIfExists: 'Vineyard' },
+    { id: 'numberOfDifferentlyNamedCards', title: '異なる名前のカード枚数（品評会）',
+      by:  5, maxNumber: 999, displayIfExists: 'Fairgrounds' },
+    { id: 'numberOfSilvers', title: '銀貨の枚数（封土）',
+      by:  3, maxNumber:  40, displayIfExists: 'Feodum' },
+  ];
+
 
 
   constructor(
     private database: CloudFirestoreMediatorService,
     private calc: VictoryPointsCalculatorService,
+    private utils: UtilitiesService
   ) {
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardPropertyList = val;
-        this.dataIsReady.cardPropertyList.complete();
-        this.receiveDataDone = true;
-      });
   }
 
   ngOnInit() {
-    this.selectedCards$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.selectedCards = val;
-        this.displayOnlyThoseInSelectedCards();
-      });
+    this.VictoryCardsFiltered$ = Observable.combineLatest(
+        this.cardPropertyList$,
+        this.selectedCards$,
+        (cardPropertyList, selectedCards) => {
+          const selectedCardsAll = selectedCards.concatAllCards();
+          const isInSupply = cardId =>
+            selectedCardsAll.map( e => cardPropertyList[e].cardId ).includes( cardId );
 
+          return this.VictoryCards.filter( e => { switch ( e.displayWhen ) {
+            case 'always'             : return true;
+            case 'isInSupply'         : return isInSupply( e.id );
+            case 'Prosperity'         : return selectedCards.Prosperity;
+            case 'DarkAges'           : return selectedCards.DarkAges;
+            case 'KnightsIsInSupply'  : return isInSupply( 'Knights' );
+            case 'CastlesIsInSupply'  : return isInSupply( 'Castles' );
+            case 'ShepherdIsInSupply' : return isInSupply( 'Shepherd' );
+            default                   : return true;
+          } });
+        });
+
+    this.otherSettingsFiltered$ = Observable.combineLatest(
+        this.cardPropertyList$,
+        this.selectedCards$,
+        (cardPropertyList, selectedCards) => {
+          const selectedCardsAll = selectedCards.concatAllCards();
+          const isInSupply = cardId =>
+            selectedCardsAll.map( e => cardPropertyList[e].cardId )
+                            .includes( cardId );
+          return this.otherSettings.filter( e => isInSupply( e.displayIfExists ) );
+        });
 
     this.resetVPCalculator$
       .skip(1)
@@ -129,35 +150,16 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
 
 
   private updateVPtotal() {
-    this.VPtotal = this.calc.total( this.numberOfVictoryCards );
-    this.VPtotalChange.emit( this.VPtotal );
-  }
-
-  private async displayOnlyThoseInSelectedCards() {
-    await this.dataIsReady.cardPropertyList.asObservable().toPromise();
-    const selectedCardsAll = this.selectedCards.concatAllCards();
-    const isInSupply = cardId =>
-      selectedCardsAll.map( e => this.cardPropertyList[e].cardId ).includes( cardId );
-
-    this.VictoryCards.forEach( e => { switch ( e.displayWhen ) {
-      case 'always'             : e.display = true;  break;
-      case 'isInSupply'         : e.display = isInSupply( e.id );  break;
-      case 'Prosperity'         : e.display = this.selectedCards.Prosperity;  break;
-      case 'DarkAges'           : e.display = this.selectedCards.DarkAges;  break;
-      case 'KnightsIsInSupply'  : e.display = isInSupply( 'Knights' );  break;
-      case 'CastlesIsInSupply'  : e.display = isInSupply( 'Castles' );  break;
-      case 'ShepherdIsInSupply' : e.display = isInSupply( 'Shepherd' );  break;
-      default                   : e.display = true;  break;
-    } });
-
-    this.OtherSettings.forEach( e => e.display = isInSupply( e.displayIfExists ) );
+    const VPtotal = this.calc.total( this.numberOfVictoryCards );
+    this.VPtotalChange.emit( VPtotal );
+    this.numberOfVictoryCardsChange.emit( this.numberOfVictoryCards );
   }
 
 
-  cardProperty( cardId ) {
-    const index = toListIndex( this.cardPropertyList, cardId );
+  cardProperty( cardId, cardPropertyList ) {
+    const index = toListIndex( cardPropertyList, cardId );
     if ( index < 0 ) return;
-    return this.cardPropertyList[ index ];
+    return cardPropertyList[ index ];
   }
 
 
@@ -184,10 +186,12 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   increment( VictoryCardId: string, by: number = 1 ) {
     this.numberOfVictoryCards[ VictoryCardId ] += by;
 
-    const VictoryCardId__ = ( VictoryCardId === 'Distant_Lands_on_TavernMat' ? 'Distant_Lands' : VictoryCardId );
+    const VictoryCardId__ = ( VictoryCardId === 'Distant_Lands_on_TavernMat'
+                                ? 'Distant_Lands'
+                                : VictoryCardId );
     const max = [].concat( this.VictoryCards,
-                           this.OtherVictoryPoints,
-                           this.OtherSettings )
+                           this.otherVictoryPoints,
+                           this.otherSettings )
                   .find( e => e.id === VictoryCardId__ ).maxNumber;
     this.numberOfVictoryCards[ VictoryCardId ]
      = Math.min( max, this.numberOfVictoryCards[ VictoryCardId ] );
@@ -205,8 +209,9 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   }
 
   resetNumbers() {
-    Object.keys( this.numberOfVictoryCards )
-      .forEach( key => this.numberOfVictoryCards[key] = 0 );
+    this.utils.objectForEach(
+        this.numberOfVictoryCards,
+        (_, key) => this.numberOfVictoryCards[key] = 0 );
     this.updateVPtotal();
   }
 

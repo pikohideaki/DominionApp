@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/combineLatest';
-
+import { Subject } from 'rxjs/Subject';
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
@@ -11,186 +10,254 @@ import { RandomizerGroup       } from '../../classes/randomizer-group';
 import { SelectedCards         } from '../../classes/selected-cards';
 import { SelectedCardsCheckbox } from '../../classes/selected-cards-checkbox-values';
 import { BlackMarketPileCard   } from '../../classes/black-market-pile-card';
+import { BlackMarketPhase      } from '../../classes/black-market-phase.enum';
 import { PlayerResult          } from '../../classes/player-result';
+import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
 
 
 @Injectable()
 export class MyRandomizerGroupService {
-  private myRandomizerGroupId: string = '';
+  private myGrpId$: Observable<string>
+    = this.myUserInfo.randomizerGroupId$;
+  private myGrpId: string = '';
+  private myGrpIdIsReadySource = new Subject<void>();
+  private myGrpIdIsReady$ = this.myGrpIdIsReadySource.asObservable();
 
-  private myRandomizerGroup$: Observable<RandomizerGroup>
+  /**
+   * [ToDo] listから自分のグループのみ取り出しているが，
+   * idを取得後にfiredatabaseに自分のグループだけ問い合わせるように変更すべき
+   */
+  private myGrp$: Observable<RandomizerGroup>
    = Observable.combineLatest(
-      this.database.randomizerGroupList$,
-      this.myUserInfo.randomizerGroupId$,
-      (list, id) => (list.find( e => e.databaseKey === id ) || new RandomizerGroup() ) );
+        this.database.randomizerGroupList$,
+        this.myGrpId$,
+        (list, id) => list.find( e => e.databaseKey === id ) || new RandomizerGroup() )
+      .distinctUntilChanged( this.cmpObj );
 
-  private signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
+
+  name$ = this.myGrp$.map( e => e.name ).distinctUntilChanged();
 
 
-  name$                      = this.myRandomizerGroup$.map( e => e.name                      ).distinctUntilChanged();
-  randomizerButtonLocked$    = this.myRandomizerGroup$.map( e => e.randomizerButtonLocked    ).distinctUntilChanged();
-  isSelectedExpansions$
+  /**
+   * myRandomizerGroupのisSelectedExpansionsを取り出せば良いが，
+   * 初期化されていないときにはexpansionsNameListの長さのfalseの配列で初期化する必要がある．
+   */
+  isSelectedExpansions$: Observable<boolean[]>
     = Observable.combineLatest(
         this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
-        this.myRandomizerGroup$.map( e => e.isSelectedExpansions )
-                .distinctUntilChanged( this.cmpObj )
-                .startWith([]),
+        this.myGrp$.map( e => e.isSelectedExpansions ).distinctUntilChanged( this.cmpObj ),
         (initArray, isSelectedExpansions) =>
-          initArray.map( (_, i) => !!isSelectedExpansions[i] ) );
+          initArray.map( (_, i) => !!isSelectedExpansions[i] ) )
+      .startWith([]);
 
-  selectedCards$             = this.myRandomizerGroup$.map( e => e.selectedCards             ).distinctUntilChanged( this.cmpObj );
-  selectedCardsCheckbox$     = this.myRandomizerGroup$.map( e => e.selectedCardsCheckbox     ).distinctUntilChanged( this.cmpObj );
-  BlackMarketPileShuffled$   = this.myRandomizerGroup$.map( e => e.BlackMarketPileShuffled   ).distinctUntilChanged( this.cmpObj );
-  BlackMarketPhase$          = this.myRandomizerGroup$.map( e => e.BlackMarketPhase          ).distinctUntilChanged();
-  newGameResult = {
-    players$ : this.myRandomizerGroup$.map( e => e.newGameResult.players ).distinctUntilChanged( this.cmpObj ),
-    place$   : this.myRandomizerGroup$.map( e => e.newGameResult.place   ).distinctUntilChanged(),
-    memo$    : this.myRandomizerGroup$.map( e => e.newGameResult.memo    ).distinctUntilChanged(),
+  selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>
+    = this.myGrp$.map( e => e.selectedCardsCheckbox )
+        .distinctUntilChanged( this.cmpObj );
+
+  BlackMarketPileShuffled$: Observable<BlackMarketPileCard[]>
+    = this.myGrp$.map( e => e.BlackMarketPileShuffled )
+        .distinctUntilChanged( this.cmpObj );
+  BlackMarketPhase$: Observable<BlackMarketPhase>
+    = this.myGrp$.map( e => e.BlackMarketPhase )
+        .distinctUntilChanged();
+
+  selectedCardsHistory$: Observable<SelectedCards[]>
+    = this.myGrp$.map( e => e.selectedCardsHistory )
+        .distinctUntilChanged( this.cmpObj );
+  selectedIndexInHistory$: Observable<number>
+    = this.myGrp$.map( e => e.selectedIndexInHistory )
+        .distinctUntilChanged( this.cmpObj );
+
+  selectedCards$: Observable<SelectedCards>
+   = Observable.combineLatest(
+      this.selectedCardsHistory$,
+      this.selectedIndexInHistory$,
+      (list, index) => list[index] || new SelectedCards() );
+
+  newGameResult: {
+    players$:            Observable<PlayerResult[]>,
+    place$:              Observable<string>,
+    memo$:               Observable<string>,
+    lastTurnPlayerName$: Observable<string>,
+  } = {
+    players$ :
+      this.myGrp$.map( e => e.newGameResult.players )
+        .distinctUntilChanged( this.cmpObj ),
+    place$ :
+      this.myGrp$.map( e => e.newGameResult.place )
+        .distinctUntilChanged(),
+    memo$ :
+      this.myGrp$.map( e => e.newGameResult.memo )
+        .distinctUntilChanged(),
+    lastTurnPlayerName$ :
+      this.myGrp$.map( e => e.newGameResult.lastTurnPlayerName )
+        .distinctUntilChanged(),
   };
-  lastTurnPlayerName$        = this.myRandomizerGroup$.map( e => e.lastTurnPlayerName        ).distinctUntilChanged();
-  newGameResultDialogOpened$ = this.myRandomizerGroup$.map( e => e.newGameResultDialogOpened ).distinctUntilChanged();
-  resetVPCalculator$         = this.myRandomizerGroup$.map( e => e.resetVPCalculator         ).distinctUntilChanged();
 
-  selectedCardsHistory$ = this.myRandomizerGroup$.map( e => e.selectedCardsHistory ).distinctUntilChanged( this.cmpObj );
+  newGameResultDialogOpened$: Observable<boolean>
+    = this.myGrp$.map( e => e.newGameResultDialogOpened )
+        .distinctUntilChanged();
+  resetVPCalculator$: Observable<number>
+    = this.myGrp$.map( e => e.resetVPCalculator )
+        .distinctUntilChanged();
+
 
 
   constructor(
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    this.myUserInfo.randomizerGroupId$
-      .subscribe( val => this.myRandomizerGroupId = val );
+    this.myGrp$.subscribe( val => console.log('MyRandomizerGroupService::myGrp$', val ) );
+    this.myGrpId$.subscribe( val => console.log('MyRandomizerGroupService::myGrpId$', val ) );
+
+    this.myGrpId$.subscribe( val => {
+        this.myGrpId = val;
+        this.myGrpIdIsReadySource.complete();
+      });
   }
 
 
-  cmpObj(x, y) {
+  private cmpObj(x, y) {
     return JSON.stringify(x) === JSON.stringify(y);
   }
 
 
-  async addToSelectedCardsHistory( newSelectedCards: SelectedCards ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-      .add.selectedCardsHistory( this.myRandomizerGroupId, {
-              selectedCards: newSelectedCards,
-              timeStamp: Date.now(),
-            } );
-  }
-
-
-  async setRandomizerButtonLocked( locked: boolean ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.randomizerButtonLocked( this.myRandomizerGroupId, locked );
-  }
 
   async setIsSelectedExpansions( index: number, value: boolean ) {
-    await this.signedIn$.first().toPromise();
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.isSelectedExpansions( this.myRandomizerGroupId, index, value );
+            .set.isSelectedExpansions( this.myGrpId, index, value );
   }
 
-  async setSelectedCards( newSelectedCards: SelectedCards ) {
-    await this.signedIn$.first().toPromise();
+  async addToHistory( newSelectedCards: SelectedCards ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.selectedCards( this.myRandomizerGroupId, newSelectedCards );
+            .add.selectedCardsHistory(
+              this.myGrpId, newSelectedCards );
+  }
+
+  async setSelectedIndexInHistory( index: number ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.selectedIndexInHistory(
+                this.myGrpId, index );
+  }
+
+  async setBMPileShuffled( shuffled: BlackMarketPileCard[] ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.BlackMarketPileShuffled( this.myGrpId, shuffled );
+  }
+
+  async setBlackMarketPhase( phase: number ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.BlackMarketPhase( this.myGrpId, phase );
   }
 
   async setSelectedCardsCheckbox( arrayName: string, index: number, value: boolean ) {
-    await this.signedIn$.first().toPromise();
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.selectedCardsCheckbox( this.myRandomizerGroupId, arrayName, index, value );
-  }
-
-  async resetSelectedCards() {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .reset.selectedCards( this.myRandomizerGroupId );
+            .set.selectedCardsCheckbox(
+              this.myGrpId, arrayName, index, value );
   }
 
   async resetSelectedCardsCheckbox() {
-    await this.signedIn$.first().toPromise();
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .reset.selectedCardsCheckbox( this.myRandomizerGroupId );
+            .reset.selectedCardsCheckbox( this.myGrpId );
   }
 
-  async setBlackMarketPileShuffled( BlackMarketPileShuffled: BlackMarketPileCard[] ) {
-    await this.signedIn$.first().toPromise();
+
+
+  async setNGRLastTurnPlayerName( value: string ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.BlackMarketPileShuffled( this.myRandomizerGroupId, BlackMarketPileShuffled );
+            .set.newGameResult.lastTurnPlayerName( this.myGrpId, value );
   }
 
-  async setBlackMarketPhase( BlackMarketPhase: number ) {
-    await this.signedIn$.first().toPromise();
+  async setNGRPlayerSelected( uid: string, value: boolean ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.BlackMarketPhase( this.myRandomizerGroupId, BlackMarketPhase );
+            .set.newGameResult.players.selected( this.myGrpId, uid, value );
   }
+
+  async setNGRPlayerVP( uid: string, value: number ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.newGameResult.players.VP( this.myGrpId, uid, value );
+  }
+
+  async setNGRPlayerNumberOfVictoryCards( uid: string, value: NumberOfVictoryCards ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.newGameResult.players.numberOfVictoryCards( this.myGrpId, uid, value );
+  }
+
+  async setNGRPlayersTurnOrder( uid: string, value: number ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.newGameResult.players.turnOrder( this.myGrpId, uid, value );
+  }
+
+  async setNGRPlace( value: string ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.newGameResult.place( this.myGrpId, value );
+  }
+
+  async setNGRMemo( value: string ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup
+            .set.newGameResult.memo( this.myGrpId, value );
+  }
+
 
   async resetVPCalculator() {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup.reset.VPCalculator( this.myRandomizerGroupId );
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
+    return this.database.randomizerGroup.reset.VPCalculator( this.myGrpId );
   }
 
-  async setLastTurnPlayerName( value: string ) {
-    await this.signedIn$.first().toPromise();
+  async setNGRDialogOpened( value: boolean ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup
-            .set.lastTurnPlayerName( this.myRandomizerGroupId, value );
-  }
-
-  async setNewGameResultPlayerSelected( uid: string, value: boolean ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResult.players.selected( this.myRandomizerGroupId, uid, value );
-  }
-
-  async setNewGameResultPlayerVP( uid: string, value: number ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResult.players.VP( this.myRandomizerGroupId, uid, value );
-  }
-
-  async setNewGameResultPlayerTurnOrder( uid: string, value: number ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResult.players.turnOrder( this.myRandomizerGroupId, uid, value );
-  }
-
-  async setNewGameResultPlace( value: string ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResult.place( this.myRandomizerGroupId, value );
-  }
-
-  async setNewGameResultMemo( value: string ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResult.memo( this.myRandomizerGroupId, value );
-  }
-
-  async setNewGameResultDialogOpened( value: boolean ) {
-    await this.signedIn$.first().toPromise();
-    return this.database.randomizerGroup
-            .set.newGameResultDialogOpened( this.myRandomizerGroupId, value );
+            .set.newGameResultDialogOpened( this.myGrpId, value );
   }
 
 
-  async addMember( groupId: string, uid: string, name: string ) {
-    await this.signedIn$.first().toPromise();
+  async addMember( groupId: string, uid: string, name: string, nameYomi: string ) {
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     const value = new PlayerResult( uid, {
               name      : name,
+              nameYomi  : nameYomi,
               selected  : false,
               VP        : 0,
               turnOrder : 0,
+              numberOfVictoryCards: new NumberOfVictoryCards(),
             });
     return this.database.randomizerGroup.add.member( groupId, uid, value );
   }
 
-
   async removeMember( groupId: string, uid: string ) {
-    await this.signedIn$.first().toPromise();
+    await this.myGrpIdIsReady$.toPromise();
+    if ( !this.myGrpId ) return Promise.resolve();
     return this.database.randomizerGroup.remove.member( groupId, uid );
   }
-
-
-
 }

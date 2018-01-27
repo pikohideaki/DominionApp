@@ -1,12 +1,12 @@
 export class PlayerName {
   databaseKey: string = '';
   name:        string = '';
-  name_yomi:   string = '';
+  nameYomi:    string = '';
 
-  constructor( databaseKey?: string, initObj?: { name: string, name_yomi: string } ) {
+  constructor( databaseKey?: string, initObj?: { name: string, nameYomi: string } ) {
     this.databaseKey = (databaseKey || '');
     if ( !initObj ) return;
-    this.name      = (initObj.name || '' );
-    this.name_yomi = (initObj.name_yomi || '' );
+    this.name     = (initObj.name || '' );
+    this.nameYomi = (initObj.nameYomi || '' );
   }
 }

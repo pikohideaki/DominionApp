@@ -145,7 +145,4 @@ export class GameResultOfPlayerComponent implements OnInit {
     }
     return gameResultOfEachPlayerForView;
   }
-
-
-
 }

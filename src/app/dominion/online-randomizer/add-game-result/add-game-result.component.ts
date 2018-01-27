@@ -1,10 +1,7 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { Observable      } from 'rxjs/Observable';
-import { Subject         } from 'rxjs/Subject';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -32,30 +29,63 @@ import { SubmitGameResultDialogComponent } from '../../sub-components/submit-gam
     './add-game-result.component.css'
   ]
 })
-export class AddGameResultComponent implements OnInit, OnDestroy {
-  private alive = true;
+export class AddGameResultComponent implements OnInit {
 
-  private dataIsReady = {
-    selectedExpansions : new Subject(),
-    cardPropertyList   : new Subject(),
-    selectedCards      : new Subject(),
-  };
+  cardPropertyList$ = this.database.cardPropertyList$;
+  selectedCards$ = this.myRandomizerGroup.selectedCards$;
 
-  private selectedExpansions: string[] = [];
-  private cardPropertyList: CardProperty[];
-  private selectedCards: SelectedCards = new SelectedCards();
+  selectedExpansionNameList$
+    = Observable.combineLatest(
+        this.database.expansionsNameList$,
+        this.myRandomizerGroup.isSelectedExpansions$,
+        (nameList, selected) =>
+          nameList.filter( (_, i) => selected[i] ) );
 
-  playerResults$: Observable<PlayerResult[]>;
-  places$: Observable<string[]>;
-  numberOfPlayersOK$: Observable<boolean>;
-  newGameResultDialogOpened$: Observable<boolean>;
-  turnOrderFilled$: Observable<boolean>;
+  places$: Observable<string[]>
+    = this.database.gameResultList$.map( gameResultList =>
+          this.utils.uniq(
+              gameResultList
+                .map( e => e.place )
+                .filter( e => e !== '' ) ) )
+        .startWith([]);
 
-  selectedPlayers: PlayerResult[] = [];
-  place = '';
-  memo = '';
-  lastTurnPlayerName: string = '';
-  nextMissingNumber: number = 1;
+  place$: Observable<string>
+    = this.myRandomizerGroup.newGameResult.place$
+        .startWith('');
+
+  playerResults$: Observable<PlayerResult[]>
+    = this.myRandomizerGroup.newGameResult.players$
+        .startWith([]);
+
+  lastTurnPlayerName$: Observable<string>
+    = this.myRandomizerGroup.newGameResult.lastTurnPlayerName$
+        .startWith('');
+
+  selectedPlayers$: Observable<PlayerResult[]>
+    = this.playerResults$.map( list =>
+          list.filter( e => e.selected ) )
+        .startWith([]);
+
+  turnOrderFilled$: Observable<boolean>
+    = this.selectedPlayers$.map( list =>
+      list.every( e => e.turnOrder !== 0 ) );
+
+  // turnOrders == [1, 0, 0, 2] -> 3
+  nextMissingNumber$: Observable<number>
+    = this.selectedPlayers$.map( list =>
+          list.filter( e => e.turnOrder !== 0 ).length + 1 )
+        .startWith(1);
+
+  memo$: Observable<string>
+    = this.myRandomizerGroup.newGameResult.memo$
+        .startWith('');
+
+  newGameResultDialogOpened$: Observable<boolean>
+    = this.myRandomizerGroup.newGameResultDialogOpened$;
+
+  numberOfPlayersOK$: Observable<boolean>
+    = this.selectedPlayers$.map( e => e.length )
+        .map( e => ( 2 <= e && e <= 6 ) );
 
 
   constructor(
@@ -66,226 +96,160 @@ export class AddGameResultComponent implements OnInit, OnDestroy {
     private database: CloudFirestoreMediatorService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
-    /* observables */
-    this.playerResults$ = this.myRandomizerGroup.newGameResult.players$;
-
-    const selectedPlayers$: Observable<PlayerResult[]>
-      = this.playerResults$.map( list => list.filter( e => e.selected ) );
-
-    this.numberOfPlayersOK$
-      = selectedPlayers$.map( e => e.length ).map( e => ( 2 <= e && e <= 6 ) );
-
-    this.newGameResultDialogOpened$
-      = this.myRandomizerGroup.newGameResultDialogOpened$;
-
-    this.places$
-      = this.database.gameResultList$.map( gameResultList =>
-          this.utils.uniq( gameResultList.map( e => e.place ).filter( e => e !== '' ) ) );
-
-    const selectedExpansions$
-      = Observable.combineLatest(
-          this.database.expansionsNameList$,
-          this.myRandomizerGroup.isSelectedExpansions$,
-          (expansionsNameList, isSelectedExpansions) =>
-            expansionsNameList.filter( (_, i) => isSelectedExpansions[i] ) );
-
-    // turnOrders == [1, 0, 0, 2] -> 3
-    const nextMissingNumber$: Observable<number>
-      = selectedPlayers$.map( list => list.filter( e => e.turnOrder !== 0 ).length + 1 );
-
-    this.turnOrderFilled$
-      = selectedPlayers$.map( list => list.every( e => e.turnOrder !== 0 ) );
-
-
-    /* subscriptions */
-    this.myRandomizerGroup.selectedCards$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.selectedCards = val;
-        this.dataIsReady.selectedCards.complete();
-      } );
-
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.cardPropertyList = val;
-        this.dataIsReady.cardPropertyList.complete();
-      } );
-
-    selectedExpansions$
-      .takeWhile( () => this.alive )
-      .subscribe( val => {
-        this.selectedExpansions = val;
-        this.dataIsReady.selectedExpansions.complete();
-      });
-
-    this.myRandomizerGroup.newGameResult.place$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.place = val );
-
-    this.myRandomizerGroup.newGameResult.memo$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.memo = val );
-
-    this.myRandomizerGroup.lastTurnPlayerName$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.lastTurnPlayerName = val );
-
-    selectedPlayers$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.selectedPlayers = val );
-
-    nextMissingNumber$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.nextMissingNumber = val );
   }
 
 
   ngOnInit() {
   }
 
-  ngOnDestroy() {
-    this.alive = false;
-  }
-
 
   async changePlace( place: string ) {
-    await this.myRandomizerGroup.setNewGameResultPlace( place );
+    await this.myRandomizerGroup.setNGRPlace( place );
   }
 
-  async changePlayersResultSelected( uid: string, value: boolean ) {
+  // プレイヤー選択
+  async changePlayersResultSelected(
+    uid: string, selected: boolean, selectedPlayers: PlayerResult[]
+  ) {
     await Promise.all([
-      this.myRandomizerGroup.setNewGameResultPlayerSelected( uid, value ),
-      this.resetTurnOrders(),
+      this.myRandomizerGroup.setNGRPlayerSelected( uid, selected ),
+      this.resetTurnOrders( selectedPlayers ),
       this.changeLastTurnPlayerName(''),
     ]);
   }
 
-  async changeLastTurnPlayerName( name: string ) {
-    await this.myRandomizerGroup.setLastTurnPlayerName( name );
-  }
 
-
-  private async submitTurnOrders() {
-    await Promise.all( [].concat(
+  /* プレイヤーの順番 */
+  private async submitTurnOrders( selectedPlayers: PlayerResult[] ) {
+    await Promise.all([
       this.changeLastTurnPlayerName(''),
-      this.selectedPlayers.map( player => {
-        this.myRandomizerGroup.setNewGameResultPlayerTurnOrder( player.uid, player.turnOrder );
-      } ))
-    );
+      selectedPlayers.map( player => {
+        this.myRandomizerGroup.setNGRPlayersTurnOrder( player.uid, player.turnOrder );
+      } )
+    ]);
   }
 
-
-
-  async resetTurnOrders() {
-    this.selectedPlayers.forEach( e => e.turnOrder = 0 );
-    await this.submitTurnOrders();
-  }
-
-  async shuffleTurnOrders() {
-    if ( this.selectedPlayers.length < 2 ) return;
-    const shuffledArray
-      = this.utils.getShuffled( this.utils.numSeq( 1, this.selectedPlayers.length ) );
-    this.selectedPlayers.forEach( (e, i) => e.turnOrder = shuffledArray[i] );
-    await this.submitTurnOrders();
-  }
-
-  async rotateTurnOrders( step: number = 1 ) {
-    if ( this.selectedPlayers.length < 2 ) return;
-    const N = this.selectedPlayers.length;
-    const next = val => (((val - 1) + N - step) % N) + 1;
-    this.selectedPlayers.forEach( e => e.turnOrder = next( e.turnOrder ) );
-    await this.submitTurnOrders();
-  }
-
-  async rotateAtRandom() {
-    const rand = this.utils.randomNumber( 0, this.selectedPlayers.length -  1 );
-    this.rotateTurnOrders( rand );
-  }
-
-  async setEmptyTurnOrder( playerIndex: number ) {
+  async setEmptyTurnOrder(
+    playerIndex: number,
+    nextMissingNumber: number,
+    selectedPlayers: PlayerResult[]
+  ) {
+    // 手動入力
     // index == 2, turnOrders == [1, 0, 0, 2] -> [1, 0, 3, 2]
-    const uid = this.selectedPlayers[ playerIndex ].uid;
-    await this.myRandomizerGroup.setNewGameResultPlayerTurnOrder( uid, this.nextMissingNumber );
+    const uid = selectedPlayers[ playerIndex ].uid;
+    await this.myRandomizerGroup.setNGRPlayersTurnOrder( uid, nextMissingNumber );
+  }
+
+  async shuffleTurnOrders( selectedPlayers: PlayerResult[] ) {
+    if ( selectedPlayers.length < 2 ) return;
+    const shuffledArray
+      = this.utils.getShuffled( this.utils.numSeq( 1, selectedPlayers.length ) );
+    selectedPlayers.forEach( (e, i) => e.turnOrder = shuffledArray[i] );
+    await this.submitTurnOrders( selectedPlayers );
+  }
+
+  async rotateAtRandom( selectedPlayers: PlayerResult[] ) {
+    const rand = this.utils.randomNumber( 0, selectedPlayers.length -  1 );
+    this.rotateTurnOrders( selectedPlayers, rand );
+  }
+
+  async rotateTurnOrders( selectedPlayers: PlayerResult[], step: number ) {
+    if ( selectedPlayers.length < 2 ) return;
+    const N = selectedPlayers.length;
+    const next = val => (((val - 1) + N - step) % N) + 1;
+    selectedPlayers.forEach( e => e.turnOrder = next( e.turnOrder ) );
+    await this.submitTurnOrders( selectedPlayers );
+  }
+
+  async resetTurnOrders( selectedPlayers: PlayerResult[] ) {
+    selectedPlayers.forEach( e => e.turnOrder = 0 );
+    await this.submitTurnOrders( selectedPlayers );
   }
 
 
-  async submitGameResult() {
-    /* wait for first value */
-    await this.dataIsReady.selectedExpansions.toPromise();
-    await this.dataIsReady.cardPropertyList.toPromise();
-    await this.dataIsReady.selectedCards.toPromise();
+  /* 最終手番プレイヤー */
+  async changeLastTurnPlayerName( name: string ) {
+    await this.myRandomizerGroup.setNGRLastTurnPlayerName( name );
+  }
 
-    this.myRandomizerGroup.setNewGameResultDialogOpened(true);
-    const dialogRef = this.dialog.open( SubmitGameResultDialogComponent );
 
-    const indexToId = cardIndex => this.cardPropertyList[cardIndex].cardId;
+  async VPClicked( uid: string, selectedPlayers ) {
+    const dialogRef = this.dialog.open( SetVpDialogComponent );
+    dialogRef.componentInstance.VP = selectedPlayers.find( e => e.uid === uid ).VP;
+    const result = await dialogRef.afterClosed().toPromise();
+    if ( !result ) return;
+    await this.myRandomizerGroup.setNGRPlayerVP( uid, result );
+  }
+
+
+  async memoClicked( memoPrev: string ) {
+    const dialogRef = this.dialog.open( SetMemoDialogComponent );
+    dialogRef.componentInstance.memo = memoPrev;
+    const memoCurr = await dialogRef.afterClosed().toPromise();
+    if ( memoCurr === undefined ) return;
+    this.myRandomizerGroup.setNGRMemo( memoCurr );
+  }
+
+
+
+
+
+  async submitGameResult(
+    cardPropertyList:          CardProperty[],
+    selectedExpansionNameList: string[],
+    selectedCards:             SelectedCards,
+    place:                     string,
+    memo:                      string,
+    selectedPlayers:           PlayerResult[],
+    lastTurnPlayerName:        string,
+  ) {
+    const indexToId = cardIndex => cardPropertyList[cardIndex].cardId;
 
     const newGameResult = new GameResult( null, {
       no         : 0,
       timeStamp  : Date.now(),
-      place      : this.place,
-      memo       : this.memo,
-      selectedExpansions : this.selectedExpansions,
+      place      : place,
+      memo       : memo,
+      selectedExpansionNameList : selectedExpansionNameList,
       selectedCardsId : {
-        Prosperity      : this.selectedCards.Prosperity,
-        DarkAges        : this.selectedCards.DarkAges,
-        KingdomCards10  : this.selectedCards.KingdomCards10 .map( indexToId ),
-        BaneCard        : this.selectedCards.BaneCard       .map( indexToId ),
-        EventCards      : this.selectedCards.EventCards     .map( indexToId ),
-        Obelisk         : this.selectedCards.Obelisk        .map( indexToId ),
-        LandmarkCards   : this.selectedCards.LandmarkCards  .map( indexToId ),
-        BlackMarketPile : this.selectedCards.BlackMarketPile.map( indexToId ),
+        Prosperity      : selectedCards.Prosperity,
+        DarkAges        : selectedCards.DarkAges,
+        KingdomCards10  : selectedCards.KingdomCards10 .map( indexToId ),
+        BaneCard        : selectedCards.BaneCard       .map( indexToId ),
+        EventCards      : selectedCards.EventCards     .map( indexToId ),
+        Obelisk         : selectedCards.Obelisk        .map( indexToId ),
+        LandmarkCards   : selectedCards.LandmarkCards  .map( indexToId ),
+        BlackMarketPile : selectedCards.BlackMarketPile.map( indexToId ),
       },
-      players : this.selectedPlayers.map( pl => ({
+      players : selectedPlayers.map( pl => ({
                 name      : pl.name,
                 VP        : pl.VP,
                 turnOrder : pl.turnOrder,
                 rank      : 1,
                 score     : 0,
               }) ),
-      lastTurnPlayerName: this.lastTurnPlayerName,
+      lastTurnPlayerName: lastTurnPlayerName,
     });
 
+    this.myRandomizerGroup.setNGRDialogOpened(true);
+    const dialogRef = this.dialog.open( SubmitGameResultDialogComponent, { autoFocus: false } );
     dialogRef.componentInstance.newGameResult = newGameResult;
 
-    dialogRef.afterClosed().subscribe( result => {
-      this.myRandomizerGroup.setNewGameResultDialogOpened(false);
-      if ( result === 'OK Clicked' ) {
-        this.myRandomizerGroup.resetSelectedCards();
-        this.myRandomizerGroup.resetSelectedCardsCheckbox();
-        this.selectedPlayers.forEach( player =>
-            this.myRandomizerGroup.setNewGameResultPlayerVP( player.uid, 0 ));
-        this.myRandomizerGroup.setLastTurnPlayerName('');
-        this.myRandomizerGroup.setNewGameResultMemo('');
-        this.myRandomizerGroup.resetVPCalculator();
-        this.openSnackBar();
-      }
-    });
+    const result = await dialogRef.afterClosed().toPromise();
+    this.myRandomizerGroup.setNGRDialogOpened(false);
+    if ( result === 'OK Clicked' ) {
+      this.myRandomizerGroup.resetSelectedCardsCheckbox();
+      selectedPlayers.forEach( player =>
+          this.myRandomizerGroup.setNGRPlayerVP( player.uid, 0 ));
+      this.myRandomizerGroup.setNGRLastTurnPlayerName('');
+      this.myRandomizerGroup.setNGRMemo('');
+      this.myRandomizerGroup.resetVPCalculator();
+      this.openSnackBar();
+    }
   }
 
 
   private openSnackBar() {
     this.snackBar.open( 'Successfully Submitted!', undefined, { duration: 3000 } );
   }
-
-  VPClicked( uid: string ) {
-    const dialogRef = this.dialog.open( SetVpDialogComponent );
-    dialogRef.componentInstance.VP = this.selectedPlayers.find( e => e.uid === uid ).VP;
-    dialogRef.afterClosed().subscribe( result => {
-      if ( !result ) return;
-      this.myRandomizerGroup.setNewGameResultPlayerVP( uid, result );
-    });
-  }
-
-
-  memoClicked() {
-    const dialogRef = this.dialog.open( SetMemoDialogComponent );
-    dialogRef.componentInstance.memo = this.memo;
-    dialogRef.afterClosed().subscribe( result => {
-      if ( result === undefined ) return;
-      this.myRandomizerGroup.setNewGameResultMemo( result );
-    });
-  }
-
 }

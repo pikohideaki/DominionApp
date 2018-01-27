@@ -8,7 +8,6 @@ import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../utilities.service';
 
-import { ResetButtonComponent } from './reset-button.component';
 import { ItemsPerPageComponent } from './items-per-page.component';
 import { PagenationComponent, getDataAtPage } from './pagenation/pagenation.component';
 
@@ -21,6 +20,7 @@ export class ColumnSetting {
   isButton?:       boolean = false;
   manip?:          ''|'input'|'select'|'multiSelect-and'|'multiSelect-or' = '';
   selectOptions$?: Observable<{ value: any, viewValue: string }[]>;  // select, multiSelect-and
+  selectOptions?:  { value: any, viewValue: string }[] = [];  // select, multiSelect-and
   manipState?:     any;
 }
 
@@ -35,20 +35,25 @@ export class ColumnSetting {
 export class DataTableComponent implements OnInit, OnDestroy {
   private alive: boolean = true;
 
+  @Input() usePagenation: boolean = true;
+
   @Input() data$: Observable<any[]>;
 
   private filteredData$: Observable<any[]>;
+  private filteredIndice$: Observable<number[]>;
   filteredDataLength$: Observable<number>;
   @Output() filteredDataOnChange = new EventEmitter<any[]>();
+  @Output() filteredIndiceOnChange = new EventEmitter<number[]>();
 
-  @Input() columnSettings: ColumnSetting[] = [];
-  private columnSettingsChange = new EventEmitter<void>();
+  @Input() columnSettings: ColumnSetting[] = [];  // initializer
+  private columnSettingsSource = new BehaviorSubject<ColumnSetting[]>([]);
+  private columnSettings$ = this.columnSettingsSource.asObservable().debounceTime( 300 /* ms */ );
 
 
   // pagenation
-  @Input() itemsPerPageOptions: number[];
+  @Input() itemsPerPageOptions: number[] = [];
 
-  @Input() private itemsPerPage: number = 100;
+  @Input() itemsPerPageInit: number = 100;
   private itemsPerPageSource = new BehaviorSubject<number>( 100 );
   itemsPerPage$ = this.itemsPerPageSource.asObservable();
 
@@ -62,7 +67,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   @Output() onClick = new EventEmitter<{
       rowIndex: number,
-      rowIndexFiltered: number,
+      rowIndexOnFiltered: number,
       columnName: string
     }>();
 
@@ -71,51 +76,33 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   constructor(
     private utils: UtilitiesService,
-    private resetButton: ResetButtonComponent
   ) {
   }
 
   ngOnInit() {
-    this.itemsPerPageSource.next( this.itemsPerPage );
+    this.columnSettingsSource.next( this.columnSettings );  // initialize
+    this.itemsPerPageSource.next( this.itemsPerPageInit );  // initialize
 
-    /* initialize */
-    this.columnSettings.forEach( column => {
-      switch (column.manip) {
-        case 'select' :
-          column.selectOptions$
-            = this.data$.map( data => {
-                const columnData = data.map( line => line[ column.name ] );
-                const values = this.utils.uniq( columnData ).sort();
-                return values.map( e => ({ value: e, viewValue: this.transform( column.name, e ) }) );
-              });
-          break;
-
-        case 'multiSelect-or' :
-        case 'multiSelect-and' :
-          column.selectOptions$
-            = this.data$.map( data => {
-                const columnData = data.map( line => line[ column.name ] );
-                const values = this.utils.uniq( [].concat( ...columnData ) ).sort();
-                return values.map( e => ({ value: e, viewValue: this.transform( column.name, e ) }));
-              });
-          break;
-
-        default:
-          break;
-      }
-    });
+    this.filteredIndice$
+      = Observable.combineLatest(
+            this.data$,
+            this.columnSettings$,
+            (data, columnSettings) =>
+              data.map( (e, i) => ({ val: e, idx: i }) )
+                  .filter( e => this.filterFunction( e.val, columnSettings ) )
+                  .map( e => e.idx ) );
 
     this.filteredData$
       = Observable.combineLatest(
             this.data$,
-            this.columnSettingsChange.asObservable().debounceTime( 300 /* ms */ ),
-            data => data.filter( line => this.filterFunction( line ) ) );
+            this.filteredIndice$,
+            (data, indice) => indice.map( idx => data[idx] ) );
 
     this.pagenatedData$
       = Observable.combineLatest(
             this.filteredData$,
-            this.itemsPerPageSource.asObservable(),
-            this.selectedPageIndexSource.asObservable(),
+            this.itemsPerPage$,
+            this.selectedPageIndex$,
             (filteredData, itemsPerPage, selectedPageIndex) =>
               getDataAtPage(
                   filteredData,
@@ -126,7 +113,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       = this.pagenatedData$.map( data => data.map( line => {
           const transformed = {};
           Object.keys( line ).forEach( key => {
-            if ( Array.isArray(line[key]) ) {
+            if ( Array.isArray( line[key] ) ) {
               transformed[key] = line[key].map( e => this.transform( key, e ) ).join(', ');
             } else {
               transformed[key] = this.transform( key, line[key] );
@@ -139,14 +126,39 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
 
     /* subscriptions */
-    this.data$.first()
-      .subscribe( data => this.columnSettingsChange.emit() );  // 最初に1回
-
-    this.filteredData$
+    this.filteredIndice$
       .takeWhile( () => this.alive )
       .subscribe( val => {
         this.selectedPageIndexSource.next(0);
-        this.filteredDataOnChange.emit( val );
+        this.filteredIndiceOnChange.emit( val );
+      });
+
+    this.filteredData$
+      .takeWhile( () => this.alive )
+      .subscribe( val => this.filteredDataOnChange.emit( val ) );
+
+    this.data$
+      .takeWhile( () => this.alive )
+      .subscribe( data => {
+        const columnSettings = this.columnSettingsSource.getValue();
+        columnSettings.forEach( column => {
+          const dataOfColumn = data.map( line => line[ column.name ] );
+          switch ( column.manip ) {
+            case 'select' :
+              column.selectOptions
+                = this.utils.uniq( dataOfColumn ).sort()
+                    .map( e => ({ value: e, viewValue: this.transform( column.name, e ) }) );
+              break;
+            case 'multiSelect-or' :
+            case 'multiSelect-and' :
+              column.selectOptions
+                = this.utils.uniq( [].concat( ...dataOfColumn ) ).sort()
+                    .map( e => ({ value: e, viewValue: this.transform( column.name, e ) }) );
+              break;
+            default: break;
+          }
+        });
+        this.columnSettingsSource.next( columnSettings );
       });
   }
 
@@ -158,38 +170,50 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   itemsPerPageOnChange( value ) {
     this.itemsPerPageSource.next( value );
+    this.selectedPageIndexSource.next(0);
   }
 
   selectedPageIndexOnChange( value ) {
     this.selectedPageIndexSource.next( value );
   }
 
-  reset( name?: string ) {
-    this.resetButton.resetSelector( this.columnSettings, name );
-    this.columnSettingsChange.emit();
-  }
-
-  cellClicked( rawData, rowIndexOnThisPage: number, columnName: string ) {
+  cellClicked(
+    rawData,
+    rowIndexOnThisPage: number,
+    columnName: string,
+    columnSettings: ColumnSetting[]
+  ) {
     const rowIndexOnFilteredData
        = this.itemsPerPageSource.value * this.selectedPageIndexSource.value + rowIndexOnThisPage;
     this.onClick.emit({
-      rowIndex: this.indexOnRawData( rawData, rowIndexOnFilteredData ),
-      rowIndexFiltered: rowIndexOnFilteredData,
+      rowIndex: this.indexOnRawData( rawData, rowIndexOnFilteredData, columnSettings ),
+      rowIndexOnFiltered: rowIndexOnFilteredData,
       columnName: columnName
     });
   }
 
 
   changeColumnState( columnName: string, value ) {
-    const column = this.columnSettings.find( e => e.name === columnName );
-    if ( !column ) return;
+    const columnSettings = this.columnSettingsSource.getValue();
+    const column = columnSettings.find( e => e.name === columnName );
+    if ( column === undefined ) return;
     column.manipState = value;
-    this.columnSettingsChange.emit();
+    this.columnSettingsSource.next( columnSettings );
+  }
+
+  reset( columnName: string ) {
+    this.changeColumnState( columnName, undefined );
+  }
+
+  resetAll() {
+    const columnSettings = this.columnSettingsSource.getValue();
+    columnSettings.forEach( e => e.manipState = undefined );
+    this.columnSettingsSource.next( columnSettings );
   }
 
 
-  private filterFunction( lineOfData: any ): boolean {
-    const validSettings = this.columnSettings.filter( column => column.manipState !== undefined );
+  private filterFunction( lineOfData: any, columnSettings: ColumnSetting[] ): boolean {
+    const validSettings = columnSettings.filter( column => column.manipState !== undefined );
 
     for ( const column of validSettings ) {
       /* no mismatches => return true; 1 or more mismatches => return false */
@@ -228,10 +252,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
 
-  private indexOnRawData( rawData, indexOnFilteredData: number ): number {
-    let filteredDataNum = 0;
-    for ( let i = 0; i < rawData.length; ++i ) {
-      if ( this.filterFunction( rawData[i] ) ) filteredDataNum++;
+  private indexOnRawData( rawData, indexOnFilteredData: number, columnSettings: ColumnSetting[] ): number {
+    for ( let i = 0, filteredDataNum = 0; i < rawData.length; ++i ) {
+      if ( this.filterFunction( rawData[i], columnSettings ) ) filteredDataNum++;
       if ( filteredDataNum > indexOnFilteredData ) return i;
     }
     return rawData.length - 1;

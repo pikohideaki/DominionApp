@@ -6,83 +6,84 @@ import { BlackMarketPhase    } from '../classes/black-market-phase.enum';
 
 
 export class RandomizerGroup {
-  databaseKey:               string;       // set only when newly created
-  name:                      string = '';  // set only when newly created
-  password:                  string = '';  // set only when newly created
-  date:                      Date = new Date();   // set only when newly created
-  randomizerButtonLocked:    boolean = false;
-  isSelectedExpansions:      boolean[] = [];
-  selectedCards:             SelectedCards = new SelectedCards();
-  selectedCardsCheckbox:     SelectedCardsCheckbox = new SelectedCardsCheckbox();
-  BlackMarketPileShuffled:   BlackMarketPileCard[] = [];
-  BlackMarketPhase:          number = BlackMarketPhase.init;
-  newGameResultDialogOpened: boolean = false;
-  newGameResult: {
-    players: PlayerResult[],
-    place:   string,
-    memo:    string,
-  } = {
-    players: [],
-    place:   '',
-    memo:    '',
-  };
-  lastTurnPlayerName: string = '';
+  databaseKey: string;             // set only when newly created
 
-  resetVPCalculator: number = 0;
-  selectedCardsHistory: { selectedCards: SelectedCards, date: Date }[] = [];
+  name:        string = '';        // set only when newly created
+  password:    string = '';        // set only when newly created
+  date:        Date = new Date();  // set only when newly created
+
+  isSelectedExpansions:    boolean[] = [];
+  selectedCardsCheckbox:   SelectedCardsCheckbox = new SelectedCardsCheckbox();
+  BlackMarketPileShuffled: BlackMarketPileCard[] = [];
+  BlackMarketPhase:        number = BlackMarketPhase.init;
+  selectedCardsHistory:    SelectedCards[] = [];
+  selectedIndexInHistory:  number = 0;
+
+  newGameResult: {
+    players:            PlayerResult[],
+    place:              string,
+    memo:               string,
+    lastTurnPlayerName: string,
+  } = {
+    players:            [],
+    place:              '',
+    memo:               '',
+    lastTurnPlayerName: '',
+  };
+
+  newGameResultDialogOpened: boolean = false;
+  resetVPCalculator:         number = 0;
 
 
   constructor( databaseKey?: string, initObj?: {
-    name:                      string,
-    password:                  string,
-    timeStamp:                 number,
-    randomizerButtonLocked:    boolean,
-    isSelectedExpansions:      boolean[],
-    selectedCards:             SelectedCards,
-    selectedCardsCheckbox:     SelectedCardsCheckbox,
-    BlackMarketPileShuffled:   BlackMarketPileCard[],
-    BlackMarketPhase:          number,
-    newGameResultDialogOpened: boolean,
+    name:      string,
+    password:  string,
+    timeStamp: number,
+
+    isSelectedExpansions:    boolean[],
+    selectedCardsCheckbox:   SelectedCardsCheckbox,
+    BlackMarketPileShuffled: BlackMarketPileCard[],
+    BlackMarketPhase:        number,
+    selectedCardsHistory:    Object[],
+    selectedIndexInHistory:  number,
+
     newGameResult: {
-      players: Object,
-      place:   string,
-      memo:    string,
+      players:            Object,
+      place:              string,
+      memo:               string,
+      lastTurnPlayerName: string,
     },
-    lastTurnPlayerName: string,
-    resetVPCalculator: number,
-    selectedCardsHistory: Object,
+
+    newGameResultDialogOpened: boolean,
+    resetVPCalculator:         number,
   }) {
     this.databaseKey = ( databaseKey || '' );
 
     if ( !initObj ) return;
-    this.name                      = ( initObj.name || '' );
-    this.password                  = ( initObj.password || '' );
-    this.date                      = new Date( initObj.timeStamp || Date.now() );
-    this.randomizerButtonLocked    = !!initObj.randomizerButtonLocked;
-    this.isSelectedExpansions      = ( initObj.isSelectedExpansions || [] );
-    this.selectedCards             = new SelectedCards( initObj.selectedCards );
-    this.selectedCardsCheckbox     = new SelectedCardsCheckbox( initObj.selectedCardsCheckbox );
-    this.BlackMarketPileShuffled   = ( initObj.BlackMarketPileShuffled || [] );
-    this.BlackMarketPhase          = ( initObj.BlackMarketPhase || BlackMarketPhase.init );
-    this.newGameResultDialogOpened = !!initObj.newGameResultDialogOpened;
+    this.name     = ( initObj.name || '' );
+    this.password = ( initObj.password || '' );
+    this.date     = new Date( initObj.timeStamp || Date.now() );
 
-    this.lastTurnPlayerName        = ( initObj.lastTurnPlayerName || '' );
+    this.isSelectedExpansions    = ( initObj.isSelectedExpansions || [] );
+    this.selectedCardsCheckbox   = new SelectedCardsCheckbox( initObj.selectedCardsCheckbox );
+    this.BlackMarketPileShuffled = ( initObj.BlackMarketPileShuffled || [] );
+    this.BlackMarketPhase        = ( initObj.BlackMarketPhase || BlackMarketPhase.init );
+    this.selectedIndexInHistory  = ( initObj.selectedIndexInHistory || 0 );
     this.selectedCardsHistory
-      = ( entries( initObj.selectedCardsHistory )
-            .sort( (a, b) => a.value.timeStamp - b.value.timeStamp )
-            .map( e => ({
-              selectedCards: new SelectedCards( e.value.selectedCards ),
-              date : new Date( e.value.timeStamp ),
-            }) ) || [] );
+      = entries( initObj.selectedCardsHistory )
+            .sort( (a, b) => b.value.timeStamp - a.value.timeStamp )  // 時刻の降順にソート
+            .map( e => new SelectedCards( e.value ) );
 
     if ( !!initObj.newGameResult ) {
-      this.newGameResult.players     = ( entries( initObj.newGameResult.players )
-                                            .map( e => new PlayerResult( e.key, e.value ) ) || [] )
-                                          .sort( (a, b) => compareString(a.name, b.name) );
-      this.newGameResult.place       = ( initObj.newGameResult.place || '' );
-      this.newGameResult.memo        = ( initObj.newGameResult.memo || '' );
-      this.resetVPCalculator         = ( initObj.resetVPCalculator || 0 );
+      this.newGameResult.players = entries( initObj.newGameResult.players )
+                                    .map( e => new PlayerResult( e.key, e.value ) )
+                                    .sort( (a, b) => a.nameYomi.localeCompare( b.nameYomi ) );
+      this.newGameResult.place              = ( initObj.newGameResult.place || '' );
+      this.newGameResult.memo               = ( initObj.newGameResult.memo || '' );
+      this.newGameResult.lastTurnPlayerName = ( initObj.newGameResult.lastTurnPlayerName || '' );
     }
+    this.newGameResultDialogOpened = !!initObj.newGameResultDialogOpened;
+    this.resetVPCalculator         = ( initObj.resetVPCalculator || 0 );
   }
 }
 

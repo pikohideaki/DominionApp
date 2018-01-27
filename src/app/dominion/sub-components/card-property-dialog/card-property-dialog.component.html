@@ -1,21 +1,26 @@
 <ng-container *ngIf="{
-      card:        card$        | async,
-      cardForView: cardForView$ | async,
-      index:       index$       | async
+      card:             card$             | async,
+      cardForView:      cardForView$      | async,
+      showingIndex:     showingIndex$     | async,
+      indiceInCardList: indiceInCardList$ | async
     } as data">
-<ng-container *ngIf="data && data.card && data.cardForView && data.index >= 0">
+<ng-container *ngIf="
+         data.card
+      && data.cardForView
+      && data.showingIndex >= 0
+    ">
   <div mat-dialog-title class="title-bar">
-    <span> {{data.card.name_jp}} ({{data.card.name_eng}}) </span>
+    <span> {{data.card.nameJp}} ({{data.card.nameEng}}) </span>
     <span class="spacer"></span>
-    <span *ngIf="cards.length > 0" class="margined-element">
+    <span *ngIf="data.indiceInCardList.length > 1" class="margined-element">
       <button mat-raised-button class="navigationButton"
           (click)='goToPreviousCard()'
-          [disabled]='data.index <= 0' >
+          [disabled]='data.showingIndex <= 0' >
         <mat-icon>chevron_left</mat-icon>
       </button>
       <button mat-raised-button class="navigationButton"
           (click)='goToNextCard()'
-          [disabled]='data.index >= cards.length - 1' >
+          [disabled]='data.showingIndex >= data.indiceInCardList.length - 1' >
         <mat-icon>chevron_right</mat-icon>
       </button>
     </span>

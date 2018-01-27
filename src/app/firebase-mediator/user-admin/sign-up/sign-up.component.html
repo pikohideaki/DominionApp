@@ -42,7 +42,7 @@
   <div>
     <mat-form-field>
       <input matInput
-          [value]="name_yomi || '' "
+          [value]="nameYomi || '' "
           (input)="nameYomiOnChange( $event.target.value )"
           placeholder="フリガナ"
           required>
@@ -52,7 +52,7 @@
 
   <div class="buttons">
     <button mat-raised-button color="primary"
-        [disabled]="!email || !password || !name || !name_yomi"
+        [disabled]="!email || !password || !name || !nameYomi"
         (click)="signUp()">
       Sign Up
     </button>

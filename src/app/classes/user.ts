@@ -2,7 +2,7 @@ export class User {
   databaseKey:       string;
 
   name:              string = '';
-  name_yomi:         string = '';
+  nameYomi:          string = '';
   randomizerGroupId: string = '';
 
   onlineGame: {
@@ -21,7 +21,7 @@ export class User {
 
   constructor( databaseKey?: string, initObj?: {
       name:              string,
-      name_yomi:         string,
+      nameYomi:          string,
       randomizerGroupId: string,
       onlineGame: {
         isSelectedExpansions: boolean[],
@@ -35,7 +35,7 @@ export class User {
 
     if ( !initObj ) return;
     this.name                            = ( initObj.name || '' );
-    this.name_yomi                       = ( initObj.name_yomi || '' );
+    this.nameYomi                        = ( initObj.nameYomi || '' );
     this.randomizerGroupId               = ( initObj.randomizerGroupId || '' );
     if ( !initObj.onlineGame ) return;
     this.onlineGame.isSelectedExpansions = ( initObj.onlineGame.isSelectedExpansions || [] );

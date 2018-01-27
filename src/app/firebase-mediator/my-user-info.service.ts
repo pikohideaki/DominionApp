@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 import { Observable      } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import 'rxjs/add/observable/combineLatest';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -18,8 +17,9 @@ export class MyUserInfoService {
   myDisplayName$: Observable<string>;
 
   private myUserInfo$: Observable<User>;
+
   name$:               Observable<string>;
-  name_yomi$:          Observable<string>;
+  nameYomi$:           Observable<string>;
   randomizerGroupId$:  Observable<string>;
   onlineGame: {
     isSelectedExpansions$: Observable<boolean[]>,
@@ -37,31 +37,52 @@ export class MyUserInfoService {
     private afAuth: AngularFireAuth,
     private database: CloudFirestoreMediatorService,
   ) {
-    this.signedIn$      = this.afAuth.authState.map( user => !!user );
-    this.uid$           = this.afAuth.authState.map( user => ( !user ? '' : user.uid ) );
-    this.myDisplayName$ = this.afAuth.authState.map( user => ( !user ? '' : user.displayName ) );
+    this.signedIn$
+      = this.afAuth.authState.map( user => !!user );
+    this.uid$
+      = this.afAuth.authState.map( user => ( !user ? '' : user.uid ) );
+    this.myDisplayName$
+      = this.afAuth.authState.map( user => ( !user ? '' : user.displayName ) );
 
     this.myUserInfo$ = Observable.combineLatest(
         this.uid$,
         this.database.users$,
         ( uid: string, users: User[] ) =>
-          (!uid || users.length === 0) ? new User() : users.find( e => e.databaseKey === uid ) || new User() );
+          (!uid || users.length === 0)
+              ? new User()
+              : users.find( e => e.databaseKey === uid ) || new User() );
 
-    this.name$              = this.myUserInfo$.map( e => e.name              ).distinctUntilChanged();
-    this.name_yomi$         = this.myUserInfo$.map( e => e.name_yomi         ).distinctUntilChanged();
-    this.randomizerGroupId$ = this.myUserInfo$.map( e => e.randomizerGroupId ).distinctUntilChanged();
+    this.name$
+      = this.myUserInfo$.map( e => e.name )
+          .distinctUntilChanged();
+    this.nameYomi$
+      = this.myUserInfo$.map( e => e.nameYomi )
+          .distinctUntilChanged();
+    this.randomizerGroupId$
+      = this.myUserInfo$.map( e => e.randomizerGroupId )
+          .distinctUntilChanged();
     this.onlineGame = {
       isSelectedExpansions$ : Observable.combineLatest(
                 this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
-                this.myUserInfo$.map( e => e.onlineGame.isSelectedExpansions ).distinctUntilChanged(),
+                this.myUserInfo$.map( e => e.onlineGame.isSelectedExpansions )
+                  .distinctUntilChanged(),
                 (initArray, isSelectedExpansions) => initArray.map( (_, i) => !!isSelectedExpansions[i] ) ),
-      numberOfPlayers$ : this.myUserInfo$.map( e => e.onlineGame.numberOfPlayers ).distinctUntilChanged(),
-      roomId$          : this.myUserInfo$.map( e => e.onlineGame.roomId          ).distinctUntilChanged(),
-      communicationId$     : this.myUserInfo$.map( e => e.onlineGame.communicationId     ).distinctUntilChanged(),
-      chatOpened$      : this.myUserInfo$.map( e => e.onlineGame.chatOpened      ).distinctUntilChanged(),
+      numberOfPlayers$ :
+        this.myUserInfo$.map( e => e.onlineGame.numberOfPlayers )
+          .distinctUntilChanged(),
+      roomId$ :
+        this.myUserInfo$.map( e => e.onlineGame.roomId )
+          .distinctUntilChanged(),
+      communicationId$ :
+        this.myUserInfo$.map( e => e.onlineGame.communicationId )
+          .distinctUntilChanged(),
+      chatOpened$ :
+        this.myUserInfo$.map( e => e.onlineGame.chatOpened )
+          .distinctUntilChanged(),
     };
 
-    this.signedInToRandomizerGroup$ = this.randomizerGroupId$.map( groupId => !!groupId );
+    this.signedInToRandomizerGroup$
+      = this.randomizerGroupId$.map( groupId => !!groupId );
 
     this.uid$.subscribe( val => this.uid = val );
   }
@@ -92,7 +113,7 @@ export class MyUserInfoService {
     return this.database.user.set.onlineGame.roomId( this.uid, value );
   }
 
-  setOnlineGameStateId( value: string ) {
+  setGameCommunicationId( value: string ) {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.communicationId( this.uid, value );
   }
@@ -101,5 +122,4 @@ export class MyUserInfoService {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.chatOpened( this.uid, value );
   }
-
 }

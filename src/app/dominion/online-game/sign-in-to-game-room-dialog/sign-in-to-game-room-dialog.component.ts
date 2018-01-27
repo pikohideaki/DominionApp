@@ -9,6 +9,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { MyUserInfoService             } from '../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameRoom } from '../../../classes/game-room';
+import { SelectedCards } from '../../../classes/selected-cards';
 
 
 @Component({
@@ -22,23 +23,25 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   newRoom: GameRoom;  // input
   dialogRef;  // input
 
-  playersName$: Observable<string[]>;
-  selectedExpansions$: Observable<string[]>;
-
   allPlayersAreReady$: Observable<boolean>;
+  playersName$: Observable<string[]>;
+  selectedExpansionNameList$: Observable<string[]>;
+  selectedCards$: Observable<SelectedCards>;
+
 
   constructor(
     private router: Router,
-    public dialog: MatDialog,
+    private dialog: MatDialog,
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) { }
 
   ngOnInit() {
-    this.myUserInfo.setOnlineGameRoomId( this.newRoom.databaseKey );
-    this.myUserInfo.setOnlineGameStateId( this.newRoom.gameRoomCommunicationId );
+    this.selectedCards$ = Observable.from([this.newRoom.selectedCards]);
 
-  console.log(this.newRoom);
+    this.myUserInfo.setOnlineGameRoomId( this.newRoom.databaseKey );
+    this.myUserInfo.setGameCommunicationId( this.newRoom.gameRoomCommunicationId );
+
     // set Observables
     this.playersName$
       = this.database.onlineGameRooms$
@@ -48,14 +51,14 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
 
     const selectingRoomRemoved$
       = this.database.onlineGameRooms$
-          .map( list => list.findIndex( room => room.databaseKey === this.newRoom.databaseKey ) )
-          .filter( result => result === -1 );
+          .map( list => !list.map( e => e.databaseKey )
+                             .includes( this.newRoom.databaseKey ) );
 
     this.allPlayersAreReady$
       = this.playersName$.map( e => e.length >= this.newRoom.numberOfPlayers )
           .startWith( false );
 
-    this.selectedExpansions$
+    this.selectedExpansionNameList$
       = this.database.expansionsNameList$
           .map( val => val.filter( (_, i) => this.newRoom.isSelectedExpansions[i] ) )
           .startWith([]);
@@ -67,13 +70,12 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
       .subscribe( () => this.dialogRef.close() );
 
     this.allPlayersAreReady$
-      .filter( e => e )
+      .filter( e => e === true )
       .takeWhile( () => this.alive )
+      .delay( 1000 )
       .subscribe( () => {
-        setTimeout( () => {
-          this.router.navigate( ['/online-game-main'] );
-          this.dialogRef.close();
-        }, 1000);
+        this.router.navigate( ['/online-game-main'] );
+        this.dialogRef.close();
       });
   }
 

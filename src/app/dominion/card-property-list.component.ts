@@ -23,9 +23,9 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
         [transform]="transformFunction"
         [columnSettings]='columnSettings'
         [itemsPerPageOptions]='[ 25, 50, 100, 200 ]'
-        [itemsPerPage]='50'
+        [itemsPerPageInit]='50'
         (onClick)='showDetail( $event )'
-        (filteredDataOnChange)="filteredDataOnChange( $event )" >
+        (filteredIndiceOnChange)="filteredIndiceOnChange( $event )">
       </app-data-table>
     </div>
   `,
@@ -33,25 +33,25 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
 export class CardPropertyListComponent implements OnInit {
 
   cardPropertyList$ = this.database.cardPropertyList$;
-  private filteredListSource = new BehaviorSubject<CardProperty[]>([]);
+  private filteredIndiceSource = new BehaviorSubject<number[]>([]);
 
 
   columnSettings: ColumnSetting[] = [
-    { isButton: false, manip: '',                name: 'no'                 , headerTitle: 'No.' },
-    { isButton: true,  manip: 'input',           name: 'name_jp'            , headerTitle: '名前' },
-    { isButton: false, manip: 'input',           name: 'name_eng'           , headerTitle: 'Name' },
-    { isButton: false, manip: 'multiSelect-or',  name: 'expansionName'      , headerTitle: 'セット名' },
-    { isButton: false, manip: 'select',          name: 'category'           , headerTitle: '分類' },
+    { isButton: false, manip: ''               , name: 'no'                 , headerTitle: 'No.' },
+    { isButton: true,  manip: 'input'          , name: 'nameJp'             , headerTitle: '名前' },
+    { isButton: false, manip: 'input'          , name: 'nameEng'            , headerTitle: 'Name' },
+    { isButton: false, manip: 'multiSelect-or' , name: 'expansionName'      , headerTitle: 'セット名' },
+    { isButton: false, manip: 'select'         , name: 'category'           , headerTitle: '分類' },
     { isButton: false, manip: 'multiSelect-and', name: 'cardTypes'          , headerTitle: '種別' },
-    { isButton: false, manip: '',                name: 'cost'               , headerTitle: 'コスト' },
-    { isButton: false, manip: '',                name: 'VP'                 , headerTitle: 'VP' },
-    { isButton: false, manip: '',                name: 'drawCard'           , headerTitle: '+card' },
-    { isButton: false, manip: '',                name: 'action'             , headerTitle: '+action' },
-    { isButton: false, manip: '',                name: 'buy'                , headerTitle: '+buy' },
-    { isButton: false, manip: '',                name: 'coin'               , headerTitle: '+coin' },
-    { isButton: false, manip: '',                name: 'VPtoken'            , headerTitle: '+VPtoken' },
-    { isButton: false, manip: 'select',          name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
-    { isButton: false, manip: 'select',          name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
+    { isButton: false, manip: ''               , name: 'cost'               , headerTitle: 'コスト' },
+    { isButton: false, manip: ''               , name: 'VP'                 , headerTitle: 'VP' },
+    { isButton: false, manip: ''               , name: 'drawCard'           , headerTitle: '+card' },
+    { isButton: false, manip: ''               , name: 'action'             , headerTitle: '+action' },
+    { isButton: false, manip: ''               , name: 'buy'                , headerTitle: '+buy' },
+    { isButton: false, manip: ''               , name: 'coin'               , headerTitle: '+coin' },
+    { isButton: false, manip: ''               , name: 'VPtoken'            , headerTitle: '+VPtoken' },
+    { isButton: false, manip: 'select'         , name: 'implemented'        , headerTitle: 'ゲーム実装状況' },
+    { isButton: false, manip: 'select'         , name: 'randomizerCandidate', headerTitle: 'ランダマイザー対象' },
   ];
 
 
@@ -71,13 +71,14 @@ export class CardPropertyListComponent implements OnInit {
     return transform( property, value );
   }
 
-  async showDetail( position ) {
+  showDetail( position ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    dialogRef.componentInstance.cards = this.filteredListSource.getValue();
-    dialogRef.componentInstance.indexSource.next( position.rowIndexFiltered );
+    dialogRef.componentInstance.indiceInCardList$
+      = Observable.from([ this.filteredIndiceSource.getValue() ]);
+    dialogRef.componentInstance.showingIndexInit = position.rowIndexOnFiltered;
   }
 
-  filteredDataOnChange( list ) {
-    this.filteredListSource.next( list );
+  filteredIndiceOnChange( indice: number[] ) {
+    this.filteredIndiceSource.next( indice );
   }
 }

@@ -29,13 +29,16 @@ export class RandomizerService {
   selectCards( implementedOnly: boolean, isSelectedExpansions: boolean[] ) {
     const selectedCardsTemp = new SelectedCards();
 
+    selectedCardsTemp.date = new Date();
+
     // 選択されている拡張セットに含まれているカードすべてをシャッフルし，indexとペアにしたリスト
     const CardsInSelectedSets_Shuffled: { index: number, data: CardProperty }[]
      = this.utils.getShuffled(
         this.cardPropertyList
           .map( (val: CardProperty, index) => ({ index: index, data: val }) )
           .filter( e => e.data.randomizerCandidate )
-          .filter( e => !implementedOnly || e.data.implemented )  // if implementedOnly is true, select implemented
+          .filter( e => !implementedOnly || e.data.implemented )
+                        // "implementedOnly is true -> select implemented"
           .filter( e => this.expansionsNameList  // selected expansion
                         .filter( (_, index) => isSelectedExpansions[index] )
                         .findIndex( name => e.data.expansionName.includes(name) ) >= 0 )
@@ -68,7 +71,7 @@ export class RandomizerService {
 
     // 災いカード（収穫祭：魔女娘）
     if ( selectedCardsTemp.KingdomCards10
-         .map( e => this.cardPropertyList[e].name_jp ).includes( '魔女娘' ) ) {
+         .map( e => this.cardPropertyList[e].nameJp ).includes( '魔女娘' ) ) {
       if ( CardsInSelectedSets_Shuffled.length <= 0 ) {
         return { valid: false, selectedCards: selectedCardsTemp };
       }
@@ -82,7 +85,7 @@ export class RandomizerService {
 
     // Black Market (one copy of each Kingdom card not in the supply. 15種類選択を推奨)
     if ( [].concat( selectedCardsTemp.KingdomCards10, selectedCardsTemp.BaneCard )
-           .map( e => this.cardPropertyList[e].name_jp ).includes( '闇市場' ) ) {
+           .map( e => this.cardPropertyList[e].nameJp ).includes( '闇市場' ) ) {
       while ( selectedCardsTemp.BlackMarketPile.length < 15 ) {
         const card = CardsInSelectedSets_Shuffled.pop();
         if ( !card ) return { valid: false, selectedCards: selectedCardsTemp };
@@ -94,12 +97,12 @@ export class RandomizerService {
 
     // Obelisk (Choose 1 Action Supply Pile)
     if ( selectedCardsTemp.LandmarkCards
-         .map( e => this.cardPropertyList[e].name_eng ).includes('Obelisk') ) {
+         .map( e => this.cardPropertyList[e].nameEng ).includes('Obelisk') ) {
       const cardIndex: number = ( () => {
         const supplyUsed: number[] = [].concat( selectedCardsTemp.KingdomCards10, selectedCardsTemp.BaneCard );
         const ObeliskCandidatesActionCards: number[] = this.utils.copy( supplyUsed );
         if ( supplyUsed.map( e => this.cardPropertyList[e].cardType ).includes('略奪者') ) {
-          const ruinsIndex: number = this.cardPropertyList.findIndex( e => e.name_jp === '廃墟' );
+          const ruinsIndex: number = this.cardPropertyList.findIndex( e => e.nameJp === '廃墟' );
           ObeliskCandidatesActionCards.unshift( ruinsIndex );
         }
         return this.utils.getRandomValue( supplyUsed );

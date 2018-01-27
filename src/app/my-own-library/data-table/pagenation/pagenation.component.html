@@ -1,44 +1,53 @@
-<div class='pagenation'>
-  <button mat-raised-button class="navigationButton"
-      (click)='goToFirstPage()'
-      [disabled]='selectedPageIndex <= 0' >
-    <mat-icon>first_page</mat-icon>
-  </button>
+<ng-container *ngIf="{
+    selectedPageIndex: selectedPageIndex$ | async,
+    rangeStart:        rangeStart$        | async,
+    rangeEnd:          rangeEnd$          | async,
+    dataSize:          dataSize$          | async,
+    pageLength:        pageLength$        | async,
+    pageIndice:        pageIndice$        | async
+  } as data">
+  <div class='pagenation'>
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex(0)'
+        [disabled]='data.selectedPageIndex <= 0' >
+      <mat-icon>first_page</mat-icon>
+    </button>
 
-  <button mat-raised-button class="navigationButton"
-      (click)='goToPreviousPage()'
-      [disabled]='selectedPageIndex <= 0' >
-    <mat-icon>chevron_left</mat-icon>
-  </button>
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.selectedPageIndex - 1 )'
+        [disabled]='data.selectedPageIndex <= 0' >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
 
-  <div *ngIf="pageLength() <= 10; then thenBlock; else elseBlock" ></div>
-  <ng-template #thenBlock>
-    <mat-button-toggle-group #group="matButtonToggleGroup" >
-      <mat-button-toggle *ngFor='let pageIndex of generatePageIndices()'
-          [value]="pageIndex"
-          [class.mat-button-toggle-normal]="selectedPageIndex !== pageIndex"
-          [class.mat-button-toggle-selected]="selectedPageIndex === pageIndex"
-          (click)="setSelectedPageIndex(pageIndex)" >
-        <span>{{pageIndex + 1}}</span>
-      </mat-button-toggle>
-    </mat-button-toggle-group>
-  </ng-template>
-  <ng-template #elseBlock>
-    <span class="range">
-      {{range().start}}-{{range().end}} of {{dataSize}}
-    </span>
-  </ng-template>
+    <div *ngIf="data.pageLength <= 10; then thenBlock; else elseBlock" ></div>
+    <ng-template #thenBlock>
+      <mat-button-toggle-group #group="matButtonToggleGroup" >
+        <mat-button-toggle *ngFor='let pageIndex of data.pageIndice'
+            [value]="pageIndex"
+            [class.mat-button-toggle-normal]="data.selectedPageIndex !== pageIndex"
+            [class.mat-button-toggle-selected]="data.selectedPageIndex === pageIndex"
+            (click)="setSelectedPageIndex( pageIndex )" >
+          <span>{{pageIndex + 1}}</span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </ng-template>
+    <ng-template #elseBlock>
+      <span class="range">
+        {{data.rangeStart}}-{{data.rangeEnd}} of {{data.dataSize}}
+      </span>
+    </ng-template>
 
 
-  <button mat-raised-button class="navigationButton"
-      (click)='goToNextPage()'
-      [disabled]='selectedPageIndex >= pageLength() - 1' >
-    <mat-icon>chevron_right</mat-icon>
-  </button>
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.selectedPageIndex + 1 )'
+        [disabled]='data.selectedPageIndex >= data.pageLength - 1' >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
 
-  <button mat-raised-button class="navigationButton"
-      (click)='goToLastPage()'
-      [disabled]='selectedPageIndex >= pageLength() - 1' >
-    <mat-icon>last_page</mat-icon>
-  </button>
-</div>
+    <button mat-raised-button class="navigationButton"
+        (click)='setSelectedPageIndex( data.pageLength - 1 )'
+        [disabled]='data.selectedPageIndex >= data.pageLength - 1' >
+      <mat-icon>last_page</mat-icon>
+    </button>
+  </div>
+</ng-container>

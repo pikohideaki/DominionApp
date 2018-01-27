@@ -1,4 +1,6 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+
+import { Observable } from 'rxjs/Observable';
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 
@@ -6,22 +8,23 @@ import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-fir
 @Component({
   selector: 'app-expansions-toggle',
   template: `
-    <div *ngFor="let name of (expansionsNameList$ | async); let idx = index" >
+    <div *ngFor="let expansion of (expansions$ | async)" >
       <mat-slide-toggle color="primary"
-            [checked]="isSelectedExpansions[idx]"
-            (change)="toggleExpansion( $event.checked, idx )">
-        {{name}}
+          [checked]="expansion.selected"
+          (change)="toggleExpansion( $event.checked, expansion.index )">
+        {{expansion.name}}
       </mat-slide-toggle>
     </div>
   `,
   styles: []
 })
 export class ExpansionsToggleComponent implements OnInit {
-  expansionsNameList$ = this.database.expansionsNameList$;
 
-  @Input()  isSelectedExpansions: boolean[] = [];
+  @Input()  isSelectedExpansions$: Observable<boolean[]>;
   @Output() isSelectedExpansionsPartEmitter
     = new EventEmitter<{ index: number, checked: boolean }>();
+
+  expansions$: Observable<{ selected: boolean, name: string, index: number }[]>;
 
 
   constructor(
@@ -30,12 +33,17 @@ export class ExpansionsToggleComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.expansions$
+      = Observable.combineLatest(
+          this.isSelectedExpansions$,
+          this.database.expansionsNameList$,
+          (isSelectedList, nameList) =>
+            isSelectedList.map( (e, i) =>
+              ({ selected: e, name: nameList[i], index: i }) ) )
+        .startWith([]);
   }
 
   toggleExpansion( checked: boolean, index: number ) {
-    this.isSelectedExpansions[ index ] = checked;
     this.isSelectedExpansionsPartEmitter.emit({ checked: checked, index: index });
   }
-
-
 }

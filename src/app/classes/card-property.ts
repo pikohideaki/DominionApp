@@ -32,65 +32,65 @@ type CardType = (
     );
 
 export class CardProperty {
-  no:                     number = 0;
-  cardId:                 string = '';
-  name_jp:                string = '';
-  name_jp_yomi:           string = '';
-  name_eng:               string = '';
-  expansionName:          string[] = [];
-  cost:                   CardCost = new CardCost({ coin: 0, potion: 0, debt: 0 });
-  category:               string = '';
-  cardTypes:              CardType[];
-  VP:                     number = 0;
-  drawCard:               number = 0;
-  action:                 number = 0;
-  buy:                    number = 0;
-  coin:                   number = 0;
-  VPtoken:                number = 0;
-  implemented:            boolean = false;
-  randomizerCandidate:    boolean = false;
-  linkId:                 number = -1;
+  no:                  number = 0;
+  cardId:              string = '';
+  nameJp:              string = '';
+  nameJpYomi:          string = '';
+  nameEng:             string = '';
+  expansionName:       string[] = [];
+  cost:                CardCost = new CardCost({ coin: 0, potion: 0, debt: 0 });
+  category:            string = '';
+  cardTypes:           CardType[] = [];
+  VP:                  number = 0;
+  drawCard:            number = 0;
+  action:              number = 0;
+  buy:                 number = 0;
+  coin:                number = 0;
+  VPtoken:             number = 0;
+  implemented:         boolean = false;
+  randomizerCandidate: boolean = false;
+  linkId:              number = -1;
 
   constructor( initObj?: {
-    no:                     number,
-    cardId:                 string,
-    name_jp:                string,
-    name_jp_yomi:           string,
-    name_eng:               string,
-    expansionName:          string,
-    cost:                   CardCost,
-    category:               string,
-    cardTypes:              string,
-    VP:                     number,
-    drawCard:               number,
-    action:                 number,
-    buy:                    number,
-    coin:                   number,
-    VPtoken:                number,
-    implemented:            boolean,
-    randomizerCandidate:    boolean,
-    linkId:                 number,
+    no:                  number,
+    cardId:              string,
+    nameJp:              string,
+    nameJpYomi:          string,
+    nameEng:             string,
+    expansionName:       string,
+    cost:                CardCost,
+    category:            string,
+    cardTypes:           string,
+    VP:                  number,
+    drawCard:            number,
+    action:              number,
+    buy:                 number,
+    coin:                number,
+    VPtoken:             number,
+    implemented:         boolean,
+    randomizerCandidate: boolean,
+    linkId:              number,
   }) {
     if ( !initObj ) return;
 
-    this.no                     = ( initObj.no            || 0 );
-    this.cardId                 = ( initObj.cardId        || '' );
-    this.name_jp                = ( initObj.name_jp       || '' );
-    this.name_jp_yomi           = ( initObj.name_jp_yomi  || '' );
-    this.name_eng               = ( initObj.name_eng      || '' );
-    this.expansionName          = ( initObj.expansionName || '' ).split(',');
-    this.cost                   = new CardCost( initObj.cost );
-    this.category               = ( initObj.category      || '' );
-    this.cardTypes              = <CardType[]>( initObj.cardTypes || '' ).split(',');
-    this.VP                     = ( initObj.VP            || 0 );
-    this.drawCard               = ( initObj.drawCard      || 0 );
-    this.action                 = ( initObj.action        || 0 );
-    this.buy                    = ( initObj.buy           || 0 );
-    this.coin                   = ( initObj.coin          || 0 );
-    this.VPtoken                = ( initObj.VPtoken       || 0 );
-    this.implemented            = !!initObj.implemented;
-    this.randomizerCandidate    = !!initObj.randomizerCandidate;
-    this.linkId                 = ( initObj.linkId        || -1 );
+    this.no                  = ( initObj.no            || 0 );
+    this.cardId              = ( initObj.cardId        || '' );
+    this.nameJp              = ( initObj.nameJp        || '' );
+    this.nameJpYomi          = ( initObj.nameJpYomi    || '' );
+    this.nameEng             = ( initObj.nameEng       || '' );
+    this.expansionName       = ( initObj.expansionName || '' ).split(',');
+    this.cost                = new CardCost( initObj.cost );
+    this.category            = ( initObj.category      || '' );
+    this.cardTypes           = ( <CardType[]>( initObj.cardTypes || '' ).split(',') || [] );
+    this.VP                  = ( initObj.VP            || 0 );
+    this.drawCard            = ( initObj.drawCard      || 0 );
+    this.action              = ( initObj.action        || 0 );
+    this.buy                 = ( initObj.buy           || 0 );
+    this.coin                = ( initObj.coin          || 0 );
+    this.VPtoken             = ( initObj.VPtoken       || 0 );
+    this.implemented         = !!initObj.implemented;
+    this.randomizerCandidate = !!initObj.randomizerCandidate;
+    this.linkId              = ( initObj.linkId        || -1 );
   }
 
 
@@ -106,27 +106,27 @@ export class CardProperty {
 
   transformAll(): any {
     return {
-      no                     : this.no,
-      cardId                 : this.cardId,
-      name_jp                : this.name_jp,
-      name_jp_yomi           : this.name_jp_yomi,
-      name_eng               : this.name_eng,
-      expansionName          : this.expansionName.join('，'),
-      cost_coin              : this.cost.coin,
-      cost_potion            : this.cost.potion,
-      cost_debt              : this.cost.debt,
-      costStr                : transform( 'cost', this.cost ),
-      category               : this.category,
-      cardTypesStr           : this.cardTypes.map( e => transform( 'cardTypes', e ) ).join('，'),
-      cardTypes              : this.cardTypes,
-      VP                     : this.VP,
-      drawCard               : this.drawCard,
-      action                 : this.action,
-      buy                    : this.buy,
-      coin                   : this.coin,
-      VPtoken                : this.VPtoken,
-      implemented            : transform( 'implemented', this.implemented ),
-      randomizerCandidate    : transform( 'randomizerCandidate', this.randomizerCandidate ),
+      no                  : this.no,
+      cardId              : this.cardId,
+      nameJp              : this.nameJp,
+      nameJpYomi          : this.nameJpYomi,
+      nameEng             : this.nameEng,
+      expansionName       : this.expansionName.join('，'),
+      cost_coin           : this.cost.coin,
+      cost_potion         : this.cost.potion,
+      cost_debt           : this.cost.debt,
+      costStr             : transform( 'cost', this.cost ),
+      category            : this.category,
+      cardTypesStr        : this.cardTypes.map( e => transform( 'cardTypes', e ) ).join('，'),
+      cardTypes           : this.cardTypes,
+      VP                  : this.VP,
+      drawCard            : this.drawCard,
+      action              : this.action,
+      buy                 : this.buy,
+      coin                : this.coin,
+      VPtoken             : this.VPtoken,
+      implemented         : transform( 'implemented', this.implemented ),
+      randomizerCandidate : transform( 'randomizerCandidate', this.randomizerCandidate ),
     };
   }
 }
@@ -174,9 +174,9 @@ export function transform( property: string, value ) {
     case 'no' :
     case 'cardId' :
     case 'expansionName' :
-    case 'name_jp' :
-    case 'name_jp_yomi' :
-    case 'name_eng' :
+    case 'nameJp' :
+    case 'nameJpYomi' :
+    case 'nameEng' :
     case 'category' :
     case 'VP' :
     case 'drawCard' :

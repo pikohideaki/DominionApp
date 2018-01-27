@@ -94,3 +94,8 @@ tbody button {
 .small-table td.small-table--narrow-cell {
   width: 60px;
 }
+
+.resetButton {
+  float: right;
+  margin: 5px;
+}

@@ -8,3 +8,11 @@
   background-color: #C6C5C5;
 }
 
+
+.card-image-area {
+  display: flex;
+  flex-flow: row wrap;
+}
+.card-image-element {
+  margin: 5px;
+}

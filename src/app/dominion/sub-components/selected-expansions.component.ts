@@ -7,9 +7,9 @@ import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-fir
 @Component({
   selector: 'app-selected-expansions',
   template: `
-    <mat-chip-list>
+    <mat-chip-list *ngIf="(expansions$ | async) as expansions">
       <mat-chip color="accent"
-          *ngFor="let expansion of (expansions$ | async)"
+          *ngFor="let expansion of expansions"
           [selected]="expansion.selected" >
         {{expansion.name}}
       </mat-chip>
@@ -19,7 +19,7 @@ import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-fir
 })
 export class SelectedExpansionsComponent implements OnInit {
 
-  @Input() selectedExpansions: string[];
+  @Input() selectedExpansionNameList$: Observable<string[]>;
   expansions$: Observable<{ name: string, selected: boolean }[]>;
 
 
@@ -29,9 +29,10 @@ export class SelectedExpansionsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.expansions$
-      = this.database.expansionsNameList$.map( namelist =>
-            namelist.map( name => ({ name: name, selected: this.selectedExpansions.includes(name) }) ) );
+    this.expansions$ = Observable.combineLatest(
+        this.database.expansionsNameList$,
+        this.selectedExpansionNameList$,
+        (nameList, selectedNameList) =>
+          nameList.map( name => ({ name: name, selected: selectedNameList.includes(name) }) ) );
   }
-
 }

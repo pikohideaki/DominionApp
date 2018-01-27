@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 @Component({
   selector: 'app-data-table--items-per-page',
   template: `
-    <mat-form-field class='itemsPerPage'>
+    <mat-form-field class='items-per-page'>
       <mat-select placeholder="items per page" [value]="itemsPerPage">
         <mat-option *ngFor="let option of itemsPerPageOptions"
             [value]="option"
@@ -14,7 +14,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
     </mat-form-field>
   `,
   styles: [`
-    .itemsPerPage {
+    .items-per-page {
       padding: 20px;
       display: inline-block;
     }
@@ -27,19 +27,13 @@ export class ItemsPerPageComponent implements OnInit {
   @Input()  itemsPerPage: number = 0;
   @Output() itemsPerPageChange = new EventEmitter<number>();
 
-  @Input()  selectedPageIndex: number = 0;
-  @Output() selectedPageIndexChange = new EventEmitter<number>();
-
   constructor() {
   }
 
   ngOnInit() {
   }
 
-  setItemsPerPage( value: number ): void {
+  setItemsPerPage( value: number ) {
     this.itemsPerPageChange.emit( value );
-    this.selectedPageIndexChange.emit(0);
   }
-
-
 }

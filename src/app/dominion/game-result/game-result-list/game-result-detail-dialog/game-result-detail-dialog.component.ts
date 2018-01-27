@@ -1,8 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
-
-import 'rxjs/add/operator/takeWhile';
-
 import { MatDialog, MatSnackBar } from '@angular/material';
+
+import { Observable } from 'rxjs/Observable';
+
 
 import { GameResult    } from '../../../../classes/game-result';
 import { SelectedCards } from '../../../../classes/selected-cards';
@@ -10,8 +10,6 @@ import { CardProperty  } from '../../../../classes/card-property';
 
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { ConfirmDialogComponent } from '../../../../my-own-library/confirm-dialog.component';
-
-import { Observable } from 'rxjs/Observable';
 
 import { CardPropertyDialogComponent } from '../../../sub-components/card-property-dialog/card-property-dialog.component';
 
@@ -28,9 +26,8 @@ export class GameResultDetailDialogComponent implements OnInit {
 
   gameResult: GameResult = new GameResult();  // input
 
-  cardPropertyList: CardProperty[] = [];
-
   selectedCards$: Observable<SelectedCards>;
+  selectedExpansionNameList$: Observable<string[]>;
 
   // firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
   firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/dominionapps/data/data/gameResultList/';
@@ -44,13 +41,15 @@ export class GameResultDetailDialogComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.selectedExpansionNameList$
+      = Observable.from([ this.gameResult.selectedExpansionNameList ]);
+
     this.firebasePath += this.gameResult.databaseKey;
 
-    const toIndex = ((cardId, cardList) => cardList.findIndex( e => e.cardId === cardId ) );
+    const toIndex = ((id, list) => list.findIndex( e => e.cardId === id ) );
 
     this.selectedCards$
       = this.database.cardPropertyList$.map( cardList => {
-          this.cardPropertyList = cardList;
           const result = new SelectedCards();
           const ids = this.gameResult.selectedCardsId;
           result.Prosperity      = ids.Prosperity;
@@ -66,13 +65,13 @@ export class GameResultDetailDialogComponent implements OnInit {
   }
 
   cardInfoButtonClicked( cardIndex: number ) {
-    const dialogRef = this.dialog.open( CardPropertyDialogComponent );
-    dialogRef.componentInstance.card = this.cardPropertyList[cardIndex];
+    const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
+    dialogRef.componentInstance.indiceInCardList$ = Observable.from([[cardIndex]]);
   }
 
-  edit() {
+  // edit() {
 
-  }
+  // }
 
   deleteGameResult() {
     const dialogRef = this.dialog.open( ConfirmDialogComponent );
@@ -88,5 +87,4 @@ export class GameResultDetailDialogComponent implements OnInit {
   private openSnackBar() {
     this.snackBar.open( 'Deleted.', undefined, { duration: 3000 } );
   }
-
 }

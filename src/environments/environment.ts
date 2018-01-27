@@ -6,19 +6,19 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyATahReMsoYLsgo60MsBGXXOBHKDB1kcPQ',
-    authDomain: 'dominionappstest.firebaseapp.com',
-    databaseURL: 'https://dominionappstest.firebaseio.com',
-    projectId: 'dominionappstest',
-    storageBucket: '',
-    messagingSenderId: '901667738014'
-  },
+      apiKey: 'AIzaSyBGFhmydRA7hmBMjTqe9pfa80lNEjb7G-0',
+      authDomain: 'dominionapps.firebaseapp.com',
+      databaseURL: 'https://dominionapps.firebaseio.com',
+      projectId: 'dominionapps',
+      storageBucket: 'dominionapps.appspot.com',
+      messagingSenderId: '830879011229'
+  }
   // firebase: {
-  //     apiKey: 'AIzaSyBGFhmydRA7hmBMjTqe9pfa80lNEjb7G-0',
-  //     authDomain: 'dominionapps.firebaseapp.com',
-  //     databaseURL: 'https://dominionapps.firebaseio.com',
-  //     projectId: 'dominionapps',
-  //     storageBucket: 'dominionapps.appspot.com',
-  //     messagingSenderId: '830879011229'
+  //   apiKey: 'AIzaSyATahReMsoYLsgo60MsBGXXOBHKDB1kcPQ',
+  //   authDomain: 'dominionappstest.firebaseapp.com',
+  //   databaseURL: 'https://dominionappstest.firebaseio.com',
+  //   projectId: 'dominionappstest',
+  //   storageBucket: '',
+  //   messagingSenderId: '901667738014'
   // },
 };

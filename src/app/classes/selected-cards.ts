@@ -1,4 +1,6 @@
 export class SelectedCards {
+  date:             Date = new Date();
+
   Prosperity:       boolean  = false;
   DarkAges:         boolean  = false;
   KingdomCards10:   number[] = [];
@@ -10,6 +12,7 @@ export class SelectedCards {
 
 
   constructor( initObj?: {
+      timeStamp:        number,
       Prosperity:       boolean,
       DarkAges:         boolean,
       KingdomCards10:   number[],
@@ -20,6 +23,7 @@ export class SelectedCards {
       BlackMarketPile:  number[],
   }) {
     if ( !initObj ) return;
+    this.date = new Date( initObj.timeStamp || Date.now() );
     this.Prosperity      = ( initObj.Prosperity      || false );
     this.DarkAges        = ( initObj.DarkAges        || false );
     this.KingdomCards10  = ( initObj.KingdomCards10  || [] );
@@ -42,4 +46,7 @@ export class SelectedCards {
     );
   }
 
+  isEmpty() {
+    return this.KingdomCards10.length === 0;
+  }
 }

@@ -18,10 +18,10 @@ export class SignUpComponent implements OnInit {
 
   waitingForResponse = false;
 
-  email: string;
+  email:    string;
   password: string;
-  name: string;
-  name_yomi: string;
+  name:     string;
+  nameYomi: string;
 
   errorMessageForEmail: string;
   errorMessageForPassword: string;
@@ -52,7 +52,7 @@ export class SignUpComponent implements OnInit {
   }
 
   nameYomiOnChange( value ) {
-    this.name_yomi = value;
+    this.nameYomi = value;
   }
 
 
@@ -68,14 +68,14 @@ export class SignUpComponent implements OnInit {
       this.database.user.setUser(
           afUser.uid,
           new User( afUser.uid, {
-            name:              this.name,
-            name_yomi:         this.name_yomi,
+            name:     this.name,
+            nameYomi: this.nameYomi,
             randomizerGroupId: '',
             onlineGame: {
               isSelectedExpansions: [],
               numberOfPlayers:       2,
               roomId:               '',
-              communicationId:          '',
+              communicationId:      '',
               chatOpened:           true,
             }
           } ) );

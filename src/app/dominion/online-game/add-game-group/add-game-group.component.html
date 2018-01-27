@@ -38,11 +38,14 @@
   <hr>
 
   <app-randomizer
-      [implementedOnly]="true"
-      [showSelectedCardsCheckbox]="false"
-      [(selectedCards)]="selectedCards"
-      [(BlackMarketPileShuffled)]="BlackMarketPileShuffled"
-      [isSelectedExpansions]="isSelectedExpansions$ | async"
-      (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )" >
+    [implementedOnly]="true"
+    [showSelectedCardsCheckbox]="false"
+    [useHistory]="false"
+    [selectedCards$]="selectedCards$"
+    [BlackMarketPileShuffled$]="BlackMarketPileShuffled$"
+    [isSelectedExpansions$]="isSelectedExpansions$"
+    (selectedCardsChange)="selectedCardsOnChange( $event )"
+    (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange( $event )"
+    (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )" >
   </app-randomizer>
 </div>

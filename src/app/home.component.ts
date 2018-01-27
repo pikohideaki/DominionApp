@@ -27,13 +27,13 @@ export class HomeComponent implements OnInit {
     private myUserInfo: MyUserInfoService
   ) {
     this.apps$ = this.myUserInfo.signedIn$.map( signedIn => [
-        // {
-        //   routerLink: '/online-game',
-        //   inService:  signedIn,
-        //   title:      'Online Game',
-        //   subtitle:   'Dominion オンライン対戦',
-        //   description: ( signedIn ? '' : '（※要ログイン）'),
-        // },
+        {
+          routerLink: '/online-game',
+          inService:  signedIn,
+          title:      'Online Game',
+          subtitle:   'Dominion オンライン対戦',
+          description: ( signedIn ? '' : '（※要ログイン）'),
+        },
         {
           routerLink: '/online-randomizer',
           inService:  signedIn,
@@ -41,7 +41,13 @@ export class HomeComponent implements OnInit {
           subtitle:   'サプライ生成＆ゲーム結果追加（グループ同期機能付き）',
           description: ( signedIn ? '' : '（※要ログイン）'),
         },
-        { routerLink: '/game-result', inService: true, title: 'Game Result List', subtitle: '成績表', },
+        {
+          routerLink: '/game-result',
+          inService: signedIn,
+          title: 'Game Result List',
+          subtitle: '成績表',
+          description: ( signedIn ? '' : '（※要ログイン）'),
+        },
         { routerLink: '/cardlist'   , inService: true, title: 'Card List'       , subtitle: 'カード一覧表', },
         { routerLink: '/rulebooks'  , inService: true, title: 'RuleBooks'       , subtitle: 'Dominionのルールブック(PDF)', },
       ] );

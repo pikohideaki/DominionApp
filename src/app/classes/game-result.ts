@@ -57,35 +57,35 @@ class SelectedCardsId {
 
 
 export class GameResult {
-  databaseKey:        string = '';  // key of this game-result in fire-database
-  no:                 number = 0;   // <- calculate locally
-  date:               Date = new Date();
-  place:              string = '';
-  players:            PlayerResultRanked[] = [];
-  memo:               string = '';
-  selectedExpansions: string[] = [];
-  selectedCardsId:    SelectedCardsId = new SelectedCardsId();
-  lastTurnPlayerName: string = '';
+  databaseKey:               string = '';  // key of this game-result in fire-database
+  no:                        number = 0;   // <- calculate locally
+  date:                      Date = new Date();
+  place:                     string = '';
+  players:                   PlayerResultRanked[] = [];
+  memo:                      string = '';
+  selectedExpansionNameList: string[] = [];
+  selectedCardsId:           SelectedCardsId = new SelectedCardsId();
+  lastTurnPlayerName:        string = '';
 
   constructor( databaseKey?: string, initObj?: {
-    no:                 number,
-    timeStamp:          number,
-    place:              string,
-    players:            PlayerResultRanked[],
-    memo:               string,
-    selectedExpansions: string[],
-    selectedCardsId:    SelectedCardsId,
-    lastTurnPlayerName: string,
+    timeStamp:                 number,
+    no:                        number,
+    place:                     string,
+    players:                   PlayerResultRanked[],
+    memo:                      string,
+    selectedExpansionNameList: string[],
+    selectedCardsId:           SelectedCardsId,
+    lastTurnPlayerName:        string,
   }) {
     this.databaseKey        = databaseKey;
 
     if ( !initObj ) return;
-    this.no                 = ( initObj.no || 0 );
-    this.date               = new Date( initObj.timeStamp || Date.now() );
-    this.place              = ( initObj.place || '' );
-    this.players            = ( initObj.players || [] ).map( e => new PlayerResultRanked(e) );
-    this.memo               = ( initObj.memo || '' );
-    this.selectedExpansions = ( initObj.selectedExpansions || [] );
+    this.no      = ( initObj.no || 0 );
+    this.date    = new Date( initObj.timeStamp || Date.now() );
+    this.place   = ( initObj.place || '' );
+    this.players = ( initObj.players || [] ).map( e => new PlayerResultRanked(e) );
+    this.memo    = ( initObj.memo || '' );
+    this.selectedExpansionNameList = ( initObj.selectedExpansionNameList || [] );
     this.selectedCardsId    = new SelectedCardsId( initObj.selectedCardsId );
     this.lastTurnPlayerName = ( initObj.lastTurnPlayerName || '' );
 

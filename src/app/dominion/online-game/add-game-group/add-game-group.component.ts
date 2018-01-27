@@ -51,12 +51,15 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     = Observable.combineLatest(
           this.numberOfPlayers$, this.isSelectedExpansions$,
           (numberOfPlayers, isSelectedExpansions) =>
-            (numberOfPlayers < 2 || 6 < numberOfPlayers)
+            !this.utils.isInRange( numberOfPlayers, 2, 7)
              || isSelectedExpansions.every( e => !e ) );
 
   // app-randomizer
-  selectedCards: SelectedCards = new SelectedCards();
-  BlackMarketPileShuffled: BlackMarketPileCard[] = [];
+  selectedCardsSource = new BehaviorSubject<SelectedCards>( new SelectedCards() );
+  selectedCards$ = this.selectedCardsSource.asObservable();
+
+  BlackMarketPileShuffledSource = new BehaviorSubject<BlackMarketPileCard[]>([]);
+  BlackMarketPileShuffled$ = this.BlackMarketPileShuffledSource.asObservable();
 
 
   constructor(
@@ -76,7 +79,9 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
       .subscribe( val => this.numberOfPlayersSource.next( val ) );
 
     if ( isDevMode() ) {
-      this.selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
+      const selectedCards = this.selectedCardsSource.getValue();
+      selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
+      this.selectedCardsSource.next( selectedCards );
       this.isSelectedExpansionsOnChange({ index: 1, checked: true });
       console.log('selected test 10 KingdomCards');
     }
@@ -123,7 +128,7 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
         this.numberOfPlayersSource.getValue(),
         this.isSelectedExpansionsSource.getValue(),
         this.memoSource.getValue(),
-        this.selectedCards );
+        this.selectedCardsSource.getValue() );
 
     // dialog
     const dialogRef = this.dialog.open( SignInToGameRoomDialogComponent );
@@ -147,6 +152,14 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
 
   private openSnackBar( message: string ) {
     this.snackBar.open( message, undefined, { duration: 3000 } );
+  }
+
+  selectedCardsOnChange( value ) {
+    this.selectedCardsSource.next( value );
+  }
+
+  BlackMarketPileShuffledOnChange( value ) {
+    this.BlackMarketPileShuffledSource.next( value );
   }
 
 }

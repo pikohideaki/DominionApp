@@ -1,15 +1,23 @@
-<div class="body-with-padding">
+<ng-container *ngIf="{
+    gameResultList:         gameResultList$         | async,
+    dateBegin:              dateBegin$              | async,
+    dateEnd:                dateEnd$                | async,
+    numberOfPlayersOptions: numberOfPlayersOptions$ | async
+  } as data">
 
+<div class="body-with-padding">
   <p>
     <span class="filterTitle"> 期間： </span>
     <mat-form-field>
       <input matInput
           placeholder="日付"
           [matDatepicker]="datepickerBegin"
-          [value]="dateBegin$ | async"
+          [value]="data.dateBegin"
           (dateInput)="changeDateBegin( $event.target.value )"
           (dateChange)="changeDateBegin( $event.target.value )" >
-      <mat-datepicker-toggle matSuffix [for]="datepickerBegin"></mat-datepicker-toggle>
+      <mat-datepicker-toggle
+        matSuffix [for]="datepickerBegin">
+      </mat-datepicker-toggle>
       <mat-datepicker #datepickerBegin></mat-datepicker>
     </mat-form-field>
     ～
@@ -17,38 +25,41 @@
       <input matInput
           placeholder="日付"
           [matDatepicker]="datepickerEnd"
-          [value]="dateEnd$ | async"
+          [value]="data.dateEnd"
           (dateInput)="changeDateEnd( $event.target.value )"
           (dateChange)="changeDateEnd( $event.target.value )">
-      <mat-datepicker-toggle matSuffix [for]="datepickerEnd"></mat-datepicker-toggle>
+      <mat-datepicker-toggle
+        matSuffix [for]="datepickerEnd">
+      </mat-datepicker-toggle>
       <mat-datepicker #datepickerEnd></mat-datepicker>
     </mat-form-field>
 
     <button mat-raised-button class="latestResultButton"
-        (click)="latestResultClicked()">
+        (click)="latestResultClicked( data.gameResultList )">
       最新の結果
     </button>
 
     <button class='floatButton' mat-raised-button
-        (click)="resetAllClicked()">
+        (click)="resetAllClicked( data.gameResultList )">
       Reset All
     </button>
   </p>
 
   <p>
     <span class="filterTitle">プレイヤー数：</span>
-    <ng-container *ngFor="let option of (numberOfPlayersChecked$ | async)">
+    <ng-container *ngFor="let option of data.numberOfPlayersOptions">
       <mat-checkbox
           [checked]="option.checked"
-          (change)="numberOfPlayersOnCheck( $event.checked, option.numberOfPlayers )" >
+          (change)="numberOfPlayersOnCheck(
+              $event.checked,
+              option.numberOfPlayers
+            )" >
         {{option.numberOfPlayers}}人
       </mat-checkbox>
     </ng-container>
   </p>
 
-
-
-  <mat-tab-group *ngIf="receiveDataDone">
+  <mat-tab-group *ngIf="data.gameResultList && data.gameResultList.length > 0">
     <mat-tab label="総合成績">
       <app-game-result-list
           [gameResultListFiltered$]="gameResultListFiltered$">
@@ -64,5 +75,8 @@
     </mat-tab>
   </mat-tab-group>
 
-  <app-waiting-spinner [done]="receiveDataDone"></app-waiting-spinner>
+  <app-waiting-spinner
+    [done]="data.gameResultList && data.gameResultList.length > 0">
+  </app-waiting-spinner>
 </div>
+</ng-container>

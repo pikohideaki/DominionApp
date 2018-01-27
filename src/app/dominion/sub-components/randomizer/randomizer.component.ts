@@ -8,12 +8,12 @@ import { RandomizerService } from './randomizer.service';
 import { AlertDialogComponent   } from '../../../my-own-library/alert-dialog.component';
 import { ConfirmDialogComponent } from '../../../my-own-library/confirm-dialog.component';
 
-import { CardPropertyDialogComponent } from '../card-property-dialog/card-property-dialog.component';
 
 import { CardProperty          } from '../../../classes/card-property';
 import { SelectedCards         } from '../../../classes/selected-cards';
 import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-values';
 import { BlackMarketPileCard   } from '../../../classes/black-market-pile-card';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 
 @Component({
@@ -29,39 +29,53 @@ export class RandomizerComponent implements OnInit {
 
   /* settings */
   @Input() showSelectedCardsCheckbox: boolean = false;
+  @Input() useHistory: boolean = true;
   @Input() implementedOnly: boolean = false;
-  @Input() undoable: boolean = true;
-  @Input() redoable: boolean = true;
-
-  @Input() private confirmUnlock: boolean = false;
-  @Input() private confirmMessage: string = '';
-
-  @Output() randomizerClicked = new EventEmitter<void>();
-  @Output() resetClicked      = new EventEmitter<void>();
-  @Output() unlockClicked     = new EventEmitter<void>();
-  @Output() undoClicked       = new EventEmitter<void>();
-  @Output() redoClicked       = new EventEmitter<void>();
-
-  @Input()  randomizerButtonLocked: boolean;
-  @Output() randomizerButtonLockedChange = new EventEmitter<boolean>();
 
 
-  @Input()  isSelectedExpansions: boolean[] = [];
+  /* 拡張セット */
+  @Input()  isSelectedExpansions$: Observable<boolean[]>;
   @Output() isSelectedExpansionsPartEmitter
     = new EventEmitter<{ index: number, checked: boolean }>();
+  expansionsToggleIsEmpty$: Observable<boolean>;
 
-  @Input()  selectedCards: SelectedCards;
+
+  // history 使わない場合
+  @Input()  selectedCards$: Observable<SelectedCards>;
   @Output() selectedCardsChange = new EventEmitter<SelectedCards>();
 
-  @Input()  selectedCardsCheckbox: SelectedCardsCheckbox
-    = new SelectedCardsCheckbox();
+  // history 使う場合
+  @Input()  selectedCardsHistory$: Observable<SelectedCards[]>;
+  @Input()  selectedIndexInHistory$: Observable<number>;
+  @Output() selectedIndexInHistoryChange = new EventEmitter<number>();
+  @Output() selectedCardsAdded = new EventEmitter<SelectedCards>();
+
+  // historyを使うかどうかによって入力を切り替えたselectedCards$
+  selectedCardsLocal$: Observable<SelectedCards>;
+
+
+  @Input()  BlackMarketPileShuffled$: Observable<BlackMarketPileCard[]>;
+  @Output() BlackMarketPileShuffledChange
+    = new EventEmitter<BlackMarketPileCard[]>();
+
+  /* checkbox values */
+  @Input()  selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>;
   @Output() selectedCardsCheckboxPartEmitter
     = new EventEmitter<{ category: string, index: number, checked: boolean }>();
   @Output() selectedCardsCheckboxOnReset = new EventEmitter<void>();
 
-  @Input()  BlackMarketPileShuffled: BlackMarketPileCard[] = [];
-  @Output() BlackMarketPileShuffledChange
-    = new EventEmitter<BlackMarketPileCard[]>();
+  // randomizerButton 連打防止
+  private randomizerButtonClickedSource = new EventEmitter<void>();
+  private randomizerButtonClicked$ = this.randomizerButtonClickedSource.asObservable();
+  randomizerButtonLocked$: Observable<boolean>
+    = Observable.merge(
+        this.randomizerButtonClicked$.map( _ => true ),
+        this.randomizerButtonClicked$.delay(500).map( _ => false ) )
+      .startWith(false);
+
+  // historyは時刻降順，0が最新
+  undoable$: Observable<boolean>;
+  redoable$: Observable<boolean>;
 
 
 
@@ -73,38 +87,50 @@ export class RandomizerComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.expansionsToggleIsEmpty$
+      = this.isSelectedExpansions$.map( val => val.every( e => !e ) )
+        .startWith( true );
+
+    this.selectedCardsLocal$ = ( this.selectedCards$ !== undefined
+        ? this.selectedCards$
+        : Observable.combineLatest(
+              this.selectedCardsHistory$,
+              this.selectedIndexInHistory$,
+              (list, index) => list[ index ] || new SelectedCards() )
+            .startWith( new SelectedCards() ) );
+
+    this.undoable$ = Observable.combineLatest(
+        this.selectedIndexInHistory$,
+        this.selectedCardsHistory$.map( e => e.length ),
+        (index, length) => length > 0 && this.utils.isInRange( index, -1, length - 1 ) );
+
+    this.redoable$ = Observable.combineLatest(
+        this.selectedIndexInHistory$,
+        this.selectedCardsHistory$.map( e => e.length ),
+        (index, length) => length > 0 && this.utils.isInRange( index, 1, length ) );
   }
 
 
-  private setRandomizerButtonLocked( value: boolean ) {
-    this.randomizerButtonLocked = value;
-    this.randomizerButtonLockedChange.emit( value );
+  undoOnClick( currentIndex: number, history: SelectedCards[] ) {
+    this.changeHistoryIndex( currentIndex + 1, history );
   }
 
-
-  undoOnClick() {
-    this.undoClicked.emit();
+  redoOnClick( currentIndex: number, history: SelectedCards[] ) {
+    this.changeHistoryIndex( currentIndex - 1, history );
   }
 
-  redoOnClick() {
-    this.redoClicked.emit();
+  resetOnClick() {
+    this.changeHistoryIndex( -1 );
   }
 
-  unlockRandomizerButton() {
-    this.unlockClicked.emit();
-
-    if ( !this.confirmUnlock ) {
-      this.setRandomizerButtonLocked( false );
-    } else {
-      const dialogRef = this.dialog.open( ConfirmDialogComponent );
-      dialogRef.componentInstance.message = this.confirmMessage;
-      dialogRef.afterClosed().filter( result => result === 'yes' )
-          .subscribe( () => this.setRandomizerButtonLocked( false ) );
-    }
+  randomizerButtonOnClick( isSelectedExpansions, history: SelectedCards[] ) {
+    this.randomizerButtonClickedSource.emit();
+    this.randomizerSelectCards( isSelectedExpansions, history );
   }
 
-
-  selectedCardsCheckboxOnChange( value: { category: string, index: number, checked: boolean } ) {
+  selectedCardsCheckboxOnChange(
+    value: { category: string, index: number, checked: boolean }
+  ) {
     this.selectedCardsCheckboxPartEmitter.emit( value );
   }
 
@@ -112,51 +138,31 @@ export class RandomizerComponent implements OnInit {
     this.isSelectedExpansionsPartEmitter.next( value );
   }
 
-  expansionsToggleIsEmpty(): boolean {
-    return this.isSelectedExpansions.every( selected => !selected );
-  }
 
-
-  resetSelectedCards() {
-    this.resetClicked.emit();
-
-    this.setRandomizerButtonLocked(false);
-
-    this.selectedCards = new SelectedCards();
-    this.selectedCardsChange.emit( this.selectedCards );
-
-    this.selectedCardsCheckbox.clear();
+  private changeHistoryIndex( index: number, history: SelectedCards[] = [] ) {
+    this.selectedIndexInHistoryChange.emit( index );
     this.selectedCardsCheckboxOnReset.emit();
-
-    this.BlackMarketPileShuffledChange.emit([]);
-  }
-
-
-
-  randomizerOnClick() {
-    this.randomizerClicked.emit();
-
-    if ( this.expansionsToggleIsEmpty() ) return;
-
-    this.setRandomizerButtonLocked(true);
-
-    const result = this.randomizer.selectCards( this.implementedOnly, this.isSelectedExpansions );
-    if ( !result.valid ) {
-      const dialogRef = this.dialog.open( AlertDialogComponent );
-      dialogRef.componentInstance.message = `サプライが足りません．セットの選択数を増やしてください．`;
-      return;
-    }
-
-    this.selectedCards = new SelectedCards( result.selectedCards );
-    this.selectedCardsChange.emit( this.selectedCards );
-
-    this.selectedCardsCheckbox.clear();
-    this.selectedCardsCheckboxOnReset.emit();
-
+    const selectedCards = ( history[ index ] || new SelectedCards() );
+    this.selectedCardsChange.emit( selectedCards );
     const BlackMarketPileShuffled
-      = this.utils.getShuffled( this.selectedCards.BlackMarketPile )
+      = this.utils.getShuffled( selectedCards.BlackMarketPile )
                   .map( e => ({ cardIndex: e, faceUp: false }) );
     this.BlackMarketPileShuffledChange.emit( BlackMarketPileShuffled );
   }
 
+  private randomizerSelectCards( isSelectedExpansions, history: SelectedCards[] ) {
+    const result = this.randomizer.selectCards(
+                          this.implementedOnly,
+                          isSelectedExpansions );
+
+    if ( !result.valid ) {
+      const dialogRef = this.dialog.open( AlertDialogComponent );
+      dialogRef.componentInstance.message
+        = `サプライが足りません．セットの選択数を増やしてください．`;
+      return;
+    } else {
+      this.selectedCardsAdded.emit( result.selectedCards );
+      this.changeHistoryIndex( 0, [ result.selectedCards, ...history ] );
+    }
+  }
 }

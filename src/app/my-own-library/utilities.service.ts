@@ -201,7 +201,21 @@ export class UtilitiesService {
 
 
   integerDivision( a: number, b: number ): number {
-    return Math.floor( a / b );
+    return Math.floor(Math.floor(a) / Math.floor(b));
+  }
+  divint( a: number, b: number ) {
+    return this.integerDivision( a, b );
+  }
+
+
+  /**
+   * @desc isInRange( target, begin, end ) === ( begin <= target && target < end )
+   */
+  isInRange( target: number, begin: number, end: number ) {
+    return ( begin <= target && target < end );
+  }
+  isInArrayRange( target: number, array: any[] ) {
+    return this.isInRange( target, 0, array.length );
   }
 
   /* float */

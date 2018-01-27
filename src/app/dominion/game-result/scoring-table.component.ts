@@ -10,17 +10,16 @@ import { ColumnSetting } from '../../my-own-library/data-table/data-table.compon
   template: `
     <div class="body-with-padding">
       <app-data-table
+          [usePagenation]="false"
           [data$]='scoringTableForView$'
           [columnSettings]='columnSettings' >
       </app-data-table>
-      <app-waiting-spinner [done]="receiveDataDone$ | async"></app-waiting-spinner>
+      <app-waiting-spinner [done]="!!(scoringTableForView$ | async)"></app-waiting-spinner>
     </div>
   `,
   styles: []
 })
 export class ScoringTableComponent implements OnInit {
-
-  receiveDataDone$: Observable<boolean>;
 
   scoringTableForView$: Observable<{
     numberOfPlayers: number,
@@ -62,9 +61,6 @@ export class ScoringTableComponent implements OnInit {
                   rank_6th : ( e.score[6] < 0 ? '' : e.score[6].toString() ),
                 }) )
           );
-
-    this.receiveDataDone$
-      = this.scoringTableForView$.map( _ => true ).startWith(false);
   }
 
   ngOnInit() {

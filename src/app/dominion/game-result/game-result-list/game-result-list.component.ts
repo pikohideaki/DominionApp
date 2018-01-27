@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Input } from '@angular/core';
 
 import { Observable      } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -6,12 +6,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MatDialog } from '@angular/material';
 
 import { getDataAtPage } from '../../../my-own-library/data-table/pagenation/pagenation.component';
-
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 import { GameResultDetailDialogComponent    } from './game-result-detail-dialog/game-result-detail-dialog.component';
-
 import { GameResult } from '../../../classes/game-result';
 
 
@@ -22,10 +19,9 @@ import { GameResult } from '../../../classes/game-result';
 })
 export class GameResultListComponent implements OnInit, OnDestroy {
   private alive = true;
-  receiveDataDone = false;
 
   @Input() private gameResultListFiltered$: Observable<GameResult[]>;
-  gameResultListFiltered: GameResult[] = [];
+  filteredDataLength$: Observable<number>;
 
   // pagenation
   private selectedPageIndexSource = new BehaviorSubject<number>(0);
@@ -54,38 +50,35 @@ export class GameResultListComponent implements OnInit, OnDestroy {
                   itemsPerPage,
                   selectedPageIndex ) );
 
+    this.filteredDataLength$ = this.gameResultListFiltered$.map( e => e.length );
+
     this.gameResultListFiltered$
       .takeWhile( () => this.alive )
-      .subscribe( gameResultListFiltered => {
-        this.gameResultListFiltered = gameResultListFiltered;
-        this.receiveDataDone = true;
-        this.changeSelectedPageIndex(0);
-      });
+      .subscribe( _ => this.changeSelectedPageIndex(0) );
   }
 
   ngOnDestroy() {
     this.alive = false;
   }
 
+
   changeSelectedPageIndex( selectedPageIndex: number ) {
-    this.selectedPageIndexSource.next(selectedPageIndex);
+    this.selectedPageIndexSource.next( selectedPageIndex );
   }
   changeItemsPerPage( itemsPerPage: number ) {
-    this.itemsPerPageSource.next(itemsPerPage);
+    this.itemsPerPageSource.next( itemsPerPage );
     this.changeSelectedPageIndex(0);
   }
 
 
 
-  getDetail( no: number ) {
-    const gameResult = this.gameResultListFiltered.find( e => e.no === no );
+  getDetail( gameResult: GameResult ) {
     const databaseKey = gameResult.databaseKey;
-    const dialogRef = this.dialog.open( GameResultDetailDialogComponent );
+    const dialogRef = this.dialog.open( GameResultDetailDialogComponent, { autoFocus: false } );
     dialogRef.componentInstance.gameResult = gameResult;
   }
 
-  memoClicked( no: number ) {
-    const gameResult = this.gameResultListFiltered.find( e => e.no === no );
+  memoClicked( gameResult: GameResult ) {
     const dialogRef = this.dialog.open( SetMemoDialogComponent );
     dialogRef.componentInstance.memo = gameResult.memo;
     dialogRef.afterClosed().subscribe( result => {
@@ -93,5 +86,4 @@ export class GameResultListComponent implements OnInit, OnDestroy {
       this.database.gameResult.setMemo( gameResult.databaseKey, result );
     });
   }
-
 }

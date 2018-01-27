@@ -1,6 +1,10 @@
 import { Component, OnInit, Inject, Input, OnChanges, SimpleChanges, Output, EventEmitter } from '@angular/core';
 
+import { Observable } from 'rxjs/Observable';
+
 import { CardProperty } from '../../../classes/card-property';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+
 
 @Component({
   selector: 'app-dominion-card-image',
@@ -9,85 +13,109 @@ import { CardProperty } from '../../../classes/card-property';
 })
 export class DominionCardImageComponent implements OnInit, OnChanges {
 
-  private CARD_IMAGE_DIR = 'assets/img/card';
-
-  sourceDir: string;
-
-  @Input() private card: CardProperty = new CardProperty();
-  @Input() faceUp:      boolean;
-  @Input() width:       number;
-  @Input() height:      number;
-  @Input() isButton:    boolean = false;
-  @Input() description: string = '';
-  @Input() empty:       boolean = false;
-
   @Output() private cardClicked = new EventEmitter<void>();
 
-  borderWidth: number;
-  borderRadius: number;
+  @Input() description: string = '';
 
-  /* 設定されたもののうち一方からもう一方を計算．
-     Input要素の書き換えを避けるためコピー． */
-  widthDerived:  number;
-  heightDerived: number;
+  @Input() card:     CardProperty = new CardProperty();
+  @Input() width:    number;
+  @Input() height:   number;
+  @Input() faceUp:   boolean;
+  @Input() isButton: boolean;
+  @Input() empty:    boolean;
+  private cardSource     = new BehaviorSubject<CardProperty>( new CardProperty() );
+  private widthSource    = new BehaviorSubject<number>(0);
+  private faceUpSource   = new BehaviorSubject<boolean>(true);
+  private isButtonSource = new BehaviorSubject<boolean>(false);
+  private emptySource    = new BehaviorSubject<boolean>(false);
+  card$     = this.cardSource.asObservable();
+  width$    = this.widthSource.asObservable();
+  faceUp$   = this.faceUpSource.asObservable();
+  isButton$ = this.isButtonSource.asObservable();
+  empty$    = this.emptySource.asObservable();
 
+  borderWidth$:  Observable<number>;
+  borderRadius$: Observable<number>;
+  sourceDir$:    Observable<string>;
+
+  height$: Observable<number>  // widthから計算
+   = Observable.combineLatest(
+      this.card$, this.width$,
+      (card, width) =>
+        ( card.isWideType() ? width * (15 / 23)
+                            : width * (23 / 15) ) );
 
   constructor(
-  ) { }
+  ) {
+    /* 設定されたもののうち一方からもう一方を計算 */
+    this.borderWidth$ = Observable.combineLatest(
+      this.width$, this.height$,
+      (width, height) => (18 / 250) * Math.min( width, height ) );
 
-  ngOnChanges( changes ) {
-    if ( this.width  !== undefined ) this.setHeight();
-    if ( this.height !== undefined ) this.setWidth();
-    this.setBorderWidth();
-    this.setBorderRadius();
-    this.setSourceDir();
+    this.borderRadius$ = this.borderWidth$;
+
+
+    const CARD_IMAGE_DIR = 'assets/img/card';
+    this.sourceDir$ = Observable.combineLatest(
+      this.empty$, this.faceUp$, this.card$,
+      (empty, faceUp, card) => {
+        if ( empty ) return 'assets/img/blank.png';
+        if ( !faceUp ) return `${CARD_IMAGE_DIR}/Card_back.jpg`;
+        // Card_back_landscape
+        // Boon-back
+        // Hex-back
+        // Stash-back
+        // Randomizer
+        return `${CARD_IMAGE_DIR}/${this.card.nameEng.replace( / /g , '_' )}.jpg`;
+      } );
+  }
+
+
+  ngOnChanges( changes: SimpleChanges ) {
+    if ( changes.card !== undefined
+         && changes.card.currentValue !== undefined ) {
+      this.cardSource.next( changes.card.currentValue );
+    }
+    if ( changes.width !== undefined
+         && changes.width.currentValue !== undefined ) {
+      this.widthSource.next( changes.width.currentValue );
+    }
+    if ( changes.height !== undefined
+         && changes.height.currentValue !== undefined ) {
+      this.widthSource.next( this.widthFromHeight( changes.height.currentValue ) );
+    }
+    if ( changes.faceUp !== undefined
+         && changes.faceUp.currentValue !== undefined ) {
+      this.faceUpSource.next( changes.faceUp.currentValue );
+    }
+    if ( changes.isButton !== undefined
+         && changes.isButton.currentValue !== undefined ) {
+      this.isButtonSource.next( changes.isButton.currentValue );
+    }
+    if ( changes.empty !== undefined
+         && changes.empty.currentValue !== undefined ) {
+      this.emptySource.next( changes.empty.currentValue );
+    }
   }
 
   ngOnInit() {
-  }
-
-
-  private setSourceDir() {
-    if ( this.empty ) {
-      this.sourceDir = `assets/img/blank.png`;
-      return;
-    }
-    if ( !this.faceUp ) {
-      this.sourceDir = `${this.CARD_IMAGE_DIR}/Card_back.jpg`;
-      return;
-    }
-    // Card_back_landscape
-    // Boon-back
-    // Hex-back
-    // Stash-back
-    // Randomizer
-    this.sourceDir = `${this.CARD_IMAGE_DIR}/${this.card.name_eng.replace( / /g , '_' )}.jpg`;
-  }
-
-  setHeight() {
-    this.widthDerived = this.width;
-    if ( this.faceUp && this.card.isWideType() ) {
-      this.heightDerived = this.widthDerived * (15 / 23);
+    this.cardSource    .next( this.card     );
+    this.faceUpSource  .next( this.faceUp   );
+    this.isButtonSource.next( this.isButton );
+    this.emptySource   .next( this.empty    );
+    if ( this.width !== undefined ) {
+      this.widthSource.next( this.width );
+    } else if ( this.height !== undefined ) {
+      this.widthSource.next( this.widthFromHeight( this.height ) );
     } else {
-      this.heightDerived = this.widthDerived * (23 / 15);
+      console.error(`width or height must be given`);
     }
   }
 
-  setWidth() {
-    this.heightDerived = this.height;
-    if ( this.faceUp && this.card.isWideType() ) {
-      this.widthDerived = this.heightDerived * (23 / 15);
-    } else {
-      this.widthDerived = this.heightDerived * (15 / 23);
-    }
-  }
 
-  setBorderWidth() {
-    this.borderWidth = (18 / 250) * Math.min( this.widthDerived, this.heightDerived );
-  }
-
-  setBorderRadius() {
-    this.borderRadius = (18 / 250) * Math.min( this.widthDerived, this.heightDerived );
+  private widthFromHeight( height ) {
+    const card = this.cardSource.getValue();
+    return ( card.isWideType() ? height * (23 / 15) : height * (15 / 23) );
   }
 
   onClicked() {
@@ -95,5 +123,4 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
       this.cardClicked.emit();
     }
   }
-
 }

@@ -2,8 +2,12 @@ import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'app-waiting-spinner',
-  template: `<mat-spinner *ngIf="!done" strokeWidth="6" diameter="48" ></mat-spinner>`,
-  styles: [],
+  template: `
+    <div *ngIf="!done" class="waiting-spinner">
+      <mat-spinner strokeWidth="6" diameter="48" ></mat-spinner>
+    </div>
+  `,
+  styles: [`.waiting-spinner { margin: 10px; }`],
 })
 export class WaitingSpinnerComponent implements OnInit {
 

@@ -1,10 +1,8 @@
-import { Component, OnInit, Input, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MatSnackBar } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/takeWhile';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -15,9 +13,7 @@ import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 import { SelectedCards         } from '../../../classes/selected-cards';
 import { RandomizerGroup       } from '../../../classes/randomizer-group';
 import { User                  } from '../../../classes/user';
-import { PlayerResult          } from '../../../classes/player-result';
 import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-values';
-import { BlackMarketPileCard   } from '../../../classes/black-market-pile-card';
 import { BlackMarketPhase      } from '../../../classes/black-market-phase.enum';
 
 
@@ -26,78 +22,183 @@ import { BlackMarketPhase      } from '../../../classes/black-market-phase.enum'
   templateUrl: './randomizer-group-list.component.html',
   styleUrls: ['./randomizer-group-list.component.css']
 })
-export class RandomizerGroupListComponent implements OnInit, OnDestroy {
-  private alive = true;
+export class RandomizerGroupListComponent implements OnInit {
 
   @Input() private sidenav;
-  newGroupName: string;
+
+  uid$:        Observable<string> = this.myUserInfo.uid$;
+  myName$:     Observable<string> = this.myUserInfo.name$;
+  myNameYomi$: Observable<string> = this.myUserInfo.nameYomi$;
+
+  randomizerGroupListWithUsers$: Observable<{ group: RandomizerGroup, users: string[] }[]>
+    = Observable.combineLatest(
+          this.database.randomizerGroupList$,
+          this.database.users$,
+          (randomizerGroupList, users) =>
+            randomizerGroupList.map( group => ({
+              group: group,
+              users: users.filter( user => user.randomizerGroupId === group.databaseKey )
+                          .map( user => user.name ),
+            })) );
+
+  newGroupName:     string;
   newGroupPassword: string;
-  signInPassword: string;
+  signInPassword:   string;
   showWrongPasswordAlert = false;
   selectedGroupId = '';
 
-  uid: string;
-  myName: string;
-
-  randomizerGroupListWithUsers$: Observable<{ group: RandomizerGroup, users: string[] }[]>;
-  private randomizerGroupListWithUsers: { group: RandomizerGroup, users: string[] }[] = [];
 
   constructor(
     public snackBar: MatSnackBar,
-    public utils: UtilitiesService,
+    private utils: UtilitiesService,
     private myUserInfo: MyUserInfoService,
     private database: CloudFirestoreMediatorService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
-    this.randomizerGroupListWithUsers$
-      = Observable.combineLatest(
-            this.database.randomizerGroupList$,
-            this.database.users$,
-            (randomizerGroupList, users) =>
-              randomizerGroupList.map( group => ({
-                group: group,
-                users: users.filter( user => user.randomizerGroupId === group.databaseKey )
-                            .map( user => user.name ),
-              }))
-      );
-
-
-    this.randomizerGroupListWithUsers$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.randomizerGroupListWithUsers = val );
-
-    this.myUserInfo.uid$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.uid = val );
-
-    this.myUserInfo.name$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.myName = val );
   }
 
   ngOnInit() {
   }
 
-  ngOnDestroy() {
-    this.alive = false;
+
+  /* sidenav */
+  closeSideNav() {
+    this.resetSignInForm();
+    this.resetAddGroupForm();
+    this.sidenav.close();
+  }
+
+  backgroundClicked() {
+    this.resetSignInForm();
+    this.selectedGroupId = '';
   }
 
 
-  private signInPasswordIsValid( groupId ): boolean {
-    const group = this.randomizerGroupListWithUsers
-                    .map( e => e.group )
-                    .find( g => g.databaseKey === groupId );
+  /* 新規グループ */
+  newGroupNameOnChange( value ) {
+    this.newGroupName = value;
+  }
+
+  newGroupPasswordOnChange( value ) {
+    this.newGroupPassword = value;
+  }
+
+  async addRandomizerGroup(
+    uid:                string,
+    myName:             string,
+    myNameYomi:         string,
+    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  ) {
+    const expansionsNameList
+      = await this.database.expansionsNameList$.first().toPromise();
+    const isSelectedExpansionsInit = expansionsNameList.map( _ => true );
+
+    const newRandomizerGroup = new RandomizerGroup( null, {
+        name:                    this.newGroupName,
+        password:                this.newGroupPassword,
+        timeStamp:               Date.now(),
+        isSelectedExpansions:    isSelectedExpansionsInit,
+        selectedCardsCheckbox:   new SelectedCardsCheckbox(),
+        BlackMarketPileShuffled: [],
+        BlackMarketPhase:        BlackMarketPhase.init,
+        selectedCardsHistory:    [],
+        selectedIndexInHistory:  0,
+        newGameResult: {
+          players:            {},
+          place:              '',
+          memo:               '',
+          lastTurnPlayerName: '',
+        },
+        newGameResultDialogOpened: false,
+        resetVPCalculator:         0,
+    });
+
+    const ref = await this.database.randomizerGroup.addGroup( newRandomizerGroup );
+    const groupId = ref.key;
+    await this.myUserInfo.setRandomizerGroupId( groupId );
+    await this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi );
+    await this.removeMemberEmptyGroup( groupListWithUsers );
+    this.resetAddGroupForm();
+
+    this.openSnackBar('Successfully signed in!');
+    this.sidenav.close();
+  }
+
+
+
+  /* グループ選択 */
+  groupClicked( $event, groupId: string ) {
+    this.resetSignInForm();
+    this.selectedGroupId = groupId;
+    $event.stopPropagation();
+  }
+
+  toYMDHMS( date: Date ) {
+    return this.utils.toYMDHMS( date );
+  }
+
+  signInPasswordOnChange( value ) {
+    this.signInPassword = value;
+  }
+
+  async signIn(
+    groupId:            string,
+    uid:                string,
+    myName:             string,
+    myNameYomi:         string,
+    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  ) {
+    if ( !this.signInPasswordIsValid( groupId, groupListWithUsers ) ) return;
+
+    this.resetSignInForm();
+    await Promise.all([
+      this.myUserInfo.setRandomizerGroupId( groupId ),
+      this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi ),
+    ]);
+
+    this.openSnackBar('Successfully signed in!');
+    this.sidenav.close();
+    await this.removeMemberEmptyGroup( groupListWithUsers );
+  }
+
+  async signOut(
+    groupId:            string,
+    uid:                string,
+    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  ) {
+    if ( !this.signInPasswordIsValid( groupId, groupListWithUsers ) ) return;
+
+    this.resetSignInForm();
+    await Promise.all([
+      this.myRandomizerGroup.removeMember( groupId, uid ),
+      this.myUserInfo.setRandomizerGroupId(''),
+    ]);
+
+    this.openSnackBar('Successfully signed out!');
+    this.sidenav.close();
+    await this.removeMemberEmptyGroup( groupListWithUsers );
+  }
+
+
+
+  /* private methods */
+  private signInPasswordIsValid(
+    groupId:            string,
+    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  ): boolean {
+    const group = groupListWithUsers.find( g => g.group.databaseKey === groupId ).group;
     const isValid = ( !group.password ) || ( this.signInPassword === group.password );
     this.showWrongPasswordAlert = !isValid;
     return isValid;
   }
 
-  private removeMemberEmptyGroup() {
-    const promises
-      = this.randomizerGroupListWithUsers
-            .filter( g => g.users.length === 0 )
-            .map( g => this.database.randomizerGroup.removeGroup( g.group.databaseKey ) );
-    return Promise.all( promises );
+  private async removeMemberEmptyGroup(
+    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  ) {
+    await Promise.all(
+      groupListWithUsers
+        .filter( g => g.users.length === 0 )
+        .map( g => this.database.randomizerGroup.removeGroup( g.group.databaseKey ) ) );
   }
 
   private resetAddGroupForm() {
@@ -109,109 +210,7 @@ export class RandomizerGroupListComponent implements OnInit, OnDestroy {
     this.signInPassword = undefined;
   }
 
-  async addRandomizerGroup() {
-    // await this.myUserInfo.myId$.first().toPromise();
-    // await this.myUserInfo.name$.first().toPromise();
-
-    const expansionsNameList
-      = await this.database.expansionsNameList$.first().toPromise();
-    const isSelectedExpansionsInit = expansionsNameList.map( _ => true );
-
-    const newRandomizerGroup = new RandomizerGroup( null, {
-        name:                      this.newGroupName,
-        password:                  this.newGroupPassword,
-        timeStamp:                 Date.now(),
-        randomizerButtonLocked:    false,
-        isSelectedExpansions:      isSelectedExpansionsInit,
-        selectedCards:             new SelectedCards(),
-        selectedCardsCheckbox:     new SelectedCardsCheckbox(),
-        BlackMarketPileShuffled:   [],
-        BlackMarketPhase:          BlackMarketPhase.init,
-        newGameResult: {
-          players: {},
-          place:   '',
-          memo:    '',
-        },
-        newGameResultDialogOpened: false,
-        lastTurnPlayerName:        '',
-        resetVPCalculator:         0,
-        selectedCardsHistory:      [],
-    });
-
-    const ref = await this.database.randomizerGroup.addGroup( newRandomizerGroup );
-    const groupId = ref.key;
-    await this.myUserInfo.setRandomizerGroupId( groupId );
-    await this.myRandomizerGroup.addMember( groupId, this.uid, this.myName );
-    await this.removeMemberEmptyGroup();
-    this.resetAddGroupForm();
-
-    this.openSnackBar('Successfully signed in!');
-    this.sidenav.close();
-  }
-
-
-  signIn = async ( groupId ) => {
-    if ( !this.signInPasswordIsValid( groupId ) ) return;
-
-    await this.myUserInfo.uid$.first().toPromise(); // wait for first value
-    await this.myUserInfo.name$.first().toPromise(); // wait for first value
-
-    await this.myUserInfo.setRandomizerGroupId( groupId );
-    await this.myRandomizerGroup.addMember( groupId, this.uid, this.myName );
-
-    await this.removeMemberEmptyGroup();
-    this.resetSignInForm();
-    this.openSnackBar('Successfully signed in!');
-    this.sidenav.close();
-  }
-
-  signOut = async ( groupId ) => {
-    if ( !this.signInPasswordIsValid( groupId ) ) return;
-
-    await this.myUserInfo.uid$.first().toPromise();  // wait for first value
-
-    await this.myRandomizerGroup.removeMember( groupId, this.uid );
-    await this.myUserInfo.setRandomizerGroupId('');
-
-    await this.removeMemberEmptyGroup();
-    this.resetSignInForm();
-    this.openSnackBar('Successfully signed out!');
-    this.sidenav.close();
-  }
-
   private openSnackBar( message: string ) {
     this.snackBar.open( message, undefined, { duration: 3000 } );
-  }
-
-
-  // view
-
-  groupClicked( $event, groupId: string ) {
-    this.resetSignInForm();
-    this.selectedGroupId = groupId;
-    $event.stopPropagation();
-  }
-
-  backgroundClicked() {
-    this.resetSignInForm();
-    this.selectedGroupId = '';
-  }
-
-  closeSideNav() {
-    this.resetSignInForm();
-    this.resetAddGroupForm();
-    this.sidenav.close();
-  }
-
-  newGroupNameOnChange( value ) {
-    this.newGroupName = value;
-  }
-
-  newGroupPasswordOnChange( value ) {
-    this.newGroupPassword = value;
-  }
-
-  signInPasswordOnChange( value ) {
-    this.signInPassword = value;
   }
 }

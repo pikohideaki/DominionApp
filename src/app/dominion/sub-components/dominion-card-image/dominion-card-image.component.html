@@ -1,16 +1,32 @@
-<div *ngIf="empty" class='dominionCard'>
-  <img [src]="sourceDir" [width]='widthDerived' [height]='heightDerived'>
-  <div *ngIf="description.length > 0" class="description">{{description}}</div>
-</div>
+<ng-container *ngIf="{
+      card:         card$         | async,
+      width:        width$        | async,
+      height:       height$       | async,
+      sourceDir:    sourceDir$    | async,
+      borderWidth:  borderWidth$  | async,
+      borderRadius: borderRadius$ | async,
+      faceUp:       faceUp$       | async,
+      isButton:     isButton$     | async,
+      empty:        empty$        | async
+    } as data">
 
-<div *ngIf="!empty" class='dominionCard'
-      [class.faceUp]="faceUp"
-      [class.faceDown]="!faceUp"
-      [class.pointer]="isButton"
-      (click)="onClicked()">
-  <img [src]="sourceDir" [width]='widthDerived' [height]='heightDerived'
-      class="image-box box-shadow"
-      [style.border-width.px]="borderWidth"
-      [style.border-radius.px]="borderRadius">
-  <div *ngIf="description.length > 0" class="description">{{description}}</div>
-</div>
+<ng-container *ngIf=" !!data.card && !!data.sourceDir">
+
+  <div *ngIf="data.empty" class='dominionCard'>
+    <img [src]="data.sourceDir" [width]='data.width' [height]='data.height'>
+    <div *ngIf="description.length > 0" class="description">{{description}}</div>
+  </div>
+
+  <div *ngIf="!data.empty" class='dominionCard'
+        [class.faceUp]="data.faceUp"
+        [class.faceDown]="!data.faceUp"
+        [class.pointer]="data.isButton"
+        (click)="onClicked()">
+    <img [src]="data.sourceDir" [width]='data.width' [height]='data.height'
+        class="image-box box-shadow"
+        [style.border-width.px]="data.borderWidth"
+        [style.border-radius.px]="data.borderRadius">
+    <div *ngIf="description.length > 0" class="description">{{description}}</div>
+  </div>
+</ng-container>
+</ng-container>

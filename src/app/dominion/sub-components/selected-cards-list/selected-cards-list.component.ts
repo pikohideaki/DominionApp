@@ -1,7 +1,6 @@
-import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/operator/takeWhile';
 
 import { MatDialog } from '@angular/material';
 
@@ -23,17 +22,15 @@ import { BlackMarketPileCard   } from '../../../classes/black-market-pile-card';
     './selected-cards-list.component.css'
   ]
 })
-export class SelectedCardsListComponent implements OnInit, OnDestroy {
-  private alive = true;
-
-  cardPropertyList: CardProperty[] = [];
+export class SelectedCardsListComponent implements OnInit {
+  cardPropertyList$ = this.database.cardPropertyList$;
 
   // settings
   @Input() showSelectedCardsCheckbox: boolean = false;
 
   // input data
-  @Input() selectedCards: SelectedCards;
-  @Input() selectedCardsCheckbox: SelectedCardsCheckbox = new SelectedCardsCheckbox();
+  @Input() selectedCards$: Observable<SelectedCards>;
+  @Input() selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>;
 
   @Output() selectedCardsCheckboxPartEmitter
     = new EventEmitter<{ category: string, index: number, checked: boolean }>();
@@ -54,28 +51,19 @@ export class SelectedCardsListComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private database: CloudFirestoreMediatorService,
   ) {
-    this.database.cardPropertyList$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.cardPropertyList = val );
   }
 
   ngOnInit() {
   }
 
-  ngOnDestroy() {
-    this.alive = false;
-  }
-
 
   selectedCardsCheckboxOnChange( category: string, index: number, value ) {
-    this.selectedCardsCheckbox[category][index] = value;
     this.selectedCardsCheckboxPartEmitter
       .emit({ category: category, index: index, checked: value });
   }
 
   cardInfoButtonClicked( cardIndex: number ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    dialogRef.componentInstance.card = this.cardPropertyList[cardIndex];
+    dialogRef.componentInstance.indiceInCardList$ = Observable.from([[cardIndex]]);
   }
-
 }

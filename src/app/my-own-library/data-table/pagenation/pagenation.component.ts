@@ -1,4 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+
+import { UtilitiesService } from '../../utilities.service';
+
 
 @Component({
   selector: 'app-data-table--pagenation',
@@ -7,49 +11,57 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 })
 export class PagenationComponent implements OnInit {
 
-  @Input()  selectedPageIndex: number = 0;
+  @Input()  selectedPageIndex$: Observable<number>;
   @Output() selectedPageIndexChange = new EventEmitter<number>();
 
-  @Input() itemsPerPage: number = 25;
-  @Input() dataSize: number = 0;
+  @Input() itemsPerPage$: Observable<number>;
+  @Input() dataSize$: Observable<number>;
+
+  rangeStart$: Observable<number>;
+  rangeEnd$:   Observable<number>;
+  pageLength$: Observable<number>;
+  pageIndice$: Observable<number[]>;
 
 
-  constructor() { }
+  constructor(
+    private utils: UtilitiesService
+  ) {
+  }
 
   ngOnInit() {
+    this.rangeStart$ = Observable.combineLatest(
+        this.itemsPerPage$,
+        this.selectedPageIndex$,
+        (itemsPerPage, selectedPageIndex) =>
+          itemsPerPage * selectedPageIndex + 1 );
+
+    this.rangeEnd$ = Observable.combineLatest(
+        this.itemsPerPage$,
+        this.selectedPageIndex$,
+        this.dataSize$,
+        (itemsPerPage, idx, dataSize) =>
+          (Math.min( dataSize, (itemsPerPage * (idx + 1)) ) ) );
+
+    this.pageLength$ = Observable.combineLatest(
+        this.itemsPerPage$,
+        this.dataSize$,
+        (itemsPerPage, dataSize) => Math.ceil( dataSize / itemsPerPage ) );
+
+    this.pageIndice$
+      = this.pageLength$.map( len => this.utils.seq0( len ) );
   }
 
-  range() {
-    return ({
-      start : this.itemsPerPage * this.selectedPageIndex + 1,
-      end   : (Math.min( this.dataSize, (this.itemsPerPage * (this.selectedPageIndex + 1)) ) || 0),
-    });
-  }
-
-  generatePageIndices() {  // dummy array to loop |dataSize/itemsPerPage| times
-    return Array.from( new Array( this.pageLength() )).map( (_, i) => i );
-  }
-
-  pageLength(): number {
-    return Math.ceil( this.dataSize / this.itemsPerPage );
-  }
-
-  setSelectedPageIndex( idx: number ): void {
+  setSelectedPageIndex( idx: number ) {
     this.selectedPageIndexChange.emit( idx );
   }
-  goToFirstPage():    void { this.setSelectedPageIndex( 0                          ); }
-  goToPreviousPage(): void { this.setSelectedPageIndex( this.selectedPageIndex - 1 ); }
-  goToNextPage():     void { this.setSelectedPageIndex( this.selectedPageIndex + 1 ); }
-  goToLastPage():     void { this.setSelectedPageIndex( this.pageLength() - 1      ); }
 }
 
 
 
 export function getDataAtPage<T>(
-    data: Array<T>,
-    itemsPerPage: number,
-    selectedPageIndex: number
-  ): Array<T> {
-    return data.slice( itemsPerPage * selectedPageIndex, itemsPerPage * (selectedPageIndex + 1) );
+  data: Array<T>,
+  itemsPerPage: number,
+  selectedPageIndex: number
+): Array<T> {
+  return data.slice( itemsPerPage * selectedPageIndex, itemsPerPage * (selectedPageIndex + 1) );
 }
-

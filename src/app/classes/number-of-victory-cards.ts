@@ -37,13 +37,17 @@ export class NumberOfVictoryCards {
   Grand_Castle:     number = 0;
   Kings_Castle:     number = 0;
 
-  DeckSize:                       number = 0;  // for Gardens
-  numberOfActionCards:            number = 0;  // for Vineyard
-  numberOfDifferentlyNamedCards:  number = 0;  // for Fairgrounds
-  numberOfSilvers:                number = 0;  // for Feodum
-  Distant_Lands_on_TavernMat:     number = 0;  // for Distant_Lands
+  DeckSize:                      number = 0;  // for Gardens
+  numberOfActionCards:           number = 0;  // for Vineyard
+  numberOfDifferentlyNamedCards: number = 0;  // for Fairgrounds
+  numberOfSilvers:               number = 0;  // for Feodum
+  Distant_Lands_on_TavernMat:    number = 0;  // for Distant_Lands
 
-  constructor() {}
+  constructor( initObj? ) {
+    if ( !initObj ) return;
+    Object.keys( initObj ).forEach( key =>
+      this[key] = ( initObj[key] || 0 ) );
+  }
 
 
   countVictoryCards(): number {

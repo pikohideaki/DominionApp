@@ -45,9 +45,11 @@
       <p> Memo : {{gameResult.memo}} </p>
     </div>
 
-    <app-selected-expansions [selectedExpansions]="gameResult.selectedExpansions" >
+    <app-selected-expansions
+      [selectedExpansionNameList$]="selectedExpansionNameList$" >
     </app-selected-expansions>
-    <app-selected-cards-list [selectedCards]="selectedCards$ | async" >
+    <app-selected-cards-list
+      [selectedCards$]="selectedCards$" >
     </app-selected-cards-list>
 
     <div class='actionButtons'>

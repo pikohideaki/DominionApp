@@ -1,49 +1,62 @@
-<app-waiting-spinner [done]="cardPropertyList.length > 0 && !!selectedCards"></app-waiting-spinner>
+<ng-container *ngIf="{
+      selectedCards:         selectedCards$         | async,
+      cardPropertyList:      cardPropertyList$      | async,
+      selectedCardsCheckbox: selectedCardsCheckbox$ | async
+    } as data">
 
-<div *ngIf="cardPropertyList.length > 0 && !!selectedCards" class="supplyTable">
-  <div class="Prosperity_DarkAges" *ngIf="selectedCards.KingdomCards10.length > 0" >
-    <mat-chip-list>
-      <mat-chip color="accent" [selected]="selectedCards.Prosperity" >植民地場</mat-chip>
-      <mat-chip color="accent" [selected]="selectedCards.DarkAges"   >避難所場</mat-chip>
-    </mat-chip-list>
-  </div>
+  <app-waiting-spinner
+    [done]="!!data.cardPropertyList && !!data.selectedCards">
+  </app-waiting-spinner>
 
-  <table class='data-table data-table--shadow3px data-table--vertical-line'>
-    <thead>
-      <tr *ngIf="selectedCards.KingdomCards10.length > 0">
-        <th *ngIf="showSelectedCardsCheckbox"></th>
-        <th>セット</th>
-        <th>名前</th>
-        <th>name</th>
-        <th>コスト</th>
-      </tr>
-    </thead>
+  <div *ngIf="!!data.cardPropertyList && !!data.selectedCards" class="supplyTable">
+    <div class="Prosperity_DarkAges" *ngIf="!data.selectedCards.isEmpty()" >
+      <mat-chip-list>
+        <mat-chip color="accent" [selected]="data.selectedCards.Prosperity" >
+          <span [class.Prosperity-not-selected]="!data.selectedCards.Prosperity">植民地場</span>
+        </mat-chip>
+        <mat-chip color="accent" [selected]="data.selectedCards.DarkAges"   >
+          <span [class.DarkAges-not-selected]="!data.selectedCards.DarkAges">避難所場</span>
+        </mat-chip>
+      </mat-chip-list>
+    </div>
 
-    <ng-container *ngFor="let category of selectedCardsCategories">
+    <table class='data-table data-table--shadow3px data-table--vertical-line'>
       <thead>
-        <tr *ngIf="selectedCards[category.name].length > 0">
-          <th colspan="5">{{category.title}}</th>
+        <tr *ngIf="!data.selectedCards.isEmpty()">
+          <th *ngIf="showSelectedCardsCheckbox"></th>
+          <th>セット</th>
+          <th>名前</th>
+          <th>name</th>
+          <th>コスト</th>
         </tr>
       </thead>
-      <tbody>
-        <tr *ngFor="let cardIndex of selectedCards[category.name]; let idx = index ">
-          <td *ngIf="showSelectedCardsCheckbox">
-            <mat-checkbox
-                [checked]="selectedCardsCheckbox[category.name][idx]"
-                (change)="selectedCardsCheckboxOnChange( category.name, idx, $event.checked )">
-            </mat-checkbox>
-          </td>
-          <td>{{ cardPropertyList[cardIndex].expansionName.join('，') }} </td>
-          <td>
-            <button mat-button color="primary" (click)="cardInfoButtonClicked( cardIndex )">
-              {{ cardPropertyList[cardIndex].name_jp }}
-            </button>
-          </td>
-          <td> {{ cardPropertyList[cardIndex].name_eng  }} </td>
-          <td> {{ cardPropertyList[cardIndex].cost.toStr() }} </td>
-        </tr>
-      </tbody>
-    </ng-container>
 
-  </table>
-</div>
+      <ng-container *ngFor="let category of selectedCardsCategories">
+        <thead>
+          <tr *ngIf="data.selectedCards[category.name].length > 0">
+            <th colspan="5">{{category.title}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let cardIndex of data.selectedCards[category.name]; let idx = index ">
+            <td *ngIf="showSelectedCardsCheckbox">
+              <mat-checkbox *ngIf="category.name !== 'Obelisk' "
+                  [checked]="data.selectedCardsCheckbox[category.name][idx]"
+                  (change)="selectedCardsCheckboxOnChange( category.name, idx, $event.checked )">
+              </mat-checkbox>
+            </td>
+            <td>{{ data.cardPropertyList[cardIndex].expansionName.join('，') }} </td>
+            <td>
+              <button mat-button color="primary" (click)="cardInfoButtonClicked( cardIndex )">
+                {{ data.cardPropertyList[cardIndex].nameJp }}
+              </button>
+            </td>
+            <td> {{ data.cardPropertyList[cardIndex].nameEng  }} </td>
+            <td> {{ data.cardPropertyList[cardIndex].cost.toStr() }} </td>
+          </tr>
+        </tbody>
+      </ng-container>
+
+    </table>
+  </div>
+</ng-container>

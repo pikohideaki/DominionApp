@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
+import { Router } from '@angular/router';
 
 import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
 import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';
@@ -22,15 +23,17 @@ export class AppComponent {
     private afAuth: AngularFireAuth,
     private myUserInfo: MyUserInfoService,
     private autoBackup: AutoBackupOnFirebaseService,
+    private router: Router
   ) {
     this.autoBackup.checkAndExecuteBackup();
   }
 
 
-  logout() {
+  async logout() {
     if ( !this.afAuth.auth.currentUser ) return;
-    this.afAuth.auth.signOut()
-    .then( () => this.openSnackBar('Successfully signed out!') );
+    await this.afAuth.auth.signOut();
+    this.router.navigate( ['/'] );
+    this.openSnackBar('Successfully signed out!');
   }
 
   private openSnackBar( message: string ) {
