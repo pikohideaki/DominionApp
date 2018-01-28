@@ -99,9 +99,9 @@ export class MyUserInfoService {
     return this.database.user.set.randomizerGroupId( this.uid, value );
   }
 
-  setOnlineGameIsSelectedExpansions( value: boolean[] ) {
+  setOnlineGameIsSelectedExpansions( index: number, value: boolean ) {
     if ( !this.uid ) return Promise.resolve();
-    return this.database.user.set.onlineGame.isSelectedExpansions( this.uid, value );
+    return this.database.user.set.onlineGame.isSelectedExpansions( this.uid, index, value );
   }
 
   setOnlineGameNumberOfPlayers( value: number ) {

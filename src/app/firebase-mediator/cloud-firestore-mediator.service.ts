@@ -65,30 +65,30 @@ export class CloudFirestoreMediatorService {
       nameYomi:          ( uid: string, value: string ) => Promise<void>,
       randomizerGroupId: ( uid: string, value: string ) => Promise<void>,
       onlineGame: {
-        isSelectedExpansions: ( uid: string, value: boolean[] ) => Promise<void>,
-        numberOfPlayers:      ( uid: string, value: number    ) => Promise<void>,
-        roomId:               ( uid: string, value: string    ) => Promise<void>,
-        communicationId:      ( uid: string, value: string    ) => Promise<void>,
-        chatOpened:           ( uid: string, value: boolean   ) => Promise<void>,
+        isSelectedExpansions: ( uid: string, index: number, value: boolean ) => Promise<void>,
+        numberOfPlayers:      ( uid: string, value: number                 ) => Promise<void>,
+        roomId:               ( uid: string, value: string                 ) => Promise<void>,
+        communicationId:      ( uid: string, value: string                 ) => Promise<void>,
+        chatOpened:           ( uid: string, value: boolean                ) => Promise<void>,
       }
     }
   };
 
   gameResult: {
-    add:     ( gameResult: GameResult )     => firebase.database.ThenableReference,
-    remove:  ( key: string )                => Promise<void>,
+    add:     ( gameResult: GameResult     ) => firebase.database.ThenableReference,
+    remove:  ( key: string                ) => Promise<void>,
     setMemo: ( key: string, value: string ) => Promise<void>,
   };
 
   randomizerGroup: {
     addGroup:    ( newGroup: RandomizerGroup ) => firebase.database.ThenableReference,
-    removeGroup: ( groupId: string )           => Promise<void>,
+    removeGroup: ( groupId: string           ) => Promise<void>,
     set: {
-      isSelectedExpansions:      ( groupId: string, index: number, value: boolean )                    => Promise<void>,
-      selectedCardsCheckbox:     ( groupId: string, arrayName: string, index: number, value: boolean ) => Promise<void>,
-      BlackMarketPileShuffled:   ( groupId: string, value: BlackMarketPileCard[] )                     => Promise<void>,
-      BlackMarketPhase:          ( groupId: string, value: number )                                    => Promise<void>,
-      selectedIndexInHistory: ( groupId: string, value: number )                                    => Promise<void>,
+      isSelectedExpansions:    ( groupId: string, index: number, value: boolean                    ) => Promise<void>,
+      selectedCardsCheckbox:   ( groupId: string, arrayName: string, index: number, value: boolean ) => Promise<void>,
+      BlackMarketPileShuffled: ( groupId: string, value: BlackMarketPileCard[]                     ) => Promise<void>,
+      BlackMarketPhase:        ( groupId: string, value: number                                    ) => Promise<void>,
+      selectedIndexInHistory:  ( groupId: string, value: number                                    ) => Promise<void>,
       newGameResult: {
         players: {
           selected:  ( groupId: string, uid: string, value: boolean ) => Promise<void>,
@@ -103,8 +103,8 @@ export class CloudFirestoreMediatorService {
       newGameResultDialogOpened: ( groupId: string, value: boolean ) => Promise<void>,
     },
     add: {
-      member: ( groupId: string, uid: string, value: PlayerResult ) => Promise<void>,
-      selectedCardsHistory:  ( groupId: string, value: SelectedCards ) => firebase.database.ThenableReference,
+      member:                ( groupId: string, uid: string, value: PlayerResult ) => Promise<void>,
+      selectedCardsHistory:  ( groupId: string, value: SelectedCards             ) => firebase.database.ThenableReference,
     },
     remove: {
       member: ( groupId: string, uid: string ) => Promise<void>,
@@ -116,17 +116,17 @@ export class CloudFirestoreMediatorService {
   };
 
   onlineGameRoom: {
-    add:          ( newGameRoom: GameRoom )              => firebase.database.ThenableReference,
-    remove:       ( roomId: string )                     => Promise<void>,
+    add:          ( newGameRoom: GameRoom              ) => firebase.database.ThenableReference,
+    remove:       ( roomId: string                     ) => Promise<void>,
     addMember:    ( roomId: string, playerName: string ) => firebase.database.ThenableReference,
-    removeMember: ( roomId: string, uid: string )        => Promise<void>,
+    removeMember: ( roomId: string, uid: string        ) => Promise<void>,
   };
 
   onlineGameCommunication: {
-    add:        ( newGameComm: GameCommunication )       => firebase.database.ThenableReference,
-    remove:     ( roomId: string )                       => Promise<void>,
+    add:        ( newGameComm: GameCommunication       ) => firebase.database.ThenableReference,
+    remove:     ( roomId: string                       ) => Promise<void>,
     addMessage: ( roomId: string, message: ChatMessage ) => firebase.database.ThenableReference,
-    addMove:    ( roomId: string, move: MoveInGame )     => firebase.database.ThenableReference,
+    addMove:    ( roomId: string, move: MoveInGame     ) => firebase.database.ThenableReference,
   };
 
 
@@ -205,8 +205,8 @@ export class CloudFirestoreMediatorService {
           userSetProperty( uid, 'randomizerGroupId', value ),
 
         onlineGame: {
-          isSelectedExpansions: ( uid: string, value: boolean[] ) =>
-            userSetProperty( uid, 'onlineGame/isSelectedExpansions', value ),
+          isSelectedExpansions: ( uid: string, index: number, value: boolean ) =>
+            userSetProperty( uid, `onlineGame/isSelectedExpansions/${index}`, value ),
 
           numberOfPlayers: ( uid: string, value: number ) =>
             userSetProperty( uid, 'onlineGame/numberOfPlayers', value ),

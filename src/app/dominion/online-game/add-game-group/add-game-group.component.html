@@ -1,8 +1,18 @@
+<ng-container *ngIf="{
+    numberOfPlayers:      numberOfPlayers$      | async,
+    isSelectedExpansions: isSelectedExpansions$ | async,
+    formIsInvalid:        formIsInvalid$        | async,
+    memo:                 memo$                 | async
+  } as data">
+
+
 <div class="body-with-padding" >
   <span class="margined-element">
     <button mat-raised-button color='primary'
-      [disabled]="formIsInvalid$ | async"
-      (click)="makeNewGameRoom()" >
+      [disabled]="data.formIsInvalid"
+      (click)="makeNewGameRoom(
+          data.numberOfPlayers,
+          data.isSelectedExpansions )" >
       部屋を作成
     </button>
   </span>
@@ -14,20 +24,20 @@
     <div>
       <span>人数（自分含む）：</span>
       <button mat-raised-button class="mini-button"
-          [disabled]="(numberOfPlayers$ | async) <= 2"
-          (click)="decrement()">
+          [disabled]="data.numberOfPlayers <= 2"
+          (click)="decrement( data.numberOfPlayers )">
         <mat-icon>exposure_neg_1</mat-icon>
       </button>
-      <span>{{numberOfPlayers$ | async}}人</span>
+      <span>{{data.numberOfPlayers}}人</span>
       <button mat-raised-button class="mini-button"
-          [disabled]="(numberOfPlayers$ | async) >= 6"
-          (click)="increment()">
+          [disabled]="data.numberOfPlayers >= 6"
+          (click)="increment( data.numberOfPlayers )">
         <mat-icon>exposure_plus_1</mat-icon>
       </button>
     </div>
 
     <div>
-      Memo：{{memo$ | async}}
+      Memo：{{data.memo}}
       <button mat-icon-button (click)="memoClicked()">
         <mat-icon>edit</mat-icon>
       </button>
@@ -49,3 +59,4 @@
     (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )" >
   </app-randomizer>
 </div>
+</ng-container>

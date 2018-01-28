@@ -1,10 +1,9 @@
-import { Component, OnInit, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { isDevMode } from '@angular/core';
 
 import { Observable      } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
-import 'rxjs/add/operator/takeWhile';
 
 import { MatDialog, MatSnackBar } from '@angular/material';
 
@@ -34,18 +33,15 @@ import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
     }
   `]
 })
-export class AddGameGroupComponent implements OnInit, OnDestroy {
+export class AddGameGroupComponent implements OnInit {
   private alive: boolean = true;
 
   // form elements
   private memoSource = new BehaviorSubject<string>('');
   memo$ = this.memoSource.asObservable();
 
-  private numberOfPlayersSource = new BehaviorSubject<number>(2);
-  numberOfPlayers$ = this.numberOfPlayersSource.asObservable();
-
-  private isSelectedExpansionsSource = new BehaviorSubject<boolean[]>([]);
-  isSelectedExpansions$ = this.isSelectedExpansionsSource.asObservable();
+  numberOfPlayers$ = this.myUserInfo.onlineGame.numberOfPlayers$;
+  isSelectedExpansions$ = this.myUserInfo.onlineGame.isSelectedExpansions$;
 
   formIsInvalid$: Observable<boolean>
     = Observable.combineLatest(
@@ -55,10 +51,10 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
              || isSelectedExpansions.every( e => !e ) );
 
   // app-randomizer
-  selectedCardsSource = new BehaviorSubject<SelectedCards>( new SelectedCards() );
+  private selectedCardsSource = new BehaviorSubject<SelectedCards>( new SelectedCards() );
   selectedCards$ = this.selectedCardsSource.asObservable();
 
-  BlackMarketPileShuffledSource = new BehaviorSubject<BlackMarketPileCard[]>([]);
+  private BlackMarketPileShuffledSource = new BehaviorSubject<BlackMarketPileCard[]>([]);
   BlackMarketPileShuffled$ = this.BlackMarketPileShuffledSource.asObservable();
 
 
@@ -70,14 +66,6 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     private myUserInfo: MyUserInfoService,
     private addGameGroupService: AddGameGroupService
   ) {
-    this.myUserInfo.onlineGame.isSelectedExpansions$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.isSelectedExpansionsSource.next( val ) );
-
-    this.myUserInfo.onlineGame.numberOfPlayers$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.numberOfPlayersSource.next( val ) );
-
     if ( isDevMode() ) {
       const selectedCards = this.selectedCardsSource.getValue();
       selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
@@ -90,28 +78,17 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
   ngOnInit() {
   }
 
-  ngOnDestroy() {
-    this.alive = false;
+
+  increment( currentValue: number ) {
+    this.myUserInfo.setOnlineGameNumberOfPlayers( currentValue + 1 );
   }
 
-
-  increment() {
-    const newValue = this.numberOfPlayersSource.getValue() + 1;
-    this.numberOfPlayersSource.next( newValue );
-    this.myUserInfo.setOnlineGameNumberOfPlayers( newValue );
-  }
-
-  decrement() {
-    const newValue = this.numberOfPlayersSource.getValue() - 1;
-    this.numberOfPlayersSource.next( newValue );
-    this.myUserInfo.setOnlineGameNumberOfPlayers( newValue );
+  decrement( currentValue: number ) {
+    this.myUserInfo.setOnlineGameNumberOfPlayers( currentValue - 1 );
   }
 
   isSelectedExpansionsOnChange( value: { index: number, checked: boolean } ) {
-    const newValue = this.isSelectedExpansionsSource.getValue();
-    newValue[ value.index ] = value.checked;
-    this.isSelectedExpansionsSource.next( newValue );
-    this.myUserInfo.setOnlineGameIsSelectedExpansions( newValue );
+    this.myUserInfo.setOnlineGameIsSelectedExpansions( value.index, value.checked );
   }
 
   memoClicked() {
@@ -123,10 +100,21 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
     });
   }
 
-  async makeNewGameRoom() {
+  selectedCardsOnChange( value ) {
+    this.selectedCardsSource.next( value );
+  }
+
+  BlackMarketPileShuffledOnChange( value ) {
+    this.BlackMarketPileShuffledSource.next( value );
+  }
+
+  async makeNewGameRoom(
+    numberOfPlayers:      number,
+    isSelectedExpansions: boolean[]
+  ) {
     const newRoom = await this.addGameGroupService.init(
-        this.numberOfPlayersSource.getValue(),
-        this.isSelectedExpansionsSource.getValue(),
+        numberOfPlayers,
+        isSelectedExpansions,
         this.memoSource.getValue(),
         this.selectedCardsSource.getValue() );
 
@@ -153,13 +141,4 @@ export class AddGameGroupComponent implements OnInit, OnDestroy {
   private openSnackBar( message: string ) {
     this.snackBar.open( message, undefined, { duration: 3000 } );
   }
-
-  selectedCardsOnChange( value ) {
-    this.selectedCardsSource.next( value );
-  }
-
-  BlackMarketPileShuffledOnChange( value ) {
-    this.BlackMarketPileShuffledSource.next( value );
-  }
-
 }

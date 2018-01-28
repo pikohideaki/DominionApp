@@ -1,5 +1,10 @@
+<ng-container *ngIf="{
+    gameRoomList: gameRoomList$ | async,
+    myName:       myName$       | async
+  } as data">
+
 <div class="body-with-padding" (click)="backgroundClicked()">
-  <div *ngFor="let room of gameRoomList | reverse">
+  <div *ngFor="let room of data.gameRoomList | reverse">
     <mat-card class="roomListItem"
         [class.notWaitingForPlayers]="!room.waitingForNewPlayers()"
         (click)="roomClicked( room.databaseKey )">
@@ -19,8 +24,8 @@
 
       <mat-card-actions *ngIf="room.databaseKey === selectedRoomId">
         <button mat-raised-button color="primary"
-              (click)="signIn( room.databaseKey )"
-              [disabled]="!myName || !room.waitingForNewPlayers()" >
+              (click)="signIn( room, data.myName )"
+              [disabled]="!data.myName || !room.waitingForNewPlayers()" >
           参加
         </button>
       </mat-card-actions>
@@ -28,5 +33,8 @@
     </mat-card>
   </div>
 
-  <button mat-raised-button (click)="resetRooms()">Reset rooms</button>
+  <button mat-raised-button (click)="resetRooms( data.gameRoomList )">
+    Reset rooms
+  </button>
 </div>
+</ng-container>

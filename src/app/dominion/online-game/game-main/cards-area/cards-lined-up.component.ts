@@ -13,7 +13,7 @@ import { MyGameRoomService } from '../my-game-room.service';
   template: `
     <ng-container *ngIf="{
           cardPropertyList: cardPropertyList$ | async,
-          myIndex: myIndex$ | async
+          myIndex:          myIndex$          | async
         } as data">
       <ng-container *ngIf="data.cardPropertyList?.length > 0">
         <ng-container

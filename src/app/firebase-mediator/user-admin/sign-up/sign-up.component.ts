@@ -56,7 +56,11 @@ export class SignUpComponent implements OnInit {
   }
 
 
-  signUp() {
+  async signUp() {
+    const expansionNameList
+      = await this.database.expansionNameList$.first().toPromise();
+    const isSelectedExpansionsInit = expansionNameList.map( _ => true );
+
     this.errorMessageForEmail = '';
     this.errorMessageForPassword = '';
 
@@ -72,7 +76,7 @@ export class SignUpComponent implements OnInit {
             nameYomi: this.nameYomi,
             randomizerGroupId: '',
             onlineGame: {
-              isSelectedExpansions: [],
+              isSelectedExpansions: expansionNameList.map( _ => true ),
               numberOfPlayers:       2,
               roomId:               '',
               communicationId:      '',

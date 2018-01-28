@@ -2,7 +2,6 @@
 # ToDo
 * receiveDataDone, isReady 等の除去．メソッドの引数はtemplate側で展開して与えればよい．
 
-
 * 動作チェック
     * sign-in-to-the-game-dialog の selectingRoomRemoved を変更した
 

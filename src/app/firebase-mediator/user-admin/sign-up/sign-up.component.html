@@ -1,3 +1,7 @@
+<ng-container *ngIf="{
+
+  } as data">
+
 <div class="wrapper">
   <div>
     <mat-form-field [color]="( errorMessageForEmail !== '' ? 'primary' : 'warn' )">
@@ -62,3 +66,4 @@
 
 <mat-progress-bar *ngIf="waitingForResponse" mode="indeterminate">
 </mat-progress-bar>
+</ng-container>

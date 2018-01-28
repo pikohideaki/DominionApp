@@ -8,9 +8,9 @@ import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service'
   providers: [],
   selector: 'app-online-game',
   template: `
-    <div *ngIf="!(signedIn$ | async); then thenBlock; else elseBlock" ></div>
-    <ng-template #thenBlock>ログインしてください。</ng-template>
-    <ng-template #elseBlock>
+    <div *ngIf="(signedIn$ | async); then signedIn; else notSignedIn" ></div>
+    <ng-template #notSignedIn>ログインしてください。</ng-template>
+    <ng-template #signedIn>
       <mat-tab-group>
         <mat-tab label="New Game">
           <app-add-game-group></app-add-game-group>

@@ -14,10 +14,10 @@ import { MyGameRoomService } from '../my-game-room.service';
   selector: 'app-cards-pile',
   template: `
     <ng-container *ngIf="{
-          isButton:    isButton$ | async,
-          faceUp:      faceUp$   | async,
-          empty:       empty$    | async,
-          card:        card$     | async,
+          isButton:    isButton$    | async,
+          faceUp:      faceUp$      | async,
+          empty:       empty$       | async,
+          card:        card$        | async,
           description: description$ | async
         } as data">
       <app-dominion-card-image

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/takeWhile';
@@ -20,11 +20,10 @@ import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.servi
   templateUrl: './game-room-list.component.html',
   styleUrls: ['./game-room-list.component.css']
 })
-export class GameRoomListComponent implements OnInit, OnDestroy {
-  private alive: boolean = true;
+export class GameRoomListComponent implements OnInit {
 
-  myName: string;
-  gameRoomList: GameRoom[] = [];
+  myName$ = this.myUserInfo.name$;
+  gameRoomList$: Observable<GameRoom[]> = this.database.onlineGameRooms$;
   selectedRoomId = '';
 
 
@@ -35,20 +34,9 @@ export class GameRoomListComponent implements OnInit, OnDestroy {
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    this.database.onlineGameRooms$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.gameRoomList = val );
-
-    this.myUserInfo.name$
-      .takeWhile( () => this.alive )
-      .subscribe( val => this.myName = val );
   }
 
   ngOnInit() {
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
   }
 
 
@@ -62,15 +50,15 @@ export class GameRoomListComponent implements OnInit, OnDestroy {
     this.selectedRoomId = '';
   }
 
-  async signIn( roomId: string ) {
+  async signIn( room: GameRoom, myName: string ) {
     const dialogRef = this.dialog.open( SignInToGameRoomDialogComponent );
+    const roomId = room.databaseKey;
 
-    dialogRef.componentInstance.newRoom
-      = this.gameRoomList.find( g => g.databaseKey === roomId );
+    dialogRef.componentInstance.newRoom = room;
 
     dialogRef.componentInstance.dialogRef = dialogRef;
     dialogRef.disableClose = true;
-    const myMemberId = this.database.onlineGameRoom.addMember( roomId, this.myName ).key;
+    const myMemberId = this.database.onlineGameRoom.addMember( roomId, myName ).key;
 
     dialogRef.afterClosed().subscribe( result => {
       if ( result === 'Cancel Clicked' ) {
@@ -81,10 +69,10 @@ export class GameRoomListComponent implements OnInit, OnDestroy {
     });
   }
 
-  resetRooms() {
-    this.gameRoomList.map( e => e.gameRoomCommunicationId )
+  resetRooms( gameRoomList: GameRoom[] ) {
+    gameRoomList.map( e => e.gameRoomCommunicationId )
       .forEach( key => this.database.onlineGameCommunication.remove(key) );
-    this.gameRoomList.map( e => e.databaseKey )
+    gameRoomList.map( e => e.databaseKey )
       .forEach( key => this.database.onlineGameRoom.remove(key) );
   }
 
