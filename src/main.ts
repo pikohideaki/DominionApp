@@ -6,12 +6,13 @@ import { environment } from './environments/environment';
 
 import 'hammerjs';
 
-if ( !isDevMode() ) {
-  console.log = ( ...args: any[] ) => {};
-}
 
 if (environment.production) {
   enableProdMode();
+}
+
+if ( !isDevMode() ) {
+  console.log = ( ...args: any[] ) => {};
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)

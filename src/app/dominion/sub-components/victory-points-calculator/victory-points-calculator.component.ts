@@ -27,13 +27,12 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   @Input() selectedCards$: Observable<SelectedCards>;  // selectedCardsに存在するもののみ表示
   @Input() resetVPCalculator$: Observable<number>;
 
-  @Output() VPtotalChange = new EventEmitter<number>();
-  VPtotal$ = this.VPtotalChange.asObservable().startWith(0);
-
+  @Input()  numberOfVictoryCards$: Observable<NumberOfVictoryCards>;
   @Output() numberOfVictoryCardsChange = new EventEmitter<NumberOfVictoryCards>();
+  @Output() VPtotalChange = new EventEmitter<number>();
+  VPtotal$: Observable<number>;
 
   cardLongSideLength = 180;
-  numberOfVictoryCards: NumberOfVictoryCards = new NumberOfVictoryCards();
 
   cardPropertyList$ = this.database.cardPropertyList$;
 
@@ -106,10 +105,11 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.VictoryCardsFiltered$ = Observable.combineLatest(
+    this.VPtotal$ = this.numberOfVictoryCards$.map( e => this.calc.total(e) );
+
+    this.VictoryCardsFiltered$ = this.selectedCards$.combineLatest(
         this.cardPropertyList$,
-        this.selectedCards$,
-        (cardPropertyList, selectedCards) => {
+        (selectedCards, cardPropertyList) => {
           const selectedCardsAll = selectedCards.concatAllCards();
           const isInSupply = cardId =>
             selectedCardsAll.map( e => cardPropertyList[e].cardId ).includes( cardId );
@@ -126,10 +126,9 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
           } });
         });
 
-    this.otherSettingsFiltered$ = Observable.combineLatest(
+    this.otherSettingsFiltered$ = this.selectedCards$.combineLatest(
         this.cardPropertyList$,
-        this.selectedCards$,
-        (cardPropertyList, selectedCards) => {
+        (selectedCards, cardPropertyList) => {
           const selectedCardsAll = selectedCards.concatAllCards();
           const isInSupply = cardId =>
             selectedCardsAll.map( e => cardPropertyList[e].cardId )
@@ -137,10 +136,10 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
           return this.otherSettings.filter( e => isInSupply( e.displayIfExists ) );
         });
 
-    this.resetVPCalculator$
+    this.resetVPCalculator$.withLatestFrom( this.numberOfVictoryCards$, (_, n) => n )
       .skip(1)
       .takeWhile( () => this.alive )
-      .subscribe( () => this.resetNumbers() );
+      .subscribe( numberOfVictoryCards => this.resetNumbers( numberOfVictoryCards ) );
   }
 
   ngOnDestroy() {
@@ -149,10 +148,10 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
 
 
 
-  private updateVPtotal() {
-    const VPtotal = this.calc.total( this.numberOfVictoryCards );
+  private updateVPtotal( numberOfVictoryCards: NumberOfVictoryCards ) {
+    const VPtotal = this.calc.total( numberOfVictoryCards );
     this.VPtotalChange.emit( VPtotal );
-    this.numberOfVictoryCardsChange.emit( this.numberOfVictoryCards );
+    this.numberOfVictoryCardsChange.emit( numberOfVictoryCards );
   }
 
 
@@ -163,28 +162,39 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   }
 
 
-  VPperCard( cardId: string ) {
-    return this.calc.VPperCard( cardId, this.numberOfVictoryCards );
+  VPperCard(
+    numberOfVictoryCards: NumberOfVictoryCards,
+    cardId: string
+  ) {
+    return this.calc.VPperCard( cardId, numberOfVictoryCards );
   }
 
 
-  decrement( VictoryCardId: string, by: number = 1 ) {
-    if ( this.numberOfVictoryCards[ VictoryCardId ] <= 0 ) return;
-    this.numberOfVictoryCards[ VictoryCardId ] -= by;
+  decrement(
+    numberOfVictoryCards: NumberOfVictoryCards,
+    VictoryCardId: string,
+    by: number = 1
+  ) {
+    if ( numberOfVictoryCards[ VictoryCardId ] <= 0 ) return;
+    numberOfVictoryCards[ VictoryCardId ] -= by;
 
-    this.numberOfVictoryCards[ VictoryCardId ]
-     = Math.max( 0, this.numberOfVictoryCards[ VictoryCardId ] );
+    numberOfVictoryCards[ VictoryCardId ]
+     = Math.max( 0, numberOfVictoryCards[ VictoryCardId ] );
 
     if ( VictoryCardId === 'Distant_Lands' ) {
-      this.numberOfVictoryCards.Distant_Lands_on_TavernMat
-        = Math.min( this.numberOfVictoryCards.Distant_Lands,
-                    this.numberOfVictoryCards.Distant_Lands_on_TavernMat );
+      numberOfVictoryCards.Distant_Lands_on_TavernMat
+        = Math.min( numberOfVictoryCards.Distant_Lands,
+                    numberOfVictoryCards.Distant_Lands_on_TavernMat );
     }
-    this.updateVPtotal();
+    this.updateVPtotal( numberOfVictoryCards );
   }
 
-  increment( VictoryCardId: string, by: number = 1 ) {
-    this.numberOfVictoryCards[ VictoryCardId ] += by;
+  increment(
+    numberOfVictoryCards: NumberOfVictoryCards,
+    VictoryCardId: string,
+    by: number = 1
+  ) {
+    numberOfVictoryCards[ VictoryCardId ] += by;
 
     const VictoryCardId__ = ( VictoryCardId === 'Distant_Lands_on_TavernMat'
                                 ? 'Distant_Lands'
@@ -193,26 +203,30 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
                            this.otherVictoryPoints,
                            this.otherSettings )
                   .find( e => e.id === VictoryCardId__ ).maxNumber;
-    this.numberOfVictoryCards[ VictoryCardId ]
-     = Math.min( max, this.numberOfVictoryCards[ VictoryCardId ] );
+    numberOfVictoryCards[ VictoryCardId ]
+     = Math.min( max, numberOfVictoryCards[ VictoryCardId ] );
     if ( VictoryCardId === 'Distant_Lands_on_TavernMat' ) {
-      this.numberOfVictoryCards.Distant_Lands
-        = Math.max( this.numberOfVictoryCards.Distant_Lands,
-                    this.numberOfVictoryCards.Distant_Lands_on_TavernMat );
+      numberOfVictoryCards.Distant_Lands
+        = Math.max( numberOfVictoryCards.Distant_Lands,
+                    numberOfVictoryCards.Distant_Lands_on_TavernMat );
     }
-    this.updateVPtotal();
+    this.updateVPtotal( numberOfVictoryCards );
   }
 
-  setValue( VictoryCardId, value ) {
-    this.numberOfVictoryCards[ VictoryCardId ] = value;
-    this.updateVPtotal();
+  setValue(
+    numberOfVictoryCards: NumberOfVictoryCards,
+    VictoryCardId:        string,
+    value:                number,
+  ) {
+    numberOfVictoryCards[ VictoryCardId ] = value;
+    this.updateVPtotal( numberOfVictoryCards );
   }
 
-  resetNumbers() {
+  resetNumbers( numberOfVictoryCards: NumberOfVictoryCards ) {
     this.utils.objectForEach(
-        this.numberOfVictoryCards,
-        (_, key) => this.numberOfVictoryCards[key] = 0 );
-    this.updateVPtotal();
+        numberOfVictoryCards,
+        (_, key) => numberOfVictoryCards[key] = 0 );
+    this.updateVPtotal( numberOfVictoryCards );
   }
 
 }

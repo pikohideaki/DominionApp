@@ -8,6 +8,7 @@ import { MyUserInfoService             } from '../../firebase-mediator/my-user-i
 
 import { SelectedCards } from '../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
+import { PlayerResult } from '../../classes/player-result';
 
 
 @Component({
@@ -18,6 +19,7 @@ import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
         <app-victory-points-calculator *ngIf="!!uid"
           [selectedCards$]="selectedCards$"
           [resetVPCalculator$]="resetVPCalculator$"
+          [numberOfVictoryCards$]="numberOfVictoryCards$"
           (numberOfVictoryCardsChange)="numberOfVictoryCardsOnChange( $event, uid )"
           (VPtotalChange)="VPtotalOnChange( $event, uid )">
         </app-victory-points-calculator>
@@ -31,6 +33,12 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
   selectedCards$ = this.myRandomizerGroup.selectedCards$;  // 存在するもののみ表示
   resetVPCalculator$ = this.myRandomizerGroup.resetVPCalculator$;
   uid$: Observable<string> = this.myUserInfo.uid$;
+  numberOfVictoryCards$
+    = Observable.combineLatest(
+        this.myRandomizerGroup.newGameResult.players$,
+        this.uid$.filter( uid => !!uid ),
+        (players, uid) => ( players.find( e => e.uid === uid ) || new PlayerResult() )
+                            .numberOfVictoryCards );
 
 
   constructor(

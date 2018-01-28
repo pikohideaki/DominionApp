@@ -45,9 +45,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
   @Output() filteredDataOnChange = new EventEmitter<any[]>();
   @Output() filteredIndiceOnChange = new EventEmitter<number[]>();
 
-  @Input() columnSettings: ColumnSetting[] = [];  // initializer
+  @Input() private columnSettings: ColumnSetting[] = [];  // initializer
   private columnSettingsSource = new BehaviorSubject<ColumnSetting[]>([]);
-  private columnSettings$ = this.columnSettingsSource.asObservable().debounceTime( 300 /* ms */ );
+  columnSettings$ = this.columnSettingsSource.asObservable().debounceTime( 300 /* ms */ );
 
 
   // pagenation
@@ -93,10 +93,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
                   .map( e => e.idx ) );
 
     this.filteredData$
-      = Observable.combineLatest(
+      = this.filteredIndice$.withLatestFrom(
             this.data$,
-            this.filteredIndice$,
-            (data, indice) => indice.map( idx => data[idx] ) );
+            (indice, data) => indice.map( idx => data[idx] ) );
+
+    this.filteredDataLength$ = this.filteredData$.map( e => e.length );
 
     this.pagenatedData$
       = Observable.combineLatest(
@@ -122,8 +123,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
           return transformed;
         }) );
 
-    this.filteredDataLength$ = this.filteredData$.map( e => e.length );
-
 
     /* subscriptions */
     this.filteredIndice$
@@ -137,24 +136,33 @@ export class DataTableComponent implements OnInit, OnDestroy {
       .takeWhile( () => this.alive )
       .subscribe( val => this.filteredDataOnChange.emit( val ) );
 
-    this.data$
+    this.filteredData$.withLatestFrom( this.data$ )
       .takeWhile( () => this.alive )
-      .subscribe( data => {
+      .subscribe( ([filteredData, data]) => {
         const columnSettings = this.columnSettingsSource.getValue();
         columnSettings.forEach( column => {
-          const dataOfColumn = data.map( line => line[ column.name ] );
+          const dataOfColumn         = data        .map( line => line[ column.name ] );
+          const dataOfColumnFiltered = filteredData.map( line => line[ column.name ] );
           switch ( column.manip ) {
-            case 'select' :
+            case 'select' : {
+              const options = this.utils.uniq( dataOfColumn ).sort();
               column.selectOptions
-                = this.utils.uniq( dataOfColumn ).sort()
-                    .map( e => ({ value: e, viewValue: this.transform( column.name, e ) }) );
-              break;
+                = options.map( e => ({
+                      value: e,
+                      viewValue: this.transform( column.name, e )
+                          + `(${dataOfColumnFiltered.filter( cell => cell === e ).length})`,
+                    }) );
+            } break;
             case 'multiSelect-or' :
-            case 'multiSelect-and' :
+            case 'multiSelect-and' : {
+              const options = this.utils.uniq( [].concat( ...dataOfColumn ) ).sort();
               column.selectOptions
-                = this.utils.uniq( [].concat( ...dataOfColumn ) ).sort()
-                    .map( e => ({ value: e, viewValue: this.transform( column.name, e ) }) );
-              break;
+                = options.map( e => ({
+                      value: e,
+                      viewValue: this.transform( column.name, e )
+                          + `(${dataOfColumnFiltered.filter( cell => cell.includes(e) ).length})`,
+                    }) );
+            } break;
             default: break;
           }
         });

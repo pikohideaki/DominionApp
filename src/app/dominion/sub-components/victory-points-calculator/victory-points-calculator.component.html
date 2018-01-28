@@ -2,16 +2,21 @@
       cardPropertyList:      cardPropertyList$      | async,
       VictoryCardsFiltered:  VictoryCardsFiltered$  | async,
       otherSettingsFiltered: otherSettingsFiltered$ | async,
-      VPtotal:               VPtotal$               | async
+      VPtotal:               VPtotal$               | async,
+      numberOfVictoryCards:  numberOfVictoryCards$  | async
     } as data">
 
-  <app-waiting-spinner [done]="!!data.cardPropertyList"></app-waiting-spinner>
+  <app-waiting-spinner
+    [done]="!!data.cardPropertyList && !!data.numberOfVictoryCards">
+  </app-waiting-spinner>
 
-  <ng-container *ngIf="!!data.cardPropertyList" >
+  <ng-container *ngIf="!!data.cardPropertyList && !!data.numberOfVictoryCards">
     <div class="result">
       <span>合計点＝<b>{{data.VPtotal}}</b></span>
       <span class="margined-element">
-        <button mat-raised-button (click)="resetNumbers()">reset</button>
+        <button mat-raised-button (click)="resetNumbers( data.numberOfVictoryCards )">
+          reset
+        </button>
       </span>
 
       <span class="spacer"></span>
@@ -31,22 +36,22 @@
           <td nowrap> {{victoryPoint.title}} </td>
           <td>
             <button mat-raised-button class="mini-button"
-                [disabled]="numberOfVictoryCards[ victoryPoint.id ] <= 0"
-                (click)="decrement( victoryPoint.id, 5 )">
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 5 )">
               <span class="numberIcon">-5</span>
             </button>
           </td>
           <td>
             <button mat-raised-button class="mini-button"
-                [disabled]="numberOfVictoryCards[ victoryPoint.id ] <= 0"
-                (click)="decrement( victoryPoint.id, 2 )">
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 2 )">
               <span class="numberIcon">-2</span>
             </button>
           </td>
           <td>
             <button mat-raised-button class="mini-button"
-                [disabled]="numberOfVictoryCards[ victoryPoint.id ] <= 0"
-                (click)="decrement( victoryPoint.id, 1 )">
+                [disabled]="data.numberOfVictoryCards[ victoryPoint.id ] <= 0"
+                (click)="decrement( data.numberOfVictoryCards, victoryPoint.id, 1 )">
               <span class="numberIcon">-1</span>
             </button>
           </td>
@@ -54,26 +59,28 @@
             <mat-form-field class="OtherVictoryPointsInput">
               <input matInput type="number"
                 min="0"
-                [value]="numberOfVictoryCards[ victoryPoint.id ]"
+                [value]="data.numberOfVictoryCards[ victoryPoint.id ]"
                 onclick="this.select(0, this.value.length)"
-                (input)="setValue( victoryPoint.id, $event.target.valueAsNumber )">
+                (input)="setValue( data.numberOfVictoryCards,
+                                   victoryPoint.id,
+                                   $event.target.valueAsNumber )">
             </mat-form-field>
           </td>
           <td>
             <button mat-raised-button class="mini-button"
-                (click)="increment( victoryPoint.id, 1 )">
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 1 )">
               <span class="numberIcon">+1</span>
             </button>
           </td>
           <td>
             <button mat-raised-button class="mini-button"
-                (click)="increment( victoryPoint.id, 2 )">
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 2 )">
               <span class="numberIcon">+2</span>
             </button>
           </td>
           <td>
             <button mat-raised-button class="mini-button"
-                (click)="increment( victoryPoint.id, 5 )">
+                (click)="increment( data.numberOfVictoryCards, victoryPoint.id, 5 )">
               <span class="numberIcon">+5</span>
             </button>
           </td>
@@ -88,32 +95,32 @@
             <td nowrap> {{setting.title}} </td>
             <td>
               <button mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ setting.id ] <= 0"
-                  (click)="decrement( setting.id, setting.by )">
+                  [disabled]="data.numberOfVictoryCards[ setting.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, setting.id, setting.by )">
                 <span class="numberIcon">-{{setting.by}}</span>
               </button>
             </td>
             <td>
               <button mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ setting.id ] <= 0"
-                  (click)="decrement( setting.id, 1 )">
+                  [disabled]="data.numberOfVictoryCards[ setting.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, setting.id, 1 )">
                 <span class="numberIcon">-1</span>
               </button>
             </td>
             <td>
               <span class="margined-element">
-                {{numberOfVictoryCards[ setting.id ]}}
+                {{data.numberOfVictoryCards[ setting.id ]}}
               </span>
             </td>
             <td>
               <button mat-raised-button class="mini-button"
-                  (click)="increment( setting.id, 1 )">
+                  (click)="increment( data.numberOfVictoryCards, setting.id, 1 )">
                 <span class="numberIcon">+1</span>
               </button>
             </td>
             <td>
               <button mat-raised-button class="mini-button"
-                  (click)="increment( setting.id, setting.by )">
+                  (click)="increment( data.numberOfVictoryCards, setting.id, setting.by )">
                 <span class="numberIcon">+{{setting.by}}</span>
               </button>
             </td>
@@ -134,31 +141,31 @@
                 [description]=""
                 [card]="cardProperty( victoryCard.id, data.cardPropertyList )">
             </app-dominion-card-image>
-            <span> {{VPperCard( victoryCard.id )}} VP </span>
+            <span> {{VPperCard( data.numberOfVictoryCards, victoryCard.id )}} VP </span>
             <span class="setNumberOfCards">
               <button *ngIf="victoryCard.maxNumber >= 12"
                   mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ victoryCard.id ] <= 0"
-                  (click)="decrement( victoryCard.id, 2 )">
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, victoryCard.id, 2 )">
                 <span class="numberIcon">-2</span>
               </button>
               <button mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ victoryCard.id ] <= 0"
-                  (click)="decrement( victoryCard.id, 1 )">
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, victoryCard.id, 1 )">
                 <span class="numberIcon">-1</span>
               </button>
               <span class="margined-element">
-                {{numberOfVictoryCards[ victoryCard.id ]}}
+                {{data.numberOfVictoryCards[ victoryCard.id ]}} 枚
               </span>
               <button mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
-                  (click)="increment( victoryCard.id, 1 )">
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
+                  (click)="increment( data.numberOfVictoryCards, victoryCard.id, 1 )">
                 <span class="numberIcon">+1</span>
               </button>
               <button *ngIf="victoryCard.maxNumber >= 12"
                   mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
-                  (click)="increment( victoryCard.id, 2 )">
+                  [disabled]="data.numberOfVictoryCards[ victoryCard.id ] >= victoryCard.maxNumber"
+                  (click)="increment( data.numberOfVictoryCards, victoryCard.id, 2 )">
                 <span class="numberIcon">+2</span>
               </button>
             </span>
@@ -167,15 +174,15 @@
             <span *ngIf="victoryCard.id == 'Distant_Lands'" class="setNumberOfCards">
               <span class="margined-element">on Tavern mat</span>
               <button mat-raised-button class="mini-button"
-                  [disabled]="numberOfVictoryCards.Distant_Lands_on_TavernMat <= 0"
-                  (click)="decrement( 'Distant_Lands_on_TavernMat', 1 )">
+                  [disabled]="data.numberOfVictoryCards.Distant_Lands_on_TavernMat <= 0"
+                  (click)="decrement( data.numberOfVictoryCards, 'Distant_Lands_on_TavernMat', 1 )">
                 <span class="numberIcon">-1</span>
               </button>
               <span class="margined-element">
-                {{numberOfVictoryCards.Distant_Lands_on_TavernMat}}
+                {{data.numberOfVictoryCards.Distant_Lands_on_TavernMat}} 枚
               </span>
               <button mat-raised-button class="mini-button"
-                  (click)="increment( 'Distant_Lands_on_TavernMat', 1 )">
+                  (click)="increment( data.numberOfVictoryCards, 'Distant_Lands_on_TavernMat', 1 )">
                 <span class="numberIcon">+1</span>
               </button>
             </span>

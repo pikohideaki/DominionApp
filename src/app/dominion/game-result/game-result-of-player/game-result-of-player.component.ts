@@ -35,11 +35,11 @@ export class GameResultOfPlayerComponent implements OnInit {
   ngOnInit() {
     this.gameResultOfEachPlayerForView$
       = Observable.combineLatest(
-        this.gameResultListFiltered$, this.sortKey$,
-        (grList, sortKey) => {
-          const result = this.getGameResultOfEachPlayer( grList );
-          return this.toGameResultOfEachPlayerForView( result, sortKey );
-        } );
+          this.gameResultListFiltered$, this.sortKey$,
+          (grList, sortKey) => {
+            const result = this.getGameResultOfEachPlayer( grList );
+            return this.toGameResultOfEachPlayerForView( result, sortKey );
+          } );
 
     this.rankOptions$
       = this.gameResultListFiltered$

@@ -18,10 +18,16 @@ import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-
 import { SetVpDialogComponent } from './set-vp-dialog.component';
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 import { SubmitGameResultDialogComponent } from '../../sub-components/submit-game-result-dialog/submit-game-result-dialog.component';
+import { NumberOfVictoryCardsStringService } from './number-of-victory-cards-string.service';
+import { VictoryPointsCalculatorService } from '../../sub-components/victory-points-calculator/victory-points-calculator.service';
 
 
 
 @Component({
+  providers: [
+    NumberOfVictoryCardsStringService,
+    VictoryPointsCalculatorService
+  ],
   selector: 'app-add-game-result',
   templateUrl: './add-game-result.component.html',
   styleUrls: [
@@ -36,10 +42,11 @@ export class AddGameResultComponent implements OnInit {
 
   selectedExpansionNameList$
     = Observable.combineLatest(
-        this.database.expansionsNameList$,
+        this.database.expansionNameList$,
         this.myRandomizerGroup.isSelectedExpansions$,
         (nameList, selected) =>
-          nameList.filter( (_, i) => selected[i] ) );
+          nameList.filter( (_, i) => selected[i] ) )
+      .startWith([]);
 
   places$: Observable<string[]>
     = this.database.gameResultList$.map( gameResultList =>
@@ -88,6 +95,15 @@ export class AddGameResultComponent implements OnInit {
         .map( e => ( 2 <= e && e <= 6 ) );
 
 
+  numberOfVictoryCardsString$: Observable<string[]>
+    = this.selectedPlayers$.combineLatest(
+        this.cardPropertyList$,
+        (selectedPlayers, cardPropertyList) =>
+          selectedPlayers.map( pl =>
+            this.numberOfVictoryCardsString.toStr( pl, cardPropertyList ) ) );
+
+
+
   constructor(
     private utils: UtilitiesService,
     public dialog: MatDialog,
@@ -95,6 +111,7 @@ export class AddGameResultComponent implements OnInit {
     private myUserInfo: MyUserInfoService,
     private database: CloudFirestoreMediatorService,
     private myRandomizerGroup: MyRandomizerGroupService,
+    private numberOfVictoryCardsString: NumberOfVictoryCardsStringService
   ) {
   }
 
@@ -238,12 +255,16 @@ export class AddGameResultComponent implements OnInit {
     const result = await dialogRef.afterClosed().toPromise();
     this.myRandomizerGroup.setNGRDialogOpened(false);
     if ( result === 'OK Clicked' ) {
-      this.myRandomizerGroup.resetSelectedCardsCheckbox();
-      selectedPlayers.forEach( player =>
-          this.myRandomizerGroup.setNGRPlayerVP( player.uid, 0 ));
-      this.myRandomizerGroup.setNGRLastTurnPlayerName('');
-      this.myRandomizerGroup.setNGRMemo('');
-      this.myRandomizerGroup.resetVPCalculator();
+      await Promise.all([
+        this.myRandomizerGroup.setSelectedIndexInHistory(-1),
+        this.myRandomizerGroup.resetSelectedCardsCheckbox(),
+        ...selectedPlayers.map( player =>
+            this.myRandomizerGroup.setNGRPlayerVP( player.uid, 0 )),
+        this.myRandomizerGroup.setNGRLastTurnPlayerName(''),
+        this.myRandomizerGroup.setNGRMemo(''),
+        this.myRandomizerGroup.resetVPCalculator(),
+        this.rotateTurnOrders( selectedPlayers, 1 ),
+      ]);
       this.openSnackBar();
     }
   }

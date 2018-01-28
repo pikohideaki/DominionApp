@@ -27,29 +27,27 @@ import { NumberOfVictoryCards } from '../classes/number-of-victory-cards';
 @Injectable()
 export class CloudFirestoreMediatorService {
   fdPath = ( isDevMode() ? {
-    expansionsNameList          : '/dev/data/expansionsNameList',
+    expansionNameList          : '/dev/data/expansionNameList',
     cardPropertyList            : '/dev/data/cardPropertyList',
-    users                       : '/dev/users',
-    userInfoList                : '/dev/userInfoList',
     scoringTable                : '/dev/data/scoreTable',
-    gameResultList              : '/dev/data/gameResultList',
+    users                       : '/dev/users',
+    gameResultList              : '/dev/gameResultList',
     randomizerGroupList         : '/dev/randomizerGroupList',
     onlineGameRoomsList         : '/dev/onlineGameRooms',
     onlineGameCommunicationList : '/dev/onlineGameCommunicationList',
   } : {
-    expansionsNameList          : '/prod/data/expansionsNameList',
+    expansionNameList          : '/prod/data/expansionNameList',
     cardPropertyList            : '/prod/data/cardPropertyList',
-    users                       : '/prod/users',
-    userInfoList                : '/prod/userInfoList',
     scoringTable                : '/prod/data/scoreTable',
-    gameResultList              : '/prod/data/gameResultList',
+    users                       : '/prod/users',
+    gameResultList              : '/prod/gameResultList',
     randomizerGroupList         : '/prod/randomizerGroupList',
     onlineGameRoomsList         : '/prod/onlineGameRooms',
     onlineGameCommunicationList : '/prod/onlineGameCommunicationList',
   } );
 
 
-  expansionsNameList$:          Observable<string[]>;
+  expansionNameList$:          Observable<string[]>;
   cardPropertyList$:            Observable<CardProperty[]>;
   users$:                       Observable<User[]>;
   scoringTable$:                Observable<number[][]>;
@@ -138,8 +136,8 @@ export class CloudFirestoreMediatorService {
     private afdb: AngularFireDatabase,
     private utils: UtilitiesService,
   ) {
-    this.expansionsNameList$
-      = afdb.list<string>( this.fdPath.expansionsNameList ).valueChanges()
+    this.expansionNameList$
+      = afdb.list<string>( this.fdPath.expansionNameList ).valueChanges()
               .map( list => list.map( e => e.toString() ) )
               .first();
 

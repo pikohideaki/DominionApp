@@ -27,13 +27,13 @@ export class HomeComponent implements OnInit {
     private myUserInfo: MyUserInfoService
   ) {
     this.apps$ = this.myUserInfo.signedIn$.map( signedIn => [
-        {
-          routerLink: '/online-game',
-          inService:  signedIn,
-          title:      'Online Game',
-          subtitle:   'Dominion オンライン対戦',
-          description: ( signedIn ? '' : '（※要ログイン）'),
-        },
+        // {
+        //   routerLink: '/online-game',
+        //   inService:  signedIn,
+        //   title:      'Online Game',
+        //   subtitle:   'Dominion オンライン対戦',
+        //   description: ( signedIn ? '' : '（※要ログイン）'),
+        // },
         {
           routerLink: '/online-randomizer',
           inService:  signedIn,
@@ -48,8 +48,8 @@ export class HomeComponent implements OnInit {
           subtitle: '成績表',
           description: ( signedIn ? '' : '（※要ログイン）'),
         },
-        { routerLink: '/cardlist'   , inService: true, title: 'Card List'       , subtitle: 'カード一覧表', },
-        { routerLink: '/rulebooks'  , inService: true, title: 'RuleBooks'       , subtitle: 'Dominionのルールブック(PDF)', },
+        { routerLink: '/cardlist' , inService: true, title: 'Card List', subtitle: 'カード一覧表', },
+        { routerLink: '/rulebooks', inService: true, title: 'RuleBooks', subtitle: 'Dominionのルールブック(PDF)', },
       ] );
   }
 

@@ -10,8 +10,9 @@
       empty:        empty$        | async
     } as data">
 
-<ng-container *ngIf=" !!data.card && !!data.sourceDir">
-
+<ng-container *ngIf=" !!data.card && !!data.sourceDir; then main; else loading"></ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
   <div *ngIf="data.empty" class='dominionCard'>
     <img [src]="data.sourceDir" [width]='data.width' [height]='data.height'>
     <div *ngIf="description.length > 0" class="description">{{description}}</div>
@@ -28,5 +29,6 @@
         [style.border-radius.px]="data.borderRadius">
     <div *ngIf="description.length > 0" class="description">{{description}}</div>
   </div>
-</ng-container>
+</ng-template>
+
 </ng-container>

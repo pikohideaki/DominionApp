@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
+import { switchMap, switchMapTo } from 'rxjs/operators';
 
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
@@ -40,15 +41,15 @@ export class MyRandomizerGroupService {
 
   /**
    * myRandomizerGroupのisSelectedExpansionsを取り出せば良いが，
-   * 初期化されていないときにはexpansionsNameListの長さのfalseの配列で初期化する必要がある．
+   * 初期化されていないときにはexpansionNameListの長さのfalseの配列で初期化する必要がある．
    */
   isSelectedExpansions$: Observable<boolean[]>
     = Observable.combineLatest(
-        this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
+        this.database.expansionNameList$.map( list => list.map( _ => false ) ),
         this.myGrp$.map( e => e.isSelectedExpansions ).distinctUntilChanged( this.cmpObj ),
         (initArray, isSelectedExpansions) =>
-          initArray.map( (_, i) => !!isSelectedExpansions[i] ) )
-      .startWith([]);
+          initArray.map( (_, i) => !!isSelectedExpansions[i] ) );
+
 
   selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>
     = this.myGrp$.map( e => e.selectedCardsCheckbox )
@@ -107,8 +108,7 @@ export class MyRandomizerGroupService {
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    this.myGrp$.subscribe( val => console.log('MyRandomizerGroupService::myGrp$', val ) );
-    this.myGrpId$.subscribe( val => console.log('MyRandomizerGroupService::myGrpId$', val ) );
+    this.myGrp$.subscribe( val => console.log('myGrp$', val ) );
 
     this.myGrpId$.subscribe( val => {
         this.myGrpId = val;

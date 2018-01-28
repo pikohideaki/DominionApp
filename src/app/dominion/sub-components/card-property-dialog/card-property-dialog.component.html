@@ -1,18 +1,21 @@
 <ng-container *ngIf="{
       card:             card$             | async,
       cardForView:      cardForView$      | async,
-      showingIndex:     showingIndex$     | async,
-      indiceInCardList: indiceInCardList$ | async
+      indiceInCardList: indiceInCardList$ | async,
+      showingIndex:     showingIndex$     | async
     } as data">
 <ng-container *ngIf="
          data.card
       && data.cardForView
       && data.showingIndex >= 0
-    ">
+    ; then main; else loading">
+</ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
   <div mat-dialog-title class="title-bar">
     <span> {{data.card.nameJp}} ({{data.card.nameEng}}) </span>
     <span class="spacer"></span>
-    <span *ngIf="data.indiceInCardList.length > 1" class="margined-element">
+    <span *ngIf="data.indiceInCardList?.length > 1" class="margined-element">
       <button mat-raised-button class="navigationButton"
           (click)='goToPreviousCard()'
           [disabled]='data.showingIndex <= 0' >
@@ -71,5 +74,5 @@
       OK
     </button>
   </div>
-</ng-container>
+</ng-template>
 </ng-container>

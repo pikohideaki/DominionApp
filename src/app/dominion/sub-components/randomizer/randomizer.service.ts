@@ -12,7 +12,7 @@ import { SelectedCards } from '../../../classes/selected-cards';
 export class RandomizerService {
 
   private cardPropertyList;
-  private expansionsNameList;
+  private expansionNameList;
 
   constructor(
     private utils: UtilitiesService,
@@ -21,8 +21,8 @@ export class RandomizerService {
     this.database.cardPropertyList$
       .subscribe( val => this.cardPropertyList = val );
 
-    this.database.expansionsNameList$
-      .subscribe( val => this.expansionsNameList = val );
+    this.database.expansionNameList$
+      .subscribe( val => this.expansionNameList = val );
   }
 
 
@@ -39,7 +39,7 @@ export class RandomizerService {
           .filter( e => e.data.randomizerCandidate )
           .filter( e => !implementedOnly || e.data.implemented )
                         // "implementedOnly is true -> select implemented"
-          .filter( e => this.expansionsNameList  // selected expansion
+          .filter( e => this.expansionNameList  // selected expansion
                         .filter( (_, index) => isSelectedExpansions[index] )
                         .findIndex( name => e.data.expansionName.includes(name) ) >= 0 )
       );

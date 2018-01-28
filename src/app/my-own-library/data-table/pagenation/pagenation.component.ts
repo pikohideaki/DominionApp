@@ -29,6 +29,14 @@ export class PagenationComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.pageLength$ = Observable.combineLatest(
+        this.itemsPerPage$,
+        this.dataSize$,
+        (itemsPerPage, dataSize) => Math.ceil( dataSize / itemsPerPage ) );
+
+    this.pageIndice$
+      = this.pageLength$.map( len => this.utils.seq0( len ) );
+
     this.rangeStart$ = Observable.combineLatest(
         this.itemsPerPage$,
         this.selectedPageIndex$,
@@ -40,15 +48,7 @@ export class PagenationComponent implements OnInit {
         this.selectedPageIndex$,
         this.dataSize$,
         (itemsPerPage, idx, dataSize) =>
-          (Math.min( dataSize, (itemsPerPage * (idx + 1)) ) ) );
-
-    this.pageLength$ = Observable.combineLatest(
-        this.itemsPerPage$,
-        this.dataSize$,
-        (itemsPerPage, dataSize) => Math.ceil( dataSize / itemsPerPage ) );
-
-    this.pageIndice$
-      = this.pageLength$.map( len => this.utils.seq0( len ) );
+          Math.min( dataSize, (itemsPerPage * (idx + 1)) ) );
   }
 
   setSelectedPageIndex( idx: number ) {

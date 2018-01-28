@@ -47,7 +47,6 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
 
   constructor(
   ) {
-    /* 設定されたもののうち一方からもう一方を計算 */
     this.borderWidth$ = Observable.combineLatest(
       this.width$, this.height$,
       (width, height) => (18 / 250) * Math.min( width, height ) );
@@ -60,12 +59,12 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
       this.empty$, this.faceUp$, this.card$,
       (empty, faceUp, card) => {
         if ( empty ) return 'assets/img/blank.png';
-        if ( !faceUp ) return `${CARD_IMAGE_DIR}/Card_back.jpg`;
-        // Card_back_landscape
-        // Boon-back
-        // Hex-back
-        // Stash-back
-        // Randomizer
+        if ( !faceUp ) {
+          if ( card.cardTypes.includes('Boon') ) return `${CARD_IMAGE_DIR}/Boon-back.jpg`;
+          if ( card.cardTypes.includes('Hex' ) ) return `${CARD_IMAGE_DIR}/Hex-back.jpg`;
+          if ( card.cardId === 'Stash' )         return `${CARD_IMAGE_DIR}/Stash-back.jpg`;
+          return `${CARD_IMAGE_DIR}/Card_back.jpg`;
+        }
         return `${CARD_IMAGE_DIR}/${this.card.nameEng.replace( / /g , '_' )}.jpg`;
       } );
   }

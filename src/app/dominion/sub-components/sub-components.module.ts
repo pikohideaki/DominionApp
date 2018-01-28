@@ -7,7 +7,6 @@ import { MyOwnLibraryModule } from '../../my-own-library/my-own-library.module';
 
 /* components */
 import { ExpansionsToggleComponent        } from './expansions-toggle.component';
-// import { MyNameSelectorComponent          } from './my-name-selector.component';
 import { SelectedExpansionsComponent      } from './selected-expansions.component';
 import { CardImageSizeSliderComponent     } from './card-image-size-slider/card-image-size-slider.component';
 import { DominionCardImageComponent       } from './dominion-card-image/dominion-card-image.component';
@@ -30,7 +29,6 @@ import { SetMemoDialogComponent          } from './set-memo-dialog.component';
   ],
   exports: [
     ExpansionsToggleComponent,
-    // MyNameSelectorComponent,
     SelectedExpansionsComponent,
     CardImageSizeSliderComponent,
     DominionCardImageComponent,
@@ -43,7 +41,6 @@ import { SetMemoDialogComponent          } from './set-memo-dialog.component';
   ],
   declarations: [
     ExpansionsToggleComponent,
-    // MyNameSelectorComponent,
     SelectedExpansionsComponent,
     CardImageSizeSliderComponent,
     DominionCardImageComponent,

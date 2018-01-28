@@ -1,23 +1,25 @@
 <ng-container *ngIf="{
-      places:                    places$                    | async,
-      place:                     place$                     | async,
-      playerResults:             playerResults$             | async,
-      lastTurnPlayerName:        lastTurnPlayerName$        | async,
-      selectedPlayers:           selectedPlayers$           | async,
-      turnOrderFilled:           turnOrderFilled$           | async,
-      nextMissingNumber:         nextMissingNumber$         | async,
-      memo:                      memo$                      | async,
-      dialogOpened:              newGameResultDialogOpened$ | async,
-      numberOfPlayersOK:         numberOfPlayersOK$         | async,
-      cardPropertyList:          cardPropertyList$          | async,
-      selectedExpansionNameList: selectedExpansionNameList$ | async,
-      selectedCards:             selectedCards$             | async
+      places:                     places$                     | async,
+      place:                      place$                      | async,
+      playerResults:              playerResults$              | async,
+      lastTurnPlayerName:         lastTurnPlayerName$         | async,
+      selectedPlayers:            selectedPlayers$            | async,
+      turnOrderFilled:            turnOrderFilled$            | async,
+      nextMissingNumber:          nextMissingNumber$          | async,
+      memo:                       memo$                       | async,
+      dialogOpened:               newGameResultDialogOpened$  | async,
+      numberOfPlayersOK:          numberOfPlayersOK$          | async,
+      cardPropertyList:           cardPropertyList$           | async,
+      selectedExpansionNameList:  selectedExpansionNameList$  | async,
+      selectedCards:              selectedCards$              | async,
+      numberOfVictoryCardsString: numberOfVictoryCardsString$ | async
     } as data">
 <ng-container *ngIf="
          !!data.places
       && !!data.cardPropertyList
       && !!data.selectedExpansionNameList
       && !!data.selectedCards
+      && !!data.numberOfVictoryCardsString
     ">
 
   <div class='body-with-padding'>
@@ -93,6 +95,7 @@
             </th>
             <th>Last Turn</th>
             <th>VP</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -122,6 +125,9 @@
               <button mat-button (click)="VPClicked( player.uid, data.selectedPlayers )">
                 {{player.VP}}
               </button>
+            </td>
+            <td>
+              {{data.numberOfVictoryCardsString[idx]}}
             </td>
           </tr>
         </tbody>

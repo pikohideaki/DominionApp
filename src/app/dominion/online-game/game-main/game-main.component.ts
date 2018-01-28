@@ -44,8 +44,7 @@ export class GameMainComponent implements OnInit {
     const myIndex$ = this.myGameRoomService.myIndex$;
 
     this.isMyTurn$ = Observable.combineLatest(
-        this.gameStateService.turnPlayerIndex$,
-        myIndex$,
+        this.gameStateService.turnPlayerIndex$, myIndex$,
         (turnPlayerIndex, myIndex) => (turnPlayerIndex === myIndex) )
       .distinctUntilChanged()
       .startWith( false );

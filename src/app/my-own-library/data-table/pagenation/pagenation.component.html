@@ -6,6 +6,10 @@
     pageLength:        pageLength$        | async,
     pageIndice:        pageIndice$        | async
   } as data">
+
+<ng-container *ngIf="!!data.pageIndice; then main; else loading"></ng-container>
+<ng-template #loading>Loading...</ng-template>
+<ng-template #main>
   <div class='pagenation'>
     <button mat-raised-button class="navigationButton"
         (click)='setSelectedPageIndex(0)'
@@ -50,4 +54,5 @@
       <mat-icon>last_page</mat-icon>
     </button>
   </div>
+</ng-template>
 </ng-container>

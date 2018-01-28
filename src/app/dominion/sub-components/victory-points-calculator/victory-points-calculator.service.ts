@@ -11,7 +11,8 @@ export class VictoryPointsCalculatorService {
 
   total( numberOfVictoryCards: NumberOfVictoryCards ): number {
     let VPtotal = 0;
-    Object.keys( numberOfVictoryCards ).forEach( key => VPtotal += this.calc( key, numberOfVictoryCards ) );
+    Object.keys( numberOfVictoryCards ).forEach( key =>
+      VPtotal += this.calc( key, numberOfVictoryCards ) );
     return VPtotal;
   }
 

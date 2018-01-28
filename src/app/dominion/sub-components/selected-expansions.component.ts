@@ -30,7 +30,7 @@ export class SelectedExpansionsComponent implements OnInit {
 
   ngOnInit() {
     this.expansions$ = Observable.combineLatest(
-        this.database.expansionsNameList$,
+        this.database.expansionNameList$,
         this.selectedExpansionNameList$,
         (nameList, selectedNameList) =>
           nameList.map( name => ({ name: name, selected: selectedNameList.includes(name) }) ) );

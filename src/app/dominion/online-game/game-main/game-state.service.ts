@@ -100,10 +100,9 @@ export class GameStateService {
         (turnCounter, numberOfPlayers) =>
           this.myGameRoom.playerShuffler[ (turnCounter + 1) % numberOfPlayers ] );
 
-    this.turnPlayerCards$
-      = Observable.combineLatest(
-            this.allPlayersCards$, this.turnPlayerIndex$,
-            (allPlayersCards, turnPlayerIndex) => allPlayersCards[ turnPlayerIndex ] );
+    this.turnPlayerCards$ = Observable.combineLatest(
+        this.allPlayersCards$, this.turnPlayerIndex$,
+        (allPlayersCards, turnPlayerIndex) => allPlayersCards[ turnPlayerIndex ] );
 
 
     // subscriptions

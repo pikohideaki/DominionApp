@@ -36,7 +36,7 @@ export class ExpansionsToggleComponent implements OnInit {
     this.expansions$
       = Observable.combineLatest(
           this.isSelectedExpansions$,
-          this.database.expansionsNameList$,
+          this.database.expansionNameList$,
           (isSelectedList, nameList) =>
             isSelectedList.map( (e, i) =>
               ({ selected: e, name: nameList[i], index: i }) ) )

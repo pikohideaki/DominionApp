@@ -63,10 +63,11 @@ export class MyUserInfoService {
           .distinctUntilChanged();
     this.onlineGame = {
       isSelectedExpansions$ : Observable.combineLatest(
-                this.database.expansionsNameList$.map( list => list.map( _ => false ) ),
+                this.database.expansionNameList$.map( list => list.map( _ => false ) ),
                 this.myUserInfo$.map( e => e.onlineGame.isSelectedExpansions )
                   .distinctUntilChanged(),
-                (initArray, isSelectedExpansions) => initArray.map( (_, i) => !!isSelectedExpansions[i] ) ),
+                (initArray, isSelectedExpansions) =>
+                    initArray.map( (_, i) => !!isSelectedExpansions[i] ) ),
       numberOfPlayers$ :
         this.myUserInfo$.map( e => e.onlineGame.numberOfPlayers )
           .distinctUntilChanged(),

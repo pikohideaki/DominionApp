@@ -59,7 +59,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
           .startWith( false );
 
     this.selectedExpansionNameList$
-      = this.database.expansionsNameList$
+      = this.database.expansionNameList$
           .map( val => val.filter( (_, i) => this.newRoom.isSelectedExpansions[i] ) )
           .startWith([]);
 

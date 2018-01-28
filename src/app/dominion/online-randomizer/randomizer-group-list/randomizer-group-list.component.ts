@@ -89,9 +89,9 @@ export class RandomizerGroupListComponent implements OnInit {
     myNameYomi:         string,
     groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
   ) {
-    const expansionsNameList
-      = await this.database.expansionsNameList$.first().toPromise();
-    const isSelectedExpansionsInit = expansionsNameList.map( _ => true );
+    const expansionNameList
+      = await this.database.expansionNameList$.first().toPromise();
+    const isSelectedExpansionsInit = expansionNameList.map( _ => true );
 
     const newRandomizerGroup = new RandomizerGroup( null, {
         name:                    this.newGroupName,
@@ -117,7 +117,7 @@ export class RandomizerGroupListComponent implements OnInit {
     const groupId = ref.key;
     await this.myUserInfo.setRandomizerGroupId( groupId );
     await this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi );
-    await this.removeMemberEmptyGroup( groupListWithUsers );
+    // await this.removeMemberEmptyGroup();
     this.resetAddGroupForm();
 
     this.openSnackBar('Successfully signed in!');
@@ -158,7 +158,7 @@ export class RandomizerGroupListComponent implements OnInit {
 
     this.openSnackBar('Successfully signed in!');
     this.sidenav.close();
-    await this.removeMemberEmptyGroup( groupListWithUsers );
+    // await this.removeMemberEmptyGroup();
   }
 
   async signOut(
@@ -176,7 +176,7 @@ export class RandomizerGroupListComponent implements OnInit {
 
     this.openSnackBar('Successfully signed out!');
     this.sidenav.close();
-    await this.removeMemberEmptyGroup( groupListWithUsers );
+    // await this.removeMemberEmptyGroup();
   }
 
 
@@ -192,14 +192,16 @@ export class RandomizerGroupListComponent implements OnInit {
     return isValid;
   }
 
-  private async removeMemberEmptyGroup(
-    groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
-  ) {
-    await Promise.all(
-      groupListWithUsers
-        .filter( g => g.users.length === 0 )
-        .map( g => this.database.randomizerGroup.removeGroup( g.group.databaseKey ) ) );
-  }
+  // private async removeMemberEmptyGroup(
+  //   // groupListWithUsers: { group: RandomizerGroup, users: string[] }[]
+  // ) {
+  //   const subscription = this.randomizerGroupListWithUsers$.subscribe( groupListWithUsers =>
+  //     )
+  //   await Promise.all(
+  //     groupListWithUsers
+  //       .filter( g => g.users.length === 0 )
+  //       .map( g => this.database.randomizerGroup.removeGroup( g.group.databaseKey ) ) );
+  // }
 
   private resetAddGroupForm() {
     this.newGroupName = undefined;

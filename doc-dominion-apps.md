@@ -1,6 +1,7 @@
 
 # ToDo
-* DataTable: debounceはどれにかけるべきか
+* receiveDataDone, isReady 等の除去．メソッドの引数はtemplate側で展開して与えればよい．
+
 
 * 動作チェック
     * sign-in-to-the-game-dialog の selectingRoomRemoved を変更した
@@ -9,11 +10,6 @@
     * my-own-library 同期
 
 * 機能追加
-    * data-table
-        * filteredDataに該当要素が無いselectorをdisabledする
-    * ゲーム結果送信後にrotationもする
-    * 結果入力画面に勝利点内訳も表示
-
 
 * 作業記録
     * lastTurnPlayerNameをnewGameResultに含めた
@@ -21,3 +17,21 @@
         * cardではなくcardIndexなどを入力に
         * cardPropertyListはこの内部で読み込み
         （component.instanceで渡すと、そのためだけにsubscribeしているcomponentが多数あるので）
+
+
+* 勝利点カードリストに変更があった場合に更新する場所
+    * \src\dominion\online-randomizer\add-game-result\number-of-victory-cards-string.service.ts
+    * \src\dominion\sub-components\victory-points-calculator\victory-points-calculator.service.ts
+    * \src\app\classes\number-of-victory-cards.ts
+
+
+* メモ
+    * import 'rxjs/add/observable/combineLatest';
+    * import 'rxjs/add/operator/takeWhile';
+    * a.withLatestFrom(b) か a.combineLatest(b) か
+        * a のみで発火すればよいときは withLatestFrom だが，
+            a, b 最初の値がそろったときに一度発火したい場合で b が遅いことがあり得る場合，
+            最初の値がそろったときの発火が行われないので，combineLatestを使わざるを得ない．
+            withLatestFrom は1個目の値でのみ発火したい場合か，
+            最初の値がそろった時に発火したい場合で2つ目の値が必ず1つ目の値より先に発火している場合
+            のみ使用できる．

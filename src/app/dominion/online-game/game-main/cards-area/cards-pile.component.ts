@@ -40,6 +40,7 @@ export class CardsPileComponent implements OnChanges, OnInit {
   @Output() cardClicked = new EventEmitter<DCard>();
 
   private DCardArraySource = new BehaviorSubject<DCard[]>([]);
+  private DCardArray$ = this.DCardArraySource.asObservable();
 
   private cardPropertyList$ = this.database.cardPropertyList$;
   private myIndex$ = this.myGameRoomService.myIndex$;
@@ -71,41 +72,30 @@ export class CardsPileComponent implements OnChanges, OnInit {
   }
 
   ngOnInit() {
-
     this.faceUp$ = Observable.combineLatest(
-      this.DCardArraySource.asObservable(),
-      this.myIndex$,
-      (DCards, myIndex) => {
-        if ( this.isEmpty( DCards ) ) return false;
-        return DCards[0].faceUp[ myIndex ];
-      });
+      this.DCardArray$, this.myIndex$,
+      (DCardArray, myIndex) =>
+        ( this.isEmpty( DCardArray ) ? false : DCardArray[0].faceUp[ myIndex ] ) );
 
     this.isButton$ = Observable.combineLatest(
-      this.DCardArraySource.asObservable(),
-      this.myIndex$,
-      (DCards, myIndex) => {
-        if ( this.isEmpty( DCards ) ) return false;
-        return DCards[0].isButton[ myIndex ];
-      });
+      this.DCardArray$, this.myIndex$,
+      (DCardArray, myIndex) =>
+        ( this.isEmpty( DCardArray ) ? false : DCardArray[0].isButton[ myIndex ] ) );
 
-    this.empty$ = this.DCardArraySource.asObservable()
-      .map( DCards => this.isEmpty( DCards ) );
+    this.empty$ = this.DCardArray$.map( DCards => this.isEmpty( DCards ) );
 
     this.description$ = Observable.combineLatest(
-      this.DCardArraySource.asObservable(),
-      this.myIndex$,
-      (DCards, myIndex) => {
-        if ( this.isEmpty( DCards ) ) return '';
-        return DCards[0].id.toString();
-      });
+      this.DCardArray$, this.myIndex$,
+      (DCardArray, myIndex) =>
+        ( this.isEmpty( DCardArray ) ? '' : DCardArray[0].id.toString() ) );
 
     this.card$ = Observable.combineLatest(
-      this.DCardArraySource.asObservable(),
+      this.DCardArray$,
       this.cardPropertyList$,
-      (DCards, cardPropertyList) => {
-        if ( this.isEmpty( DCards ) ) return cardPropertyList[0];
-        return cardPropertyList[ DCards[0].cardListIndex ];
-      });
+      (DCardArray, cardPropertyList) =>
+        ( this.isEmpty( DCardArray )
+            ? cardPropertyList[0]
+            : cardPropertyList[ DCardArray[0].cardListIndex ] ) );
   }
 
 
