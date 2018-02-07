@@ -1,0 +1,35 @@
+<ng-container *ngIf="{
+      cardPropertyList: cardPropertyList$ | async,
+      myIndex:          myIndex$          | async,
+      DCardArray:       DCardArray$       | async
+    } as data">
+<ng-container *ngIf="data.cardPropertyList?.length > 0; then main; else loading"></ng-container>
+<ng-template #loading>
+  <app-dominion-card-image
+    [width]="width"
+    [empty]="true">
+  </app-dominion-card-image>
+</ng-template>
+<ng-template #main>
+  <ng-container
+      *ngIf="!data.DCardArray || data.DCardArray.length === 0
+              then emptyCard; else Card">
+  </ng-container>
+  <ng-template #emptyCard>
+    <app-dominion-card-image
+      [width]="width"
+      [empty]="true">
+    </app-dominion-card-image>
+  </ng-template>
+  <ng-template #Card>
+    <app-dominion-card-image *ngFor="let DCard of data.DCardArray"
+      [card]="data.cardPropertyList[ DCard.cardListIndex ]"
+      [width]="width"
+      [faceUp]="DCard.faceUp[ data.myIndex ]"
+      [isButton]="DCard.isButton[ data.myIndex ]"
+      [description]="DCard.id.toString()"
+      (cardClicked)="onClicked( DCard )" >
+    </app-dominion-card-image>
+  </ng-template>
+</ng-template>
+</ng-container>

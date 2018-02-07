@@ -20,7 +20,7 @@ import { GameState             } from '../classes/game-state';
 import { BlackMarketPileCard   } from '../classes/black-market-pile-card';
 import { ChatMessage           } from '../classes/chat-message';
 import { PlayerResult          } from '../classes/player-result';
-import { GameCommunication, MoveInGame } from '../classes/game-room-communication';
+import { GameCommunication, StateTransition } from '../classes/game-room-communication';
 import { NumberOfVictoryCards } from '../classes/number-of-victory-cards';
 
 
@@ -47,7 +47,7 @@ export class CloudFirestoreMediatorService {
   } );
 
 
-  expansionNameList$:          Observable<string[]>;
+  expansionNameList$:           Observable<string[]>;
   cardPropertyList$:            Observable<CardProperty[]>;
   users$:                       Observable<User[]>;
   scoringTable$:                Observable<number[][]>;
@@ -125,8 +125,8 @@ export class CloudFirestoreMediatorService {
   onlineGameCommunication: {
     add:        ( newGameComm: GameCommunication       ) => firebase.database.ThenableReference,
     remove:     ( roomId: string                       ) => Promise<void>,
-    addMessage: ( roomId: string, message: ChatMessage ) => firebase.database.ThenableReference,
-    addMove:    ( roomId: string, move: MoveInGame     ) => firebase.database.ThenableReference,
+    sendMessage: ( roomId: string, message: ChatMessage ) => firebase.database.ThenableReference,
+    sendMove:    ( roomId: string, move: StateTransition     ) => firebase.database.ThenableReference,
   };
 
 
@@ -392,9 +392,9 @@ export class CloudFirestoreMediatorService {
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).push( newGameComm ),
       remove:     ( roomId: string ) =>
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).remove( roomId ),
-      addMessage: ( roomId: string, message: ChatMessage ) =>
+      sendMessage: ( roomId: string, message: ChatMessage ) =>
         this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList` ).push( message ),
-      addMove:    ( roomId: string, move: MoveInGame ) =>
+      sendMove:    ( roomId: string, move: StateTransition ) =>
         this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/moves` ).push( move ),
     };
 

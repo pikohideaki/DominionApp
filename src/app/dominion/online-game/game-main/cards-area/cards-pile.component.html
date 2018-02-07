@@ -1,0 +1,47 @@
+<ng-container *ngIf="{
+      isButton:         isButton$         | async,
+      faceUp:           faceUp$           | async,
+      empty:            empty$            | async,
+      card:             card$             | async,
+      description:      description$      | async,
+      topDCard:         topDCard$         | async,
+      cardPropertyList: cardPropertyList$ | async
+    } as data">
+<ng-container
+  *ngIf="data.cardPropertyList?.length > 0; then main; else loading">
+</ng-container>
+<ng-template #loading>
+  <app-dominion-card-image
+    [width]="width"
+    [empty]="true">
+  </app-dominion-card-image>
+</ng-template>
+<ng-template #main>
+  <ng-container
+      *ngIf="data.isButton    !== undefined
+          && data.faceUp      !== undefined
+          && data.empty       !== undefined
+          && data.description !== undefined
+          && !!data.card
+          && !!data.topDCard
+      ; then Card; else emptyCard">
+  </ng-container>
+  <ng-template #emptyCard>
+    <app-dominion-card-image
+      [width]="width"
+      [empty]="true">
+    </app-dominion-card-image>
+  </ng-template>
+  <ng-template #Card>
+    <app-dominion-card-image
+      [card]="data.card"
+      [width]="width"
+      [faceUp]="data.faceUp"
+      [isButton]="data.isButton"
+      [empty]="data.empty"
+      [description]="data.description"
+      (cardClicked)="onClickedIfIsButton( data.isButton, data.topDCard )" >
+    </app-dominion-card-image>
+  </ng-template>
+</ng-template>
+</ng-container>

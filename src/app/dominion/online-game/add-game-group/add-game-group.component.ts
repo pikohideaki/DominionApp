@@ -34,8 +34,6 @@ import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
   `]
 })
 export class AddGameGroupComponent implements OnInit {
-  private alive: boolean = true;
-
   // form elements
   private memoSource = new BehaviorSubject<string>('');
   memo$ = this.memoSource.asObservable();

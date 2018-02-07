@@ -10,6 +10,9 @@
 
 .BasicCards,.KingdomCards {
   margin: 5px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
 }
 
 .BasicCards_KingdomCards {
@@ -24,4 +27,8 @@
   background-size: cover;
   padding-top : 35px;
   padding-left : 10px;
+}
+
+.card-pile {
+  margin: 2px;
 }

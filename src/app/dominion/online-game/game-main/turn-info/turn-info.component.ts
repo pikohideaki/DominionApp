@@ -29,14 +29,16 @@ export class TurnInfoComponent implements OnInit {
   ngOnInit() {
     this.phaseCharacter$  = this.turnInfo$.map( e => {
           switch ( e.phase ) {
-            case ''        : return '';
-            case 'Action'  : return 'A';
-            case 'Action*' : return 'A*';
-            case 'Buy'     : return 'B';
-            case 'Buy*'    : return 'B*';
-            case 'BuyCard' : return `B'`;
-            case 'Night'   : return 'N';
-            case 'CleanUp' : return 'C';
+            case ''            : return '';
+            case 'StartOfTurn' : return '';
+            case 'Action'      : return 'A';
+            case 'Action*'     : return 'A*';
+            case 'BuyPlay'     : return 'B';
+            case 'BuyPlay*'    : return 'B*';
+            case 'BuyCard'     : return `B'`;
+            case 'Night'       : return 'N';
+            case 'CleanUp'     : return 'C';
+            case 'EndOfTurn'   : return '';
             default :
               throw new Error(`unknown phase name '${e.phase}'`);
           }

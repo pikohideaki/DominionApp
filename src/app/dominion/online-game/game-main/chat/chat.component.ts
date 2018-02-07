@@ -52,7 +52,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
   async submitMessage() {
     if ( !this.newMessage ) return;
     this.disableSubmitButton = true;
-    await this.gameCommunication.addMessage( this.newMessage );
+    await this.gameCommunication.sendMessage( this.newMessage );
     this.newMessage = '';
     this.disableSubmitButton = false;
   }

@@ -64,6 +64,6 @@ export class SelectedCardsListComponent implements OnInit {
 
   cardInfoButtonClicked( cardIndex: number ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    dialogRef.componentInstance.indiceInCardList$ = Observable.from([[cardIndex]]);
+    dialogRef.componentInstance.indiceInCardList$ = Observable.of([cardIndex]);
   }
 }

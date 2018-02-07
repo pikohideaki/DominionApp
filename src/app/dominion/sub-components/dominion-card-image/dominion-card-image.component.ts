@@ -28,32 +28,33 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
   private faceUpSource   = new BehaviorSubject<boolean>(true);
   private isButtonSource = new BehaviorSubject<boolean>(false);
   private emptySource    = new BehaviorSubject<boolean>(false);
-  card$     = this.cardSource.asObservable();
-  width$    = this.widthSource.asObservable();
-  faceUp$   = this.faceUpSource.asObservable();
-  isButton$ = this.isButtonSource.asObservable();
-  empty$    = this.emptySource.asObservable();
-
-  borderWidth$:  Observable<number>;
-  borderRadius$: Observable<number>;
-  sourceDir$:    Observable<string>;
+  card$     = this.cardSource    .asObservable();
+  width$    = this.widthSource   .asObservable().distinctUntilChanged();
+  faceUp$   = this.faceUpSource  .asObservable().distinctUntilChanged();
+  isButton$ = this.isButtonSource.asObservable().distinctUntilChanged();
+  empty$    = this.emptySource   .asObservable().distinctUntilChanged();
 
   height$: Observable<number>  // widthから計算
    = Observable.combineLatest(
-      this.card$, this.width$,
-      (card, width) =>
-        ( card.isWideType() ? width * (15 / 23)
-                            : width * (23 / 15) ) );
+        this.card$, this.width$,
+        (card, width) =>
+          ( card.isWideType() ? width * (15 / 23)
+                              : width * (23 / 15) ) )
+      .distinctUntilChanged();
+
+  borderWidth$:  Observable<number>
+    = Observable.combineLatest(
+        this.width$, this.height$,
+        (width, height) => (18 / 250) * Math.min( width, height ) );
+
+  borderRadius$: Observable<number> = this.borderWidth$;
+
+  sourceDir$: Observable<string>;
+
 
   constructor(
   ) {
-    this.borderWidth$ = Observable.combineLatest(
-      this.width$, this.height$,
-      (width, height) => (18 / 250) * Math.min( width, height ) );
-
-    this.borderRadius$ = this.borderWidth$;
-
-
+    // this.card$.subscribe( val => console.log( this.description, val ) );
     const CARD_IMAGE_DIR = 'assets/img/card';
     this.sourceDir$ = Observable.combineLatest(
       this.empty$, this.faceUp$, this.card$,
@@ -71,29 +72,30 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
 
 
   ngOnChanges( changes: SimpleChanges ) {
+    // console.log(changes);
     if ( changes.card !== undefined
-         && changes.card.currentValue !== undefined ) {
-      this.cardSource.next( changes.card.currentValue );
+          && changes.card.currentValue !== undefined ) {
+      this.cardSource.next( changes.card.currentValue || new CardProperty() );
     }
     if ( changes.width !== undefined
-         && changes.width.currentValue !== undefined ) {
-      this.widthSource.next( changes.width.currentValue );
+          && changes.width.currentValue !== undefined ) {
+      this.widthSource.next( changes.width.currentValue || 0 );
     }
     if ( changes.height !== undefined
-         && changes.height.currentValue !== undefined ) {
+          && changes.height.currentValue !== undefined ) {
       this.widthSource.next( this.widthFromHeight( changes.height.currentValue ) );
     }
     if ( changes.faceUp !== undefined
          && changes.faceUp.currentValue !== undefined ) {
-      this.faceUpSource.next( changes.faceUp.currentValue );
+      this.faceUpSource.next( changes.faceUp.currentValue || false );
     }
     if ( changes.isButton !== undefined
          && changes.isButton.currentValue !== undefined ) {
-      this.isButtonSource.next( changes.isButton.currentValue );
+      this.isButtonSource.next( changes.isButton.currentValue || false );
     }
     if ( changes.empty !== undefined
          && changes.empty.currentValue !== undefined ) {
-      this.emptySource.next( changes.empty.currentValue );
+      this.emptySource.next( changes.empty.currentValue || false );
     }
   }
 

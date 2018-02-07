@@ -1,10 +1,20 @@
-import { seq0 } from '../my-own-library/utilities';
+import { seq0, objectEntries, permutation, objectForEach } from '../my-own-library/utilities';
+
+
+export function getDCardsByIdArray( idArray: (number[]|void), dcards: DCard[] ): DCard[] {
+  // cardIdArrayの順番で取得
+  if ( !idArray ) return dcards;
+  return idArray.map( id => dcards.find( c => c.id === id ) ).filter( e => e !== undefined );
+}
+
 
 
 export class GameState {
-  turnCounter:    number       = 0;
-  turnInfo:       TurnInfo     = new TurnInfo();
-  allPlayersData: PlayerData[] = [];
+  turnCounter:     number = 0;
+  numberOfPlayers: number = 0;
+
+  turnInfo:        TurnInfo     = new TurnInfo();
+  allPlayersData:  PlayerData[] = [];
 
   DCards: {
     allPlayersCards: PlayerCards[],
@@ -20,8 +30,10 @@ export class GameState {
     BlackMarketPile: [],
   };
 
+
   constructor( dataObj?: {
     turnCounter:     number,
+    numberOfPlayers: number,
     turnInfo:        TurnInfo,
     allPlayersData:  PlayerData[],
     DCards: {
@@ -33,7 +45,9 @@ export class GameState {
     }
   }) {
     if ( !dataObj ) return;
-    this.turnCounter = ( dataObj.turnCounter || 0 );
+    this.turnCounter     = ( dataObj.turnCounter     || 0 );
+    this.numberOfPlayers = ( dataObj.numberOfPlayers || 0 );
+
     this.turnInfo = new TurnInfo( dataObj.turnInfo );
     this.allPlayersData = ( dataObj.allPlayersData || [] ).map( e => new PlayerData(e) );
     if ( !dataObj.DCards ) return;
@@ -45,6 +59,7 @@ export class GameState {
   }
 
   setNumberOfPlayers( numberOfPlayers: number ) {
+    this.numberOfPlayers = numberOfPlayers;
     if ( this.allPlayersData.length === 0 ) {
       this.allPlayersData = seq0( numberOfPlayers ).map( _ => new PlayerData() );
     }
@@ -52,19 +67,126 @@ export class GameState {
       this.DCards.allPlayersCards = seq0( numberOfPlayers ).map( _ => new PlayerCards() );
     }
   }
+
+  turnPlayerIndex() {
+    return (this.turnCounter % this.numberOfPlayers) || 0;
+  }
+
+  nextTurnPlayerIndex() {
+    return ((this.turnCounter + 1) % this.numberOfPlayers) || 0;
+  }
+
+  turnPlayerCards() {
+    return this.DCards.allPlayersCards[ this.turnPlayerIndex() ];
+  }
+
+
+  getDirectory( cardId: number ): DCardPath[] {
+    let result: DCardPath[];
+    this.DCards.allPlayersCards.forEach( (playerCards, playerIndex) =>
+      objectForEach( playerCards, (pile, key: PlayerCardDirectory ) => {
+        if ( pile.map( c => c.id ).includes( cardId ) ) {
+          result = ['allPlayersCards', playerIndex, key];
+        }
+      }) );
+
+    objectForEach( this.DCards.BasicCards, (pile, key: BasicCardsDirectory) => {
+      if ( pile.map( c => c.id ).includes( cardId ) ) {
+        result = ['BasicCards', key];
+      }
+    });
+
+    if ( this.DCards.BlackMarketPile.map( c => c.id ).includes( cardId ) ) {
+      result = ['BlackMarketPile'];
+    }
+
+    this.DCards.KingdomCards.forEach( (pile, index) => {
+      if ( pile.map( c => c.id ).includes( cardId ) ) {
+        result = ['KingdomCards', index];
+      }
+    });
+
+    if ( this.DCards.trashPile.map( c => c.id ).includes( cardId ) ) {
+      result = ['trashPile'];
+    }
+
+    return result;
+  }
+
+
+  getAllPlayersCards() {
+    return [].concat(
+      ...this.DCards.allPlayersCards.map( pl => pl.getDCards() ) );
+  }
+
+  getAllDCards(): DCard[] {
+    return [].concat(
+        this.getAllPlayersCards(),
+        this.DCards.BasicCards.getDCards(),
+        this.DCards.KingdomCards.getDCards(),
+        this.DCards.trashPile,
+        this.DCards.BlackMarketPile );
+  }
+
+
+
+  getDCards( cardIdArray: number[] ): DCard[] {
+    return getDCardsByIdArray( cardIdArray, this.getAllDCards() );
+  }
+
+  removeDCards( cardIdArray: number[] ) {
+    this.DCards.allPlayersCards.forEach( pl => pl.removeDCards( cardIdArray ) );
+    this.DCards.BasicCards.removeDCards( cardIdArray );
+    this.DCards.KingdomCards.removeDCards( cardIdArray );
+    this.DCards.trashPile
+      = this.DCards.trashPile.filter( c => !cardIdArray.includes(c.id) );
+    this.DCards.BlackMarketPile
+      = this.DCards.BlackMarketPile.filter( c => !cardIdArray.includes(c.id) );
+  }
 }
 
 
 
 export type Phase = ''
+                    |'StartOfTurn'
                     |'Action'
                     |'Action*'
-                    |'Buy'
-                    |'Buy*'
+                    |'BuyPlay'
+                    |'BuyPlay*'
                     |'BuyCard'
                     |'Night'
-                    |'CleanUp';
+                    |'Night*'
+                    |'CleanUp'
+                    |'EndOfTurn';
 
+
+export type PlayerCardDirectory = 'Deck'
+                                 |'DiscardPile'
+                                 |'HandCards'
+                                 |'PlayArea'
+                                 |'Aside'
+                                 |'Open';
+
+export type BasicCardsDirectory = 'Curse'
+                                 |'Copper'
+                                 |'Silver'
+                                 |'Gold'
+                                 |'Estate'
+                                 |'Duchy'
+                                 |'Province'
+                                 |'Platinum'
+                                 |'Colony'
+                                 |'Potion';
+
+export type DCardPath = number
+                            |PlayerCardDirectory
+                            |BasicCardsDirectory
+                            |'allPlayersCards'
+                            |'BasicCards'
+                            |'KingdomCards'
+                            |'trashPile'
+                            |'BlackMarketPile'
+                          ;
 
 export class DCard {  // Dominion card
   id:            number  = 0;
@@ -115,17 +237,21 @@ export class BasicCards {
     Potion:   DCard[],
   } ) {
     if ( !dataObj ) return;
-    this.Curse    = ( dataObj.Curse    || [] ).map( e => new DCard(e) );
-    this.Copper   = ( dataObj.Copper   || [] ).map( e => new DCard(e) );
-    this.Silver   = ( dataObj.Silver   || [] ).map( e => new DCard(e) );
-    this.Gold     = ( dataObj.Gold     || [] ).map( e => new DCard(e) );
-    this.Estate   = ( dataObj.Estate   || [] ).map( e => new DCard(e) );
-    this.Duchy    = ( dataObj.Duchy    || [] ).map( e => new DCard(e) );
-    this.Province = ( dataObj.Province || [] ).map( e => new DCard(e) );
-    this.Platinum = ( dataObj.Platinum || [] ).map( e => new DCard(e) );
-    this.Colony   = ( dataObj.Colony   || [] ).map( e => new DCard(e) );
-    this.Potion   = ( dataObj.Potion   || [] ).map( e => new DCard(e) );
+    objectForEach( dataObj, (_, key) => {
+      this[key] = ( dataObj[key] || [] ).map( e => new DCard(e) );
+    });
   }
+
+  getDCards( cardIdArray?: number[] ): DCard[] {
+    const allDCards: DCard[] = [].concat( ...objectEntries( this ) );
+    return getDCardsByIdArray( cardIdArray, allDCards );
+  }
+
+  removeDCards( cardIdArray: number[] ) {
+    objectForEach( this, (pile, key, obj) =>
+      obj[key] = pile.filter( c => !cardIdArray.includes(c.id) ) );
+  }
+
 }
 
 export class KingdomCards extends Array<DCard[]> {
@@ -147,6 +273,18 @@ export class KingdomCards extends Array<DCard[]> {
       this[i] = ( kingdomCards[i] || [] ).map( e => new DCard(e) );
     }
   }
+
+  // Arrayの拡張クラスではこの記法でないとメソッドが追加されない（？）
+  getDCards = ( cardIdArray?: number[] ): DCard[] => {
+    const allDCards: DCard[] = [].concat( ...[].concat( this ) );
+    return getDCardsByIdArray( cardIdArray, allDCards );
+  }
+
+  removeDCards = ( cardIdArray: number[] ) => {
+    this.forEach( (pile, key, obj) =>
+      obj[key] = pile.filter( c => !cardIdArray.includes(c.id) ) );
+  }
+
 }
 
 export class PlayerCards {
@@ -166,13 +304,21 @@ export class PlayerCards {
     Open:        DCard[],
   } ) {
     if ( !dataObj ) return;
-    this.Deck        = ( dataObj.Deck        || [] ).map( e => new DCard(e) );
-    this.DiscardPile = ( dataObj.DiscardPile || [] ).map( e => new DCard(e) );
-    this.HandCards   = ( dataObj.HandCards   || [] ).map( e => new DCard(e) );
-    this.PlayArea    = ( dataObj.PlayArea    || [] ).map( e => new DCard(e) );
-    this.Aside       = ( dataObj.Aside       || [] ).map( e => new DCard(e) );
-    this.Open        = ( dataObj.Open        || [] ).map( e => new DCard(e) );
+    objectForEach( dataObj, (_, key) => {
+      this[key] = ( dataObj[key] || [] ).map( e => new DCard(e) );
+    });
   }
+
+  getDCards( cardIdArray?: number[] ): DCard[] {
+    const allDCards: DCard[] = [].concat( ...objectEntries( this ) );
+    return getDCardsByIdArray( cardIdArray, allDCards );
+  }
+
+  removeDCards( cardIdArray: number[] ) {
+    objectForEach( this, (pile, key, obj) =>
+      obj[key] = pile.filter( c => !cardIdArray.includes(c.id) ) );
+  }
+
 }
 
 
@@ -180,6 +326,8 @@ export class PlayerData {
   VPtoken:    number = 0;
   // VPtotal:    number = 0;
   // turnCount:  number = 0;
+  // debt
+  // vcoin
 
   constructor( dataObj?: {
     VPtoken:   number,
@@ -194,9 +342,9 @@ export class PlayerData {
 }
 
 export class TurnInfo {
-  phase:  Phase  = '';
-  action: number = 0;
-  buy:    number = 0;
+  phase:  Phase  = 'StartOfTurn';
+  action: number = 1;
+  buy:    number = 1;
   coin:   number = 0;
 
   constructor( dataObj?: {
@@ -206,9 +354,9 @@ export class TurnInfo {
     coin:   number,
   } ) {
     if ( !dataObj ) return;
-    this.phase  = ( dataObj.phase  || '' );
-    this.action = ( dataObj.action || 0  );
-    this.buy    = ( dataObj.buy    || 0  );
-    this.coin   = ( dataObj.coin   || 0  );
+    this.phase  = ( dataObj.phase  || 'StartOfTurn' );
+    this.action = ( dataObj.action || 1 );
+    this.buy    = ( dataObj.buy    || 1 );
+    this.coin   = ( dataObj.coin   || 0 );
   }
 }

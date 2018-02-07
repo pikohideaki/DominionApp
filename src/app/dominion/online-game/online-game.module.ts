@@ -20,6 +20,7 @@ import { TurnInfoComponent        } from './game-main/turn-info/turn-info.compon
 import { SharedAreaComponent      } from './game-main/shared-area/shared-area.component';
 import { OtherPlayerAreaComponent } from './game-main/other-player-area/other-player-area.component';
 import { TurnPlayerAreaComponent  } from './game-main/turn-player-area/turn-player-area.component';
+import { MyAreaComponent } from './game-main/my-area/my-area.component';
 
 
 @NgModule({
@@ -57,6 +58,7 @@ import { TurnPlayerAreaComponent  } from './game-main/turn-player-area/turn-play
     SharedAreaComponent,
     OtherPlayerAreaComponent,
     TurnPlayerAreaComponent,
+    MyAreaComponent,
   ],
   entryComponents: [
     SignInToGameRoomDialogComponent

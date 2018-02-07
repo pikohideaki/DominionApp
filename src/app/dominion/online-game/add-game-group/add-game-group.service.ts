@@ -10,6 +10,7 @@ import { GameRoom } from '../../../classes/game-room';
 import { GameCommunication } from '../../../classes/game-room-communication';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
 import { ChatMessage } from '../../../classes/chat-message';
+import { TurnInfo } from '../../../classes/game-state';
 
 
 
@@ -43,11 +44,17 @@ export class AddGameGroupService {
       newRoom.numberOfPlayers      = numberOfPlayers;
       newRoom.isSelectedExpansions = isSelectedExpansions;
       newRoom.memo                 = memo;
-      newRoom.playerShuffler       = this.utils.permutation( numberOfPlayers );
       newRoom.selectedCards        = selectCards;
+      newRoom.playerShuffler       = this.utils.permutation( numberOfPlayers );
       newRoom.initCards( this.cardPropertyList );
       newRoom.initDecks();
       newRoom.initialState.setNumberOfPlayers( numberOfPlayers );
+      newRoom.initialState.turnInfo = new TurnInfo({
+            phase:  'StartOfTurn',
+            action: 1,
+            buy:    1,
+            coin:   0
+        });
     }
 
     {

@@ -1,4 +1,69 @@
 
+# ToDo
+* パフォーマンス
+    * firebaseへ送るデータを文字列化などで圧縮
+    * gameState Observableを分割して部分監視するように
+* 山札・捨て札のサイズが0になっている
+* プレイヤー募集画面のキャンセルのdisable
+* 設定画面
+    * カードサイズ調整
+    * 
+* forEachを使って検索するときにbreakできるように Array.some を使って utils のメソッドを書き直す
+* move -> state transition
+* カードの圧縮表示
+
+
+## check
+* buttonizeを発行しているところでそれ以外は非ボタンのときunbuttonize others を発行するように
+* initializeDone と合成している observable で発火されないとまずいときはあるか
+
+
+## memo
+* 今の設計だとsnapshotは古い状態で複数手順の操作は書かねばならない
+    （たとえばdrawCards(N)はdrawCard(1) x N で書けない）
+* 命令列の同期による実装はうまく動く．問題は何を操作とみなすか
+    * ボタン操作の入力列＋必要な場合は付加情報のみ (Observable<UserInput[]>)
+        * ボタン操作に対応する命令列はリプレイに有用
+        * 入力列から現在の形式の命令列へ変換する関数を作れば今の設計を転用できる
+        * 入力列を受け取った後をローカルにできるので，gameSnapshot object を直接更新する書き方ができ，
+            古いsnapshotで頑張らなくてもよくなる．
+    * カード操作命令は完全に同期
+* async function の利用をやめたことで直列な処理を別々に書く必要が生まれる
+    * しかしゲーム状態をデータと一対一対応させる方針なので，
+        async function のどの await まで処理を進めたかという状態を持つのは困る．
+
+* GameStateService
+    * GameStateShortcutService
+        * GameLoopService
+
+* フェーズの自動遷移は難しい
+    * Action --> BuyPlay
+        * アクションが0になっても法貨などがあると回復できるので自動遷移条件にできない．
+        * 手札のアクションカードが0になったときがあっても，
+          DrawCards の直前に一瞬だけ0になるときは除かねばならない．
+    * BuyPlay --> BuyCard
+        * 一度サプライをクリックして購入を開始したら遷移すればよい
+        * BuyPlayフェーズでは財宝カードのプレイにより手札の財宝カードが0から1以上に回復することは今のところないので
+            自動遷移は可能（Rocksが怪しいがBuyPhaseは銀貨は山札に獲得なので問題ない）
+
+
+* Object.assign( dest, src ) でオブジェクトのコピー
+* obs1.buffer(obs2) で ob1 の出力を obs2 が発火するタイミングまで溜めて配列で出力ができる
+    * idleTime:  Observable<boolean> を作って
+
+
+## 設計方針
+* すべてのゲーム状態をデータと一対一対応させる
+* 命令列の発行さえ正しくできればよい
+* 
+
+
+## 定義
+* ゲーム状態とはゲームの状態を表す情報すべてを過不足なく含むデータとする。
+    * 各プレイヤーの名前と対応するインデックスは外部で定義するとし，
+        ゲーム状態はプレイヤーはインデックスで表されるとする
+
+
 ## 処理の流れ
 * プレイヤー募集開始時にGameRoomクラスを作成 (add-game-group.component)
     * ゲーム初期状態はこのときに生成される
@@ -51,9 +116,10 @@
 ## データフロー
 * 構成要素
     * View : game-main.component とその子要素すべて
-    * game-state.service (
-        以下Stat） : ゲームの状態管理を行う．状態遷移を行う基本操作を含む．
-    * game-room-communication.service （以下Comm） : firebase との通信を担う．ゲーム状態遷移命令列とチャットメッセージの同期．
+    * game-state.service (以下Stat） :
+        ゲームの状態管理を行う．状態遷移を行う基本操作を含む．
+    * game-room-communication.service （以下Comm） :
+        firebase との通信を担う．ゲーム状態遷移命令列とチャットメッセージの同期．
 * 関係
     * View <--> Stat
         * View --> Stat : ボタン操作を Stat で解釈

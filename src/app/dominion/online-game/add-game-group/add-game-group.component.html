@@ -51,12 +51,14 @@
     [implementedOnly]="true"
     [showSelectedCardsCheckbox]="false"
     [useHistory]="false"
-    [selectedCards$]="selectedCards$"
-    [BlackMarketPileShuffled$]="BlackMarketPileShuffled$"
+
     [isSelectedExpansions$]="isSelectedExpansions$"
+    [selectedCards$]="selectedCards$"
+
+    (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )"
     (selectedCardsChange)="selectedCardsOnChange( $event )"
     (BlackMarketPileShuffledChange)="BlackMarketPileShuffledOnChange( $event )"
-    (isSelectedExpansionsPartEmitter)="isSelectedExpansionsOnChange( $event )" >
+  >
   </app-randomizer>
 </div>
 </ng-container>

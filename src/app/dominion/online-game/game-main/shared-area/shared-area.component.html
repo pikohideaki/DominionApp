@@ -1,80 +1,96 @@
 <ng-container *ngIf="{
-    BasicCards:   BasicCards$   | async,
-    Prosperity:   Prosperity$   | async,
-    KingdomCards: KingdomCards$ | async,
-    trashPile:    trashPile$    | async
+    Prosperity: Prosperity$ | async,
+    trashPile:  trashPile$  | async
   } as data">
 
 <div class="shared-area box-shadow">
   <div class="BasicCards_KingdomCards">
     <div class="BasicCards">
-      <div *ngIf="data.BasicCards">
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Copper"
+          [DCardArray$]="BasicCards.Copper$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Silver"
+          [DCardArray$]="BasicCards.Silver$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Gold"
+          [DCardArray$]="BasicCards.Gold$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
-        <app-cards-pile *ngIf="data.Prosperity"
-          [DCardArray]="data.BasicCards.Platinum"
+      </div>
+      <div class="card-pile" *ngIf="data.Prosperity">
+        <app-cards-pile
+          [DCardArray$]="BasicCards.Platinum$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
 
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Estate"
+          [DCardArray$]="BasicCards.Estate$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Duchy"
+          [DCardArray$]="BasicCards.Duchy$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Province"
+          [DCardArray$]="BasicCards.Province$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
-        <app-cards-pile *ngIf="data.Prosperity"
-          [DCardArray]="data.BasicCards.Colony"
+      </div>
+      <div class="card-pile" *ngIf="data.Prosperity">
+        <app-cards-pile
+          [DCardArray$]="BasicCards.Colony$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
+      </div>
 
+      <div class="card-pile">
         <app-cards-pile
-          [DCardArray]="data.BasicCards.Curse"
+          [DCardArray$]="BasicCards.Curse$"
           width='55'
           (cardClicked)="onClick( $event )" >
         </app-cards-pile>
       </div>
     </div>
     <div class="KingdomCards">
-      <app-cards-pile *ngFor="let idArray of data.KingdomCards"
-        [DCardArray]="idArray"
+      <div class="card-pile" *ngFor="let idArray$ of KingdomCards">
+        <app-cards-pile
+          [DCardArray$]="idArray$"
+          width='70'
+          (cardClicked)="onClick( $event )" >
+        </app-cards-pile>
+      </div>
+    </div>
+  </div>
+
+  <div class="trashPile">
+    <div>
+      <app-cards-pile *ngIf="data.trashPile?.length > 0"
+        [DCardArray$]="trashPile$"
         width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-pile>
     </div>
-  </div>
-
-  <div class="trashPile" >
-    <ng-container *ngIf="data.trashPile">
-      <app-cards-pile *ngIf="data.trashPile.length > 0"
-        [DCardArray]="data.trashPile"
-        width='70'
-        (cardClicked)="onClick( $event )" >
-      </app-cards-pile>
-    </ng-container>
   </div>
 </div>
 </ng-container>

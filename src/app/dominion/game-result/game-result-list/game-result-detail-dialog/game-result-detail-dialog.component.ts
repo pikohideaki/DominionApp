@@ -42,7 +42,7 @@ export class GameResultDetailDialogComponent implements OnInit {
 
   ngOnInit() {
     this.selectedExpansionNameList$
-      = Observable.from([ this.gameResult.selectedExpansionNameList ]);
+      = Observable.of( this.gameResult.selectedExpansionNameList );
 
     this.firebasePath += this.gameResult.databaseKey;
 
@@ -66,7 +66,7 @@ export class GameResultDetailDialogComponent implements OnInit {
 
   cardInfoButtonClicked( cardIndex: number ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
-    dialogRef.componentInstance.indiceInCardList$ = Observable.from([[cardIndex]]);
+    dialogRef.componentInstance.indiceInCardList$ = Observable.of([cardIndex]);
   }
 
   // edit() {

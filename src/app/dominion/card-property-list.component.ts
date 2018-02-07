@@ -74,7 +74,7 @@ export class CardPropertyListComponent implements OnInit {
   showDetail( position ) {
     const dialogRef = this.dialog.open( CardPropertyDialogComponent, { autoFocus: false } );
     dialogRef.componentInstance.indiceInCardList$
-      = Observable.from([ this.filteredIndiceSource.getValue() ]);
+      = Observable.of( this.filteredIndiceSource.getValue() );
     dialogRef.componentInstance.showingIndexInit = position.rowIndexOnFiltered;
   }
 

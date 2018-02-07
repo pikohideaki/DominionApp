@@ -1,4 +1,4 @@
-import { shuffle, objectEntries, seq0 } from '../my-own-library/utilities';
+import { shuffle, objectEntries, seq0, objectForEach } from '../my-own-library/utilities';
 
 import { SelectedCards } from './selected-cards';
 import { CardProperty, numberToPrepare, toListIndex } from './card-property';
@@ -12,11 +12,12 @@ export class GameRoom {
   isSelectedExpansions: boolean[] = [];
 
   // set automatically
+  playerShuffler: number[] = [];
+  private playersName:    string[] = [];
+
   databaseKey:             string        = '';
   gameRoomCommunicationId: string        = '';
   date:                    Date          = new Date();
-  playerShuffler:          number[]      = [];
-  playersName:             string[]      = [];
   selectedCards:           SelectedCards = new SelectedCards();
   initialState:            GameState     = new GameState();
 
@@ -25,10 +26,10 @@ export class GameRoom {
       numberOfPlayers:         number,
       memo:                    string,
       isSelectedExpansions:    boolean[],
-      gameRoomCommunicationId: string,
-      timeStamp:               number,
       playerShuffler:          number[],
       playersName:             Object,
+      gameRoomCommunicationId: string,
+      timeStamp:               number,
       selectedCards:           any,
       initialState:            GameState,
     }
@@ -40,13 +41,20 @@ export class GameRoom {
     this.memo                 = ( dataObj.memo || '' );
     this.isSelectedExpansions = ( dataObj.isSelectedExpansions || [] );
 
+    this.playerShuffler = ( dataObj.playerShuffler || [] );
+    this.playersName    = objectEntries( dataObj.playersName );
+
     this.gameRoomCommunicationId = ( dataObj.gameRoomCommunicationId || '' );
-    this.date                   = new Date( dataObj.timeStamp || Date.now() );
-    this.playerShuffler         = ( dataObj.playerShuffler || seq0( this.numberOfPlayers ) );
-    this.playersName            = objectEntries( dataObj.playersName );
-    this.selectedCards          = new SelectedCards( dataObj.selectedCards );
-    this.initialState           = ( dataObj.initialState || new GameState() );
+    this.date                    = new Date( dataObj.timeStamp || Date.now() );
+    this.selectedCards           = new SelectedCards( dataObj.selectedCards );
+    this.initialState            = ( dataObj.initialState || new GameState() );
   }
+
+
+  playersNameShuffled() {
+    return this.playersName.map( (_, i) => this.playersName[ this.playerShuffler[i] ] );
+  }
+
 
   initCards( cardPropertyList: CardProperty[] ) {
     let serialNumber = 0;
@@ -55,7 +63,7 @@ export class GameRoom {
       const card = new DCard();
       card.id = serialNumber++;
       card.cardListIndex = cardListIndex;
-      card.faceUp   = seq0( this.numberOfPlayers ).map( _ => false  );
+      card.faceUp   = seq0( this.numberOfPlayers ).map( _ => true );
       card.isButton = seq0( this.numberOfPlayers ).map( _ => false );
 
       let ref: any = this.initialState.DCards;
@@ -114,11 +122,16 @@ export class GameRoom {
         playerCards.Deck.push( this.initialState.DCards.BasicCards.Estate.pop() );
       }
 
+      playerCards.Deck.forEach( c => c.faceUp = c.faceUp.map( _ => false ) );
+
       shuffle( playerCards.Deck );
 
       for ( let i = 0; i < 5; ++i ) {
         playerCards.HandCards.push( playerCards.Deck.pop() );
       }
+
+      // face up own HandCards
+      playerCards.HandCards.forEach( c => c.faceUp[index] = true );
 
       // this.sortHandCards( index, cardpropertyList );
 

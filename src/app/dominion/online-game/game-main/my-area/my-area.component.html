@@ -1,16 +1,16 @@
-<div *ngIf="!!(turnPlayerCards$ | async)" class="turn-player-area">
+<div *ngIf="!!(myCards$ | async)" class="my-area">
   <div class="PlayArea_Aside">
     <div class="CardArea box-shadow PlayArea">
       <app-cards-lined-up
-        [DCardArray$]="turnPlayerCards.PlayArea$"
-        width='50'
+        [DCardArray$]="myCards.PlayArea$"
+        width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-lined-up>
     </div>
     <div class="CardArea box-shadow Aside">
       <app-cards-lined-up
-        [DCardArray$]="turnPlayerCards.Aside$"
-        width='50'
+        [DCardArray$]="myCards.Aside$"
+        width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-lined-up>
     </div>
@@ -19,22 +19,22 @@
   <div class="Deck_HandCards_DiscardPile">
     <div class="CardArea box-shadow Deck">
       <app-cards-pile
-        [DCardArray$]="turnPlayerCards.Deck$"
-        width='50'
+        [DCardArray$]="myCards.Deck$"
+        width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-pile>
     </div>
     <div class="CardArea box-shadow HandCards">
       <app-cards-lined-up
-        [DCardArray$]="turnPlayerCards.HandCards$"
-        width='50'
+        [DCardArray$]="myCards.HandCards$"
+        width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-lined-up>
     </div>
     <div class="CardArea box-shadow DiscardPile">
       <app-cards-pile
-        [DCardArray$]="turnPlayerCards.DiscardPileReveresed$"
-        width='50'
+        [DCardArray$]="myCards.DiscardPileReveresed$"
+        width='70'
         (cardClicked)="onClick( $event )" >
       </app-cards-pile>
     </div>

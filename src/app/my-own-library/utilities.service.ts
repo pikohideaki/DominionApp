@@ -97,6 +97,10 @@ export class UtilitiesService {
     return JSON.parse( JSON.stringify( object || {} ) );
   }
 
+  compareByJsonString( obj1: Object, obj2: Object ) {
+    return JSON.stringify(obj1) === JSON.stringify(obj2);
+  }
+
 
   /* Date */
   weekNumber( date: Date ) {
@@ -299,6 +303,13 @@ export class UtilitiesService {
     return [].concat( ar1, ar2 );
   }
 
+  getReversed( array: any[] ) {
+    return this.copy( array ).reverse();
+  }
+
+  getSortedByKey( array: any[], key: string ) {
+    return this.copy( array ).sort( (x, y) => x[key] - y[key] );
+  }
 
   // let a = [ 1,2,3,[1,2,3],5 ];
   // let b = this.utils.makeShallowCopy(a);
@@ -425,6 +436,7 @@ export class UtilitiesService {
   numberSequence( start: number, length: number, step: number = 1 ): number[] {
     return Array.from( new Array(length) ).map( (_, i) => i * step + start );
   }
+
 
 
 

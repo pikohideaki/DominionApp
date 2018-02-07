@@ -41,12 +41,12 @@ export class RandomizerComponent implements OnInit {
 
 
   // history 使わない場合
-  @Input()  selectedCards$: Observable<SelectedCards>;
+  @Input()  selectedCards$: Observable<SelectedCards>;  // option
   @Output() selectedCardsChange = new EventEmitter<SelectedCards>();
 
   // history 使う場合
-  @Input()  selectedCardsHistory$: Observable<SelectedCards[]>;
-  @Input()  selectedIndexInHistory$: Observable<number>;
+  @Input()  selectedCardsHistory$: Observable<SelectedCards[]>;  // option
+  @Input()  selectedIndexInHistory$: Observable<number>;  // option
   @Output() selectedIndexInHistoryChange = new EventEmitter<number>();
   @Output() selectedCardsAdded = new EventEmitter<SelectedCards>();
 
@@ -54,12 +54,12 @@ export class RandomizerComponent implements OnInit {
   selectedCardsLocal$: Observable<SelectedCards>;
 
 
-  @Input()  BlackMarketPileShuffled$: Observable<BlackMarketPileCard[]>;
+  @Input()  BlackMarketPileShuffled$: Observable<BlackMarketPileCard[]>;  // option
   @Output() BlackMarketPileShuffledChange
     = new EventEmitter<BlackMarketPileCard[]>();
 
   /* checkbox values */
-  @Input()  selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>;
+  @Input()  selectedCardsCheckbox$: Observable<SelectedCardsCheckbox>;  // option
   @Output() selectedCardsCheckboxPartEmitter
     = new EventEmitter<{ category: string, index: number, checked: boolean }>();
   @Output() selectedCardsCheckboxOnReset = new EventEmitter<void>();
@@ -87,27 +87,44 @@ export class RandomizerComponent implements OnInit {
   }
 
   ngOnInit() {
+    if ( this.selectedCards$ === undefined ) {
+      this.selectedCards$ = Observable.of( new SelectedCards() );
+    }
+    if ( this.selectedCardsHistory$ === undefined ) {
+      this.selectedCardsHistory$ = Observable.of([]);
+    }
+    if ( this.selectedIndexInHistory$ === undefined ) {
+      this.selectedIndexInHistory$ = Observable.of(0);
+    }
+    if ( this.BlackMarketPileShuffled$ === undefined ) {
+      this.BlackMarketPileShuffled$ = Observable.of([]);
+    }
+    if ( this.selectedCardsCheckbox$ === undefined ) {
+      this.selectedCardsCheckbox$ = Observable.of( new SelectedCardsCheckbox() );
+    }
+
+    this.selectedCardsLocal$
+      = ( !this.useHistory
+            ? this.selectedCards$
+            : Observable.combineLatest(
+                  this.selectedCardsHistory$,
+                  this.selectedIndexInHistory$,
+                  (list, index) => list[ index ] || new SelectedCards() )
+                .startWith( new SelectedCards() ) );
+
     this.expansionsToggleIsEmpty$
       = this.isSelectedExpansions$.map( val => val.every( e => !e ) )
         .startWith( true );
 
-    this.selectedCardsLocal$ = ( this.selectedCards$ !== undefined
-        ? this.selectedCards$
-        : Observable.combineLatest(
-              this.selectedCardsHistory$,
-              this.selectedIndexInHistory$,
-              (list, index) => list[ index ] || new SelectedCards() )
-            .startWith( new SelectedCards() ) );
-
     this.undoable$ = Observable.combineLatest(
         this.selectedIndexInHistory$,
-        this.selectedCardsHistory$.map( e => e.length ),
-        (index, length) => length > 0 && this.utils.isInRange( index, -1, length - 1 ) );
+        this.selectedCardsHistory$,
+        (index, history) => history.length > 0 && this.utils.isInRange( index, -1, history.length - 1 ) );
 
     this.redoable$ = Observable.combineLatest(
         this.selectedIndexInHistory$,
-        this.selectedCardsHistory$.map( e => e.length ),
-        (index, length) => length > 0 && this.utils.isInRange( index, 1, length ) );
+        this.selectedCardsHistory$,
+        (index, history) => history.length > 0 && this.utils.isInRange( index, 1, history.length ) );
   }
 
 

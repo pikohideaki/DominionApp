@@ -1,46 +1,25 @@
-import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty } from '../../../../classes/card-property';
 import { DCard } from '../../../../classes/game-state';
 import { MyGameRoomService } from '../my-game-room.service';
+import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 
 
 @Component({
   selector: 'app-cards-pile',
-  template: `
-    <ng-container *ngIf="{
-          isButton:    isButton$    | async,
-          faceUp:      faceUp$      | async,
-          empty:       empty$       | async,
-          card:        card$        | async,
-          description: description$ | async
-        } as data">
-      <app-dominion-card-image
-        [faceUp]="data.faceUp"
-        [width]="width"
-        [isButton]="data.isButton"
-        [description]="data.description"
-        [card]="data.card"
-        [empty]="data.empty"
-        (cardClicked)="onClickedIfIsButton( data.isButton )" >
-      </app-dominion-card-image>
-    </ng-container>
-  `,
+  templateUrl: './cards-pile.component.html',
   styles: [],
 })
-export class CardsPileComponent implements OnChanges, OnInit {
+export class CardsPileComponent implements OnInit {
 
-  @Input() DCardArray: DCard[] = [];
+  @Input() private DCardArray$: Observable<DCard[]>;
   @Input() width: number;
   @Output() cardClicked = new EventEmitter<DCard>();
-
-  private DCardArraySource = new BehaviorSubject<DCard[]>([]);
-  private DCardArray$ = this.DCardArraySource.asObservable();
 
   private cardPropertyList$ = this.database.cardPropertyList$;
   private myIndex$ = this.myGameRoomService.myIndex$;
@@ -51,56 +30,62 @@ export class CardsPileComponent implements OnChanges, OnInit {
   description$: Observable<string>;
   card$:        Observable<CardProperty>;
 
+  topDCard$:    Observable<DCard>;
 
 
   constructor(
     private database: CloudFirestoreMediatorService,
-    private myGameRoomService: MyGameRoomService
+    private myGameRoomService: MyGameRoomService,
+    private utils: UtilitiesService
   ) {
   }
 
 
-  isEmpty( DCards ) {
-    return ( !DCards || DCards.length === 0 );
-  }
-
-
-  ngOnChanges( changes: SimpleChanges ) {
-    if ( changes.DCardArray !== undefined ) {
-      this.DCardArraySource.next( this.DCardArray );
-    }
-  }
-
   ngOnInit() {
+    const isEmpty = DCardArray => ( !DCardArray || DCardArray.length === 0 );
+
+    this.topDCard$ = this.DCardArray$.map( DCardArray =>
+        ( isEmpty( DCardArray ) ? new DCard() : DCardArray[0] ) );
+
+    // this.topDCard$.subscribe( val => console.log('topDCard', val ) );
+
+    this.empty$ = this.DCardArray$.map( isEmpty ).distinctUntilChanged();
+
     this.faceUp$ = Observable.combineLatest(
-      this.DCardArray$, this.myIndex$,
-      (DCardArray, myIndex) =>
-        ( this.isEmpty( DCardArray ) ? false : DCardArray[0].faceUp[ myIndex ] ) );
+        this.empty$, this.topDCard$, this.myIndex$,
+        (empty, topDCard, myIndex) =>
+          (empty ? false : topDCard.faceUp[ myIndex ] ) )
+      .distinctUntilChanged();
 
     this.isButton$ = Observable.combineLatest(
-      this.DCardArray$, this.myIndex$,
-      (DCardArray, myIndex) =>
-        ( this.isEmpty( DCardArray ) ? false : DCardArray[0].isButton[ myIndex ] ) );
+        this.empty$, this.topDCard$, this.myIndex$,
+        (empty, topDCard, myIndex) =>
+          (empty ? false : topDCard.isButton[ myIndex ] ) )
+      .distinctUntilChanged();
 
-    this.empty$ = this.DCardArray$.map( DCards => this.isEmpty( DCards ) );
-
-    this.description$ = Observable.combineLatest(
-      this.DCardArray$, this.myIndex$,
-      (DCardArray, myIndex) =>
-        ( this.isEmpty( DCardArray ) ? '' : DCardArray[0].id.toString() ) );
+    this.description$
+      // = this.topDCard$.map( topDCard => '' )
+      = this.topDCard$.map( topDCard => topDCard.id.toString() )
+          .distinctUntilChanged();
 
     this.card$ = Observable.combineLatest(
-      this.DCardArray$,
-      this.cardPropertyList$,
-      (DCardArray, cardPropertyList) =>
-        ( this.isEmpty( DCardArray )
-            ? cardPropertyList[0]
-            : cardPropertyList[ DCardArray[0].cardListIndex ] ) );
+        this.cardPropertyList$,
+        this.topDCard$,
+        (cardPropertyList, topDCard) =>
+          cardPropertyList[ topDCard.cardListIndex ] );
+
+
+    // this.card$.subscribe( e => console.log('card$', e ) );
+    // this.faceUp$.subscribe( e => console.log('faceUp$', e ) );
+    // this.isButton$.subscribe( e => console.log('isButton$', e ) );
+    // this.empty$.subscribe( e => console.log('empty$', e ) );
+    // this.description$.subscribe( e => console.log('description$', e ) );
+    // this.DCardArray$.subscribe( e => console.log('pile::DCardArray$', e ) );
   }
 
 
-  onClickedIfIsButton( isButton: boolean ) {
-    if ( !isButton || this.isEmpty( this.DCardArray ) ) return;
-    this.cardClicked.emit( this.DCardArray[0] );
+  onClickedIfIsButton( isButton: boolean, topCard: DCard ) {
+    if ( !isButton ) return;
+    this.cardClicked.emit( topCard );
   }
 }

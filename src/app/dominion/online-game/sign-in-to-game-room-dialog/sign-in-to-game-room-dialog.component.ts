@@ -37,7 +37,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.selectedCards$ = Observable.from([this.newRoom.selectedCards]);
+    this.selectedCards$ = Observable.of( this.newRoom.selectedCards );
 
     this.myUserInfo.setOnlineGameRoomId( this.newRoom.databaseKey );
     this.myUserInfo.setGameCommunicationId( this.newRoom.gameRoomCommunicationId );
@@ -46,7 +46,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
     this.playersName$
       = this.database.onlineGameRooms$
           .map( list => ( list.find( e => e.databaseKey === this.newRoom.databaseKey )
-                            || new GameRoom() ).playersName )
+                            || new GameRoom() ).playersNameShuffled() )
           .startWith([]);
 
     const selectingRoomRemoved$
@@ -65,7 +65,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
 
 
     // subscriptions
-    selectingRoomRemoved$
+    selectingRoomRemoved$.filter( e => e === true )
       .takeWhile( () => this.alive )
       .subscribe( () => this.dialogRef.close() );
 

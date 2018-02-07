@@ -9,8 +9,10 @@ import { GameStateService } from './game-state.service';
 import { GameRoomCommunicationService } from './game-room-communication.service';
 
 import { CardProperty } from '../../../classes/card-property';
-import { DCard } from '../../../classes/game-state';
+import { DCard, GameState } from '../../../classes/game-state';
 import { GameStateShortcutService } from './game-state-shortcut.service';
+import { GameLoopService } from './game-loop.service';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 
 @Component({
@@ -18,43 +20,47 @@ import { GameStateShortcutService } from './game-state-shortcut.service';
     MyGameRoomService,
     GameStateService,
     GameRoomCommunicationService,
+    GameStateShortcutService,
+    GameLoopService
   ],
   selector: 'app-game-main',
   templateUrl: './game-main.component.html',
   styleUrls: ['./game-main.component.css']
 })
 export class GameMainComponent implements OnInit {
-  receiveDataDone$: Observable<boolean>;
-  chatOpened$:      Observable<boolean>;
-  isMyTurn$:        Observable<boolean>;
-  autoScroll:       boolean = true;
+  chatOpened$: Observable<boolean>
+    = this.myUserInfo.onlineGame.chatOpened$;
+
+  myIndex$ = this.myGameRoomService.myIndex$;
+
+  isMyTurn$: Observable<boolean>
+    = Observable.combineLatest(
+        this.gameStateService.turnPlayerIndex$,
+        this.myIndex$,
+        (turnPlayerIndex, myIndex) => (turnPlayerIndex === myIndex) )
+      .distinctUntilChanged()
+      .startWith( false );
+
+  gameSnapshot$ = this.gameStateService.gameSnapshot$;
+
+  autoScroll: boolean = true;
+
+  action: number = 0;
+
+  private messageSource = new BehaviorSubject<string>('');
+  message$: Observable<string> = this.messageSource.asObservable();
 
 
   constructor(
     private myUserInfo: MyUserInfoService,
     private myGameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
-    private gameStateShortcut: GameStateShortcutService
+    private gameStateShortcut: GameStateShortcutService,
+    private gameLoopService: GameLoopService
   ) {
   }
 
   ngOnInit() {
-    this.chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
-
-    const myIndex$ = this.myGameRoomService.myIndex$;
-
-    this.isMyTurn$ = Observable.combineLatest(
-        this.gameStateService.turnPlayerIndex$, myIndex$,
-        (turnPlayerIndex, myIndex) => (turnPlayerIndex === myIndex) )
-      .distinctUntilChanged()
-      .startWith( false );
-
-    this.receiveDataDone$
-      = Observable.combineLatest(
-            this.myGameRoomService.myGameRoom$,
-            myIndex$,
-            () => true ).first().delay( new Date( Date.now() + 500 ) )
-        .startWith(false);
   }
 
   async toggleSideNav( sidenav ) {
@@ -69,25 +75,26 @@ export class GameMainComponent implements OnInit {
   // ゲーム操作
   onCardClicked( card: DCard ) {
     this.gameStateShortcut.onCardClicked( card );
+    // this.gameLoopService.clickedCardSource.next( card );
   }
-  goToNextPhase()   { this.gameStateShortcut.goToNextPhase();   }
+  goToNextPhase( snapshot: GameState ) {
+    this.gameStateShortcut.goToNextPhase( snapshot.turnInfo.phase );
+  }
+
   goToNextPlayer()  { this.gameStateShortcut.goToNextPlayer();  }
-  sortMyHandCards() { this.gameStateShortcut.sortMyHandCards(); }
+
+  sortMyHandCards( snapshot: GameState, myIndex: number ) {
+    this.gameStateShortcut.sortHandCards( snapshot, myIndex );
+  }
 
 
 
 
   //////////////////////////////// test
-  test_faceUpAllCards() {
-    this.gameStateShortcut.test_faceUpAllCards();
+  incrementTurnCounter() {
+    this.gameStateService.sendins.incrementTurnCounter();
   }
-  test_faceDownAllCards() {
-    this.gameStateShortcut.test_faceDownAllCards();
-  }
-  test_isButtonAllCards() {
-    this.gameStateShortcut.test_isButtonAllCards();
-  }
-  test_isNotButtonAllCards() {
-    this.gameStateShortcut.test_isNotButtonAllCards();
+  logSnapshot() {
+    this.gameStateService.logSnapshotSource.next(null);
   }
 }

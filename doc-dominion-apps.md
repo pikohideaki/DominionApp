@@ -1,14 +1,15 @@
 
 # ToDo
-* receiveDataDone, isReady 等の除去．メソッドの引数はtemplate側で展開して与えればよい．
 
 * 動作チェック
-    * sign-in-to-the-game-dialog の selectingRoomRemoved を変更した
 
 * 作業
     * my-own-library 同期
 
 * 機能追加
+    * 闇市場デッキ
+        * 3枚めくるを押した人以外にはボタンを表示しないように
+        * 保険でリセットボタンはつけるべきか
 
 * 作業記録
     * lastTurnPlayerNameをnewGameResultに含めた
@@ -16,6 +17,7 @@
         * cardではなくcardIndexなどを入力に
         * cardPropertyListはこの内部で読み込み
         （component.instanceで渡すと、そのためだけにsubscribeしているcomponentが多数あるので）
+    * sign-in-to-the-game-dialog の selectingRoomRemoved を変更した
 
 
 * 勝利点カードリストに変更があった場合に更新する場所

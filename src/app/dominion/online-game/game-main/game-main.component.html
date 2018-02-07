@@ -1,7 +1,9 @@
 <ng-container *ngIf="{
-      receiveDataDone: receiveDataDone$ | async,
-      isMyTurn:        isMyTurn$        | async,
-      chatOpened:      chatOpened$      | async
+      isMyTurn:     isMyTurn$     | async,
+      chatOpened:   chatOpened$   | async,
+      gameSnapshot: gameSnapshot$ | async,
+      myIndex:      myIndex$      | async,
+      message:      message$      | async
     } as data">
   <div class="body">
     <div class="sidebar">
@@ -12,20 +14,22 @@
       <mat-button-toggle-group [vertical]="true" (change)="toggleAutoScroll( $event.value )">
         <mat-button-toggle [value]="false" [checked]="!autoScroll"
               matTooltip="auto scroll off" matTooltipPosition="after">
-          <mat-icon>stop</mat-icon>
+          <mat-icon>pause</mat-icon>
         </mat-button-toggle>
         <mat-button-toggle [value]="true"  [checked]="autoScroll"
               matTooltip="auto scroll on" matTooltipPosition="after">
-          <mat-icon>arrow_downward</mat-icon>
+          <mat-icon>play_arrow</mat-icon>
         </mat-button-toggle>
       </mat-button-toggle-group>
 
       <span class="spacer"></span>
 
-      <ng-container *ngIf="data.receiveDataDone">
+      <ng-container>
+
+
 
         <ng-container *ngIf="data.isMyTurn">
-          <button mat-button (click)="goToNextPhase()"
+          <button mat-button (click)="goToNextPhase( data.gameSnapshot )"
               matTooltip="Go to next phase" matTooltipPosition="after">
             <mat-icon class="goToNextPhaseIcon">file_download</mat-icon>
           </button>
@@ -37,10 +41,16 @@
 
         <app-turn-info></app-turn-info>
 
-        <button mat-button (click)="sortMyHandCards()"
+        <button mat-button (click)="sortMyHandCards( data.gameSnapshot, data.myIndex )"
             matTooltip="Sort hand cards" matTooltipPosition="after">
           <mat-icon>sort</mat-icon>
         </button>
+
+        <button mat-button (click)="incrementTurnCounter()">++</button>
+        <button mat-button (click)="logSnapshot()">log</button>
+        <!-- <button mat-button (click)="faceUpCards()">表</button>
+        <button mat-button (click)="faceDownCards()">裏</button> -->
+
       </ng-container>
     </div>
 
@@ -50,29 +60,33 @@
         <app-chat [autoScroll]="autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
-      <div class="margined-element">
-        <app-waiting-spinner [done]="data.receiveDataDone">
-        </app-waiting-spinner>
-      </div>
-      <div>
-        <div class="shared-area_other-player-area">
-          <app-shared-area class="shared-area"
-            (cardClicked)="onCardClicked( $event )">
-          </app-shared-area>
-          <app-other-player-area
-            (cardClicked)="onCardClicked( $event )">
-          </app-other-player-area>
+      <div class="column">
+        <div class="upper-part">
+          <div class="shared-area_other-player-area">
+            <app-shared-area class="shared-area"
+              (cardClicked)="onCardClicked( $event )">
+            </app-shared-area>
+            <app-other-player-area
+              (cardClicked)="onCardClicked( $event )">
+            </app-other-player-area>
+          </div>
+          <div *ngIf="!data.isMyTurn">
+            <app-turn-player-area
+              (cardClicked)="onCardClicked( $event )">
+            </app-turn-player-area>
+          </div>
         </div>
-        <app-turn-player-area
-          (cardClicked)="onCardClicked( $event )">
-        </app-turn-player-area>
-      </div>
-
-      <div class="margined-element test">
-        <button mat-raised-button (click)="test_faceUpAllCards()">faceUp</button>
-        <button mat-raised-button (click)="test_faceDownAllCards()">faceDown</button>
-        <button mat-raised-button (click)="test_isButtonAllCards()">isButton</button>
-        <button mat-raised-button (click)="test_isNotButtonAllCards()">isNotButton</button>
+        <div class="spacer"></div>
+        <div class="message-area-wrapper">
+          <div class="message-area">
+            {{data.message}}
+          </div>
+        </div>
+        <div class="my-area-wrapper">
+          <app-my-area
+            (cardClicked)="onCardClicked( $event )">
+          </app-my-area>
+        </div>
       </div>
 
     </mat-sidenav-container>
