@@ -33,9 +33,10 @@ export class GameStateService {
     = this.gameCommunicationService.moves$;
 
   // moves
-  private loadMovesDoneSource = new BehaviorSubject<boolean>( false );
-  loadMovesDone$ = this.loadMovesDoneSource.asObservable();
+  private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
+  initialStateIsReady$ = this.initialStateIsReadySource.asObservable().distinctUntilChanged();
   private lastAppliedIndex: number = -1;
+
 
 
   // observables
@@ -103,6 +104,7 @@ export class GameStateService {
               BlackMarketPile: BlackMarketPile,
             }
           }) );
+
 
   turnPlayerIndex$: Observable<number>
     = this.gameSnapshot$.map( e => e.turnPlayerIndex() ).distinctUntilChanged();
@@ -198,6 +200,10 @@ export class GameStateService {
   };
 
 
+
+  private isnull = (( array ) => (array === undefined || array.length === 0));
+
+
   sendins = {
     incrementTurnCounter: () =>
       this.gameCommunicationService.sendMove('increment turnCounter', {}),
@@ -256,6 +262,17 @@ export class GameStateService {
   logSnapshotSource = new BehaviorSubject<void>(null);
 
 
+  private movesSubscription;
+  resetGame = async () => {
+    this.initialStateIsReadySource.next( false );
+    this.lastAppliedIndex = -1;
+    this.movesSubscription.unsubscribe();
+    await this.gameCommunicationService.removeAllMoves();
+    this.lastAppliedIndex = -1;
+    await this.startProcessing();
+  }
+
+
   constructor(
     private utils: UtilitiesService,
     private myGameRoomService: MyGameRoomService,
@@ -274,10 +291,6 @@ export class GameStateService {
     this.startProcessing();
   }
 
-
-  isnull( array ) {
-    return (array === undefined || array.length === 0);
-  }
 
 
 
@@ -299,7 +312,7 @@ export class GameStateService {
     // 命令列の取得・適用を開始．
     await this.initialize();
 
-    this.moves$.subscribe( moves => {
+    this.movesSubscription = this.moves$.subscribe( moves => {
       const rangeBegin = this.lastAppliedIndex + 1;
       const rangeEnd   = moves.length;
       this.lastAppliedIndex = rangeEnd - 1;
@@ -314,11 +327,9 @@ export class GameStateService {
           case 'add action' : this.setval.turnInfo.addAction( move.data.value ); break;
           case 'add buy'    : this.setval.turnInfo.addBuy   ( move.data.value ); break;
           case 'add coin'   : this.setval.turnInfo.addCoin  ( move.data.value ); break;
-
           case 'set VPtoken of player' :
             this.setval.playerData.VPtoken( move.data.value, move.data.playerId );
             break;
-
           case 'face up cards for players' :
             this.setval.DCards.faceUpCardsForPlayers( move.data.cardIdArray, move.data.playerIdArray );
             break;
@@ -334,32 +345,10 @@ export class GameStateService {
           case 'move cards to' :
             this.setval.DCards.moveCardsTo( move.data.cardIdArray, move.data.dest );
             break;
-
-          case 'face up cards for all players' :
-            break;
-          case 'face down cards for all players' :
-            break;
-          case 'buttonize cards for all players' :
-            break;
-          case 'unbuttonize cards for all players' :
-            break;
-          case 'trash' :
-            break;
-          case 'discard' :
-            break;
-          case 'play' :
-            break;
-          case 'gain' :
-            break;
-          case 'gain to' :
-            break;
-          case 'set aside' :
-            break;
-
           default: console.error(`There is no instruction "${move.instruction}".`); break;
         }
       });
-      this.loadMovesDoneSource.next( true );
+      this.initialStateIsReadySource.next( true );
     });
   }
 

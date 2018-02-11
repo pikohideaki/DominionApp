@@ -50,6 +50,8 @@ export class GameMainComponent implements OnInit {
   private messageSource = new BehaviorSubject<string>('');
   message$: Observable<string> = this.messageSource.asObservable();
 
+  initialStateIsReady$ = this.gameStateService.initialStateIsReady$;
+
 
   constructor(
     private myUserInfo: MyUserInfoService,
@@ -97,4 +99,11 @@ export class GameMainComponent implements OnInit {
   logSnapshot() {
     this.gameStateService.logSnapshotSource.next(null);
   }
+
+  resetGame() {
+    this.gameStateService.resetGame();
+  }
+  // emit() {
+  //   this.gameLoopService.closingNotifierSource.next();
+  // }
 }

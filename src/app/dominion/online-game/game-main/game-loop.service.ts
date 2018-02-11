@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/interval';
 import 'rxjs/add/operator/pairwise';
+import 'rxjs/add/operator/buffer';
 
 import { DCard, GameState, PlayerCards } from '../../../classes/game-state';
 import { GameStateService } from './game-state.service';
@@ -12,22 +14,21 @@ import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameStateShortcutService } from './game-state-shortcut.service';
 import { CardProperty } from '../../../classes/card-property';
+import { pairwise } from 'rxjs/operators';
+import { filter } from 'rxjs/operator/filter';
+
+
 
 
 @Injectable()
 export class GameLoopService {
 
-  private cardPropertyList$ = this.database.cardPropertyList$.first();
+  private cardPropertyList$    = this.database.cardPropertyList$.first();
+  private myIndex$             = this.gameRoomService.myIndex$;
+  private gameSnapshot$        = this.gameStateService.gameSnapshot$;
+  private turnPlayerIndex$     = this.gameStateService.turnPlayerIndex$;
 
-
-  private myIndex$ = this.gameRoomService.myIndex$;
-
-  private turnPlayerIndex$ = this.gameStateService.turnPlayerIndex$;
-
-  private isMyTurn$
-    = Observable.combineLatest(
-        this.turnPlayerIndex$, this.myIndex$, (a, b) => a === b )
-      .distinctUntilChanged();
+  private initialStateIsReady$ = this.gameStateService.initialStateIsReady$;
 
   private myName$: Observable<string>
    = Observable.combineLatest(
@@ -36,25 +37,23 @@ export class GameLoopService {
         (myIndex, playerNameList) => playerNameList[ myIndex ] || '' )
       .distinctUntilChanged();
 
-
-  private gameSnapshot$ = this.gameStateService.gameSnapshot$;
-  private initializeDone$ = this.gameStateService.loadMovesDone$;
+  private isMyTurn$
+    = Observable.combineLatest(
+          this.turnPlayerIndex$, this.myIndex$, (a, b) => a === b )
+        .distinctUntilChanged();
 
 
   // 自分のターンでかつ初期化が完了した状態でのみphaseを出力
   // 自分のターンでないときは空文字を出力
-  private myTurnPhase$ = Observable.combineLatest(
-      this.gameStateService.phase$,
-      this.isMyTurn$,
-      this.initializeDone$.filter( e => e === true ),
-      this.cardPropertyList$,
-      (phase, isMyTurn, _1, _2) => ( isMyTurn ? phase : '' ) )
-    .distinctUntilChanged();
-
-  private gameValues$ = Observable.combineLatest(
-      this.myIndex$,
-      this.gameSnapshot$,
-      this.cardPropertyList$ );
+  private myTurnPhase$
+    = Observable.combineLatest(
+          this.gameStateService.phase$,
+          this.isMyTurn$,
+          this.initialStateIsReady$,
+          this.cardPropertyList$,
+          (phase, isMyTurn, initializeDone, _) =>
+            ( isMyTurn && initializeDone ? phase : '' ) )
+        .distinctUntilChanged();
 
   private isStartOfMyTurn$   = this.myTurnPhase$.map( phase => phase === 'StartOfTurn').distinctUntilChanged();
   private isMyActionPhase$   = this.myTurnPhase$.map( phase => phase === 'Action'     ).distinctUntilChanged();
@@ -65,45 +64,45 @@ export class GameLoopService {
   private isMyNightPhase$    = this.myTurnPhase$.map( phase => phase === 'Night'      ).distinctUntilChanged();
   private isMyCleanUpPhase$  = this.myTurnPhase$.map( phase => phase === 'CleanUp'    ).distinctUntilChanged();
   private isEndOfMyTurn$     = this.myTurnPhase$.map( phase => phase === 'EndOfTurn'  ).distinctUntilChanged();
-  private isMyActionPhase
-    = this.myTurnPhase$.map( phase => ['BuyPlay', 'BuyCard'].includes( phase ) ).distinctUntilChanged();
+  private isMyBuyPhase$      = this.myTurnPhase$.map( phase => ['BuyPlay', 'BuyCard'].includes( phase ) )
+                                  .distinctUntilChanged();
 
 
-  // isMy~~Phaseはfalseで開始するのでOnEndはprev === true のときのみ発火するように
+  private filterByObservable
+    : <T>(source$: Observable<T>, filterBy$: Observable<boolean>) => Observable<T>
+    = ( (source$, filterBy$) => {
+      return source$
+        .withLatestFrom( filterBy$.startWith( false ) )
+        .filter( ([source, filterBy]) => filterBy === true )
+        .map( ([source, filterBy]) => source );
+    });
 
-  private startOfMyTurn$
-    = this.isStartOfMyTurn$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myActionPhaseOnBegin$
-    = this.isMyActionPhase$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myActionPhaseOnEnd$
-    = this.isMyActionPhase$.pairwise().filter( ([prev, curr]) => prev === true && curr === false )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myBuyPlayPhaseOnBegin$
-    = this.isMyBuyPlayPhase$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myBuyPlayPhaseOnEnd$
-    = this.isMyBuyPlayPhase$.pairwise().filter( ([prev, curr]) => prev === true && curr === false )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myBuyCardPhaseOnBegin$
-    = this.isMyBuyCardPhase$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myBuyCardPhaseOnEnd$
-    = this.isMyBuyCardPhase$.pairwise().filter( ([prev, curr]) => prev === true && curr === false )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myNightPhaseOnBegin$
-    = this.isMyNightPhase$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myNightPhaseOnEnd$
-    = this.isMyNightPhase$.pairwise().filter( ([prev, curr]) => prev === true && curr === false )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private myCleanUpPhaseOnBegin$
-    = this.isMyCleanUpPhase$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
-  private endOfMyTurn$
-    = this.isEndOfMyTurn$.filter( e => e === true )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
+  private gameValues$ = Observable.combineLatest(
+      this.myIndex$,
+      this.gameSnapshot$,
+      this.cardPropertyList$ );
+
+  private filterAndAttachData = (( source$: Observable<boolean>, changedTo: boolean ) => {
+    return this.filterByObservable( source$, this.initialStateIsReady$ )
+        .pairwise()
+        .filter( ([prev, curr]) => (
+            changedTo ? prev === true  && curr === false
+                      : prev === false && curr === true  ) )
+        .withLatestFrom( this.gameValues$.startWith( [0, new GameState(), []] ) )
+        .map( ([_, gameValues]) => gameValues );
+  });
+
+  private myTurnOnBegin$         = this.filterAndAttachData( this.isMyTurn$,         true  );
+  private myTurnOnEnd$           = this.filterAndAttachData( this.isMyTurn$,         false );
+  private myStartOfTurnOnBegin$  = this.filterAndAttachData( this.isStartOfMyTurn$,  true  );
+  private myActionPhaseOnEnd$    = this.filterAndAttachData( this.isMyActionPhase$,  false );
+  private myBuyPlayPhaseOnEnd$   = this.filterAndAttachData( this.isMyBuyPlayPhase$, false );
+  private myNightPhaseOnBegin$   = this.filterAndAttachData( this.isMyNightPhase$,   true  );
+  private myNightPhaseOnEnd$     = this.filterAndAttachData( this.isMyNightPhase$,   false );
+  private myCleanUpPhaseOnBegin$ = this.filterAndAttachData( this.isMyCleanUpPhase$, true  );
+  private myEndOfTurnOnBegin$    = this.filterAndAttachData( this.isEndOfMyTurn$,    true  );
+
+  private myBuyPhaseOnEnd$       = this.filterAndAttachData( this.isMyBuyPhase$,     false );
 
 
   private myHandCards$
@@ -111,53 +110,33 @@ export class GameLoopService {
         .distinctUntilChanged( (x, y) => x.length === y.length );
 
   private myHandCardsChangeInMyActionPhase$
-    = Observable.combineLatest( this.isMyActionPhase$, this.myHandCards$ )
-        .filter( ([isMyActionPhase, _]) => isMyActionPhase )
-        .map( ([_, myHandCards]) => myHandCards )
-      .withLatestFrom( this.gameValues$ );
-
+    = this.filterByObservable( this.myHandCards$, this.isMyActionPhase$ )
+        .withLatestFrom( this.gameValues$ );
   private myHandCardsChangeInMyBuyPlayPhase$
-    = Observable.combineLatest( this.isMyBuyPlayPhase$, this.myHandCards$ )
-        .filter( ([isMyBuyPlayPhase, _]) => isMyBuyPlayPhase )
-        .map( ([_, myHandCards]) => myHandCards )
-      .withLatestFrom( this.gameValues$ );
-
+    = this.filterByObservable( this.myHandCards$, this.isMyBuyPlayPhase$ )
+        .withLatestFrom( this.gameValues$ );
   private myHandCardsChangeInMyNightPhase$
-    = Observable.combineLatest( this.isMyNightPhase$, this.myHandCards$ )
-        .filter( ([isMyNightPhase, _]) => isMyNightPhase )
-        .map( ([_, myHandCards]) => myHandCards )
-      .withLatestFrom( this.gameValues$ );
+    = this.filterByObservable( this.myHandCards$, this.isMyNightPhase$ )
+        .withLatestFrom( this.gameValues$ );
 
 
   private ActionChangeInMyActionPhase$
-    = Observable.combineLatest(
-          this.isMyActionPhase,
-          this.gameStateService.action$ )
-        .filter( ([isMyActionPhase, _]) => isMyActionPhase )
-        .map( ([_, action]) => action )
+    = this.filterByObservable( this.gameStateService.action$, this.isMyActionPhase$ )
         .distinctUntilChanged();
 
   private BuyChangeInMyBuyPhase$
-    = Observable.combineLatest(
-          this.isMyActionPhase,
-          this.gameStateService.buy$ )
-        .filter( ([isMyBuyPhase, _]) => isMyBuyPhase )
-        .map( ([_, buy]) => buy )
+    = this.filterByObservable( this.gameStateService.buy$, this.isMyBuyPhase$ )
         .distinctUntilChanged();
 
   private CoinOrSupplyChangeInMyBuyPhase$
-    = Observable.combineLatest(
-          this.isMyActionPhase,
+    = this.filterByObservable(
+        Observable.combineLatest(
           this.gameStateService.coin$,
           this.gameStateService.KingdomCards$.map( e => e.getDCards().length ).distinctUntilChanged(),
-          this.gameStateService.BasicCards$  .map( e => e.getDCards().length ).distinctUntilChanged() )
-        .filter( ([isMyBuyPhase, ]) => isMyBuyPhase )
-        .map( ([_, coin, ]) => coin )
+          this.gameStateService.BasicCards$  .map( e => e.getDCards().length ).distinctUntilChanged(),
+          (coin, _1, _2) => coin ),
+        this.isMyBuyPhase$ )
       .withLatestFrom( this.gameValues$ );
-
-  private MyBuyPhaseOnEnd$
-    = this.isMyActionPhase.pairwise().filter( ([prev, curr]) => prev === true && curr === false )
-        .withLatestFrom( this.gameValues$, (_, gameValues) => gameValues );
 
 
 
@@ -170,6 +149,7 @@ export class GameLoopService {
     private gameStateService: GameStateService,
     private gameStateShortcut: GameStateShortcutService
   ) {
+    // this.emit$.subscribe( console.log );
 
     // this.myTurnPhase$.subscribe( val => console.log('myTurnPhase$', val ) );
     // this.gameStateService.phase$.subscribe( val => console.log('phase$', val ) );
@@ -177,44 +157,44 @@ export class GameLoopService {
     // this.isMyBuyCardPhase$.subscribe( val => console.log('isMyBuyCardPhase$', val ) );
     // this.isMyBuyPhase$.subscribe( val => console.log('isMyBuyPhase$', val ) );
 
-    const printObservableName = (...args) => {
-      // console.log( ...args );
-    };
+    const printObservableName: (...args) => void
+      = (...args) => { console.log( ...args ); };
 
-    this.startOfMyTurn$.subscribe( gameSnapshot => {
+    this.myTurnOnBegin$.subscribe( gameSnapshot => {
       //// dialog
       this.gameStateShortcut.resetTurnInfo();
-      // ターン始めに予約されたカード・持続カードの解決など
+      this.gameStateService.sendins.turnInfo.phase('StartOfTurn');
     });
+
+    this.myStartOfTurnOnBegin$.subscribe( gameSnapshot => {
+      // ターン始めに予約されたカード・持続カードの解決など
+      this.gameStateService.sendins.turnInfo.phase('Action');
+    });
+
 
     { // Action phase
       this.myHandCardsChangeInMyActionPhase$.combineLatest( this.ActionChangeInMyActionPhase$ )
       .subscribe( ([[myHandCards, [myIndex, snapshot, cardList]], action]) => {
         printObservableName('myHandCardsChangeInMyActionPhase');
-        // if ( myActionCardsInHand.length === 0 ) {  // 手札にアクションカードが無いなら終了
-        //   this.gameStateService.sendins.turnInfo.phase('BuyPlay');
-        //   return;
-        // }
         if ( action > 0 ) {
           // 手札のアクションカードをボタン化
-          this.gameStateShortcut.setButtonizationBy(
-              myHandCards,
-              [myIndex],
+          this.gameStateShortcut.buttonizeIf(
+              myHandCards, [myIndex],
               dcard => cardList[ dcard.cardListIndex ].cardTypes.includes('Action') );
         } else {
           // ただし action <= 0 のときは手札のアクションカードを非ボタン化
-          this.gameStateService.sendins.DCard.unbuttonizeCardsForPlayers(
-              myHandCards.map( c => c.id ), [myIndex] );
+          this.gameStateShortcut.unbuttonizeIf(
+              myHandCards, [myIndex],
+              dcard => cardList[ dcard.cardListIndex ].cardTypes.includes('Action') );
         }
       });
 
       this.myActionPhaseOnEnd$.subscribe( ([myIndex, snapshot, cardList]) => {
         printObservableName('myActionPhaseOnEnd');
-        // const myActionCardsInHand
-        //   = snapshot.turnPlayerCards().HandCards
-        //       .filter( e => cardList[ e.cardListIndex ].cardTypes.includes('Action') );
-        this.gameStateService.sendins.DCard.unbuttonizeCardsForPlayers(
-            snapshot.turnPlayerCards().HandCards.map( c => c.id ), [myIndex] );
+        this.gameStateShortcut.unbuttonizeIf(
+            snapshot.DCards.allPlayersCards[ myIndex ].HandCards,
+            [myIndex],
+            dcard => cardList[ dcard.cardListIndex ].cardTypes.includes('Action') );
       });
     }
 
@@ -225,19 +205,20 @@ export class GameLoopService {
         this.myHandCardsChangeInMyBuyPlayPhase$
         .subscribe( ([myHandCards, [myIndex, snapshot, cardList]]) => {
           printObservableName('myHandCardsChangeInMyBuyPlayPhase');
-          const myTreasureCardsInHand
-            = myHandCards.filter( e => cardList[ e.cardListIndex ].cardTypes.includes('Treasure') );
-          // if ( myTreasureCardsInHand.length === 0 ) {  // 手札に財宝カードが無いなら終了
-          //   this.gameStateService.sendins.turnInfo.phase('BuyCard');
-          //   return;
-          // }
-          this.gameStateService.sendins.DCard.buttonizeCardsForPlayers(
-              myTreasureCardsInHand.map( c => c.id ), [myIndex] );
+          // 手札の財宝カードをボタン化
+          this.gameStateShortcut.buttonizeIf(
+              myHandCards,
+              [myIndex],
+              dcard => cardList[ dcard.cardListIndex ].cardTypes.includes('Treasure') );
         });
+
         this.myBuyPlayPhaseOnEnd$.subscribe( ([myIndex, snapshot, cardList]) => {
           printObservableName('myBuyPlayPhaseOnEnd');
-          this.gameStateShortcut.unbuttonizeTreasureInHand(
-              snapshot, cardList, myIndex );
+
+          this.gameStateShortcut.unbuttonizeIf(
+              snapshot.DCards.allPlayersCards[ myIndex ].HandCards,
+              [myIndex],
+              dcard => cardList[ dcard.cardlistindex ].cardTypes.includes('Treasure') );
         });
       }
 
@@ -250,15 +231,15 @@ export class GameLoopService {
 
         this.CoinOrSupplyChangeInMyBuyPhase$.subscribe( ([coin, [myIndex, snapshot, cardList]]) => {
           printObservableName('CoinOrSupplyChangeInMyBuyPhase');
-          const isTarget: (DCard) => boolean
-            = (dcard: DCard) => (cardList[ dcard.cardListIndex ].cost.coin <= coin);
-          this.gameStateShortcut.buttonizeSupply( snapshot, cardList, myIndex, isTarget );
+          // サプライの購入可能なカードをボタン化
+          this.gameStateShortcut.buttonizeSupplyIf(
+              snapshot, cardList, myIndex,
+              (dcard: DCard) => (cardList[ dcard.cardListIndex ].cost.coin <= coin) );
         });
 
-        this.MyBuyPhaseOnEnd$.subscribe( ([myIndex, snapshot, cardList]) => {
+        this.myBuyPhaseOnEnd$.subscribe( ([myIndex, snapshot, cardList]) => {
           printObservableName('MyBuyPhaseOnEnd');
-          const isTarget: (DCard) => boolean = (dcard: DCard) => true;
-          this.gameStateShortcut.unbuttonizeSupply( snapshot, cardList, myIndex, isTarget );
+          this.gameStateShortcut.unbuttonizeSupply( snapshot, cardList, myIndex );
         });
       }
     }
@@ -287,7 +268,7 @@ export class GameLoopService {
     });
 
 
-    this.endOfMyTurn$.subscribe( ([myIndex, snapshot, cardList]) => {
+    this.myEndOfTurnOnBegin$.subscribe( ([myIndex, snapshot, cardList]) => {
       printObservableName('myTurnOnEnd');
       // 次のプレイヤーへ
       this.gameStateService.sendins.incrementTurnCounter();

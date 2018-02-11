@@ -59,7 +59,7 @@ export class GameRoomCommunicationService {
           .switchMap( id =>
             this.afdb.list<StateTransition>(
               `${this.database.fdPath.onlineGameCommunicationList}/${id}/moves` )
-            .valueChanges(['child_added']) )
+            .valueChanges(['child_added', 'child_removed']) )
           .distinctUntilChanged( (a, b) => a === b, x => x.length );
             // .map( list => list.map( e => new MoveInGame(e) ) ) );
 
@@ -91,4 +91,9 @@ export class GameRoomCommunicationService {
     await this.database.onlineGameCommunication.sendMove( this.communicationId, move );
   }
 
+
+  async removeAllMoves() {
+    await this.ready$.filter( e => e ).toPromise();
+    await this.database.onlineGameCommunication.removeAllMoves( this.communicationId );
+  }
 }

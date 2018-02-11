@@ -342,9 +342,9 @@ export class PlayerData {
 }
 
 export class TurnInfo {
-  phase:  Phase  = 'StartOfTurn';
-  action: number = 1;
-  buy:    number = 1;
+  phase:  Phase  = '';
+  action: number = 0;
+  buy:    number = 0;
   coin:   number = 0;
 
   constructor( dataObj?: {
@@ -354,9 +354,9 @@ export class TurnInfo {
     coin:   number,
   } ) {
     if ( !dataObj ) return;
-    this.phase  = ( dataObj.phase  || 'StartOfTurn' );
-    this.action = ( dataObj.action || 1 );
-    this.buy    = ( dataObj.buy    || 1 );
+    this.phase  = ( dataObj.phase  || '' );
+    this.action = ( dataObj.action || 0 );
+    this.buy    = ( dataObj.buy    || 0 );
     this.coin   = ( dataObj.coin   || 0 );
   }
 }

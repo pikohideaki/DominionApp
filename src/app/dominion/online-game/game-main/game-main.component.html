@@ -1,9 +1,10 @@
 <ng-container *ngIf="{
-      isMyTurn:     isMyTurn$     | async,
-      chatOpened:   chatOpened$   | async,
-      gameSnapshot: gameSnapshot$ | async,
-      myIndex:      myIndex$      | async,
-      message:      message$      | async
+      initialStateIsReady: initialStateIsReady$ | async,
+      isMyTurn:            isMyTurn$            | async,
+      chatOpened:          chatOpened$          | async,
+      gameSnapshot:        gameSnapshot$        | async,
+      myIndex:             myIndex$             | async,
+      message:             message$             | async
     } as data">
   <div class="body">
     <div class="sidebar">
@@ -26,8 +27,6 @@
 
       <ng-container>
 
-
-
         <ng-container *ngIf="data.isMyTurn">
           <button mat-button (click)="goToNextPhase( data.gameSnapshot )"
               matTooltip="Go to next phase" matTooltipPosition="after">
@@ -48,6 +47,8 @@
 
         <button mat-button (click)="incrementTurnCounter()">++</button>
         <button mat-button (click)="logSnapshot()">log</button>
+        <button mat-button (click)="resetGame()">reset</button>
+        <!-- <button mat-button (click)="emit()">emit</button> -->
         <!-- <button mat-button (click)="faceUpCards()">表</button>
         <button mat-button (click)="faceDownCards()">裏</button> -->
 
@@ -60,35 +61,38 @@
         <app-chat [autoScroll]="autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
-      <div class="column">
-        <div class="upper-part">
-          <div class="shared-area_other-player-area">
-            <app-shared-area class="shared-area"
-              (cardClicked)="onCardClicked( $event )">
-            </app-shared-area>
-            <app-other-player-area
-              (cardClicked)="onCardClicked( $event )">
-            </app-other-player-area>
+      <ng-container *ngIf="data.initialStateIsReady; then main; else loading"></ng-container>
+      <ng-template #loading>Loading...</ng-template>
+      <ng-template #main>
+        <div class="column">
+          <div class="upper-part">
+            <div class="shared-area_other-player-area">
+              <app-shared-area class="shared-area"
+                (cardClicked)="onCardClicked( $event )">
+              </app-shared-area>
+              <app-other-player-area
+                (cardClicked)="onCardClicked( $event )">
+              </app-other-player-area>
+            </div>
+            <div *ngIf="!data.isMyTurn">
+              <app-turn-player-area
+                (cardClicked)="onCardClicked( $event )">
+              </app-turn-player-area>
+            </div>
           </div>
-          <div *ngIf="!data.isMyTurn">
-            <app-turn-player-area
+          <div class="spacer"></div>
+          <div class="message-area-wrapper">
+            <div class="message-area">
+              {{data.message}}
+            </div>
+          </div>
+          <div class="my-area-wrapper">
+            <app-my-area
               (cardClicked)="onCardClicked( $event )">
-            </app-turn-player-area>
+            </app-my-area>
           </div>
         </div>
-        <div class="spacer"></div>
-        <div class="message-area-wrapper">
-          <div class="message-area">
-            {{data.message}}
-          </div>
-        </div>
-        <div class="my-area-wrapper">
-          <app-my-area
-            (cardClicked)="onCardClicked( $event )">
-          </app-my-area>
-        </div>
-      </div>
-
+      </ng-template>
     </mat-sidenav-container>
   </div>
 </ng-container>

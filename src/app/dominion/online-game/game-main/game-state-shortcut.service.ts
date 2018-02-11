@@ -92,11 +92,9 @@ export class GameStateShortcutService {
 
 
   resetTurnInfo() {
-    console.log('resetTurnInfo');
     this.gameState.sendins.turnInfo.action(1);
     this.gameState.sendins.turnInfo.buy(1);
     this.gameState.sendins.turnInfo.coin(0);
-    this.gameState.sendins.turnInfo.phase('Action');
   }
 
 
@@ -129,23 +127,70 @@ export class GameStateShortcutService {
   }
 
 
+
+  /* カードのボタン化 */
+
   /**
    * @param targetArray dcards in this array are buttonized or unbuttonized
    * @param condition true -> buttonized, false -> unbuttonized
    */
-  setButtonizationBy(
+  private buttonizeIf_sub(
     targetArray: DCard[],
     playerIds: number[],
-    condition: (DCard) => boolean
+    condition: (DCard) => boolean,
+    buttonize: boolean
   ) {
-    const toBeButtonized:   DCard[] = targetArray.filter( condition );
-    const toBeUnButtonized: DCard[] = targetArray.filter( e => !condition(e) );
+    const toBeButtonized:   DCard[] = targetArray.filter( e => condition(e) === buttonize );
+    const toBeUnButtonized: DCard[] = targetArray.filter( e => condition(e) !== buttonize );
     this.gameState.sendins.DCard.buttonizeCardsForPlayers(
         toBeButtonized.map( c => c.id ), playerIds );
     this.gameState.sendins.DCard.unbuttonizeCardsForPlayers(
         toBeUnButtonized.map( c => c.id ), playerIds );
   }
+  buttonizeIf(
+    targetArray: DCard[],
+    playerIds: number[],
+    condition: (DCard) => boolean
+  ) {
+    this.buttonizeIf_sub( targetArray, playerIds, condition, true );
+  }
+  unbuttonizeIf(
+    targetArray: DCard[],
+    playerIds: number[],
+    condition: (DCard) => boolean
+  ) {
+    this.buttonizeIf_sub( targetArray, playerIds, condition, false );
+  }
 
+
+
+  buttonizeSupplyIf(
+    snapshot: GameState,
+    cardList: CardProperty[],
+    myIndex: number,
+    condition: (Dcard) => boolean
+  ) {
+    const topCards
+      = [].concat(
+            this.utils.objectMap( snapshot.DCards.BasicCards, e => e[0] ),
+            snapshot.DCards.KingdomCards.map( pile => pile[0] )
+          )
+          .filter( c => c !== undefined );
+    this.buttonizeIf( topCards, [myIndex], condition );
+  }
+
+  unbuttonizeSupply(
+    snapshot: GameState,
+    cardList: CardProperty[],
+    myIndex: number
+  ) {
+    this.buttonizeSupplyIf( snapshot, cardList, myIndex, _ => false );
+  }
+
+
+
+
+  /* カードの移動操作 */
 
   discard( toDiscardPile: number[], myIndex: number ) {
     this.gameState.sendins.DCard.unbuttonizeCardsForPlayers(
@@ -211,78 +256,7 @@ export class GameStateShortcutService {
   }
 
 
-  private sub_buttonizeSupply(
-    buttonize: boolean,
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-    isTarget: (Dcard) => boolean
-  ) {
-    // サプライの購入可能なカードをボタン化
-    const topCardsAvailableId
-      = [].concat( this.utils.objectMap( snapshot.DCards.BasicCards, e => e[0] ),
-                    snapshot.DCards.KingdomCards.map( pile => pile[0] ) )
-          .filter( c => c !== undefined )
-          .filter( isTarget )
-          .map( c => c.id );
-    if ( buttonize ) {
-      this.gameState.sendins.DCard.buttonizeCardsForPlayers(
-          topCardsAvailableId, [myIndex] );
-    } else {
-      this.gameState.sendins.DCard.unbuttonizeCardsForPlayers(
-          topCardsAvailableId, [myIndex] );
-    }
-  }
-  buttonizeSupply(
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-    isTarget: (Dcard) => boolean
-  ) {
-    this.sub_buttonizeSupply( true, snapshot, cardList, myIndex, isTarget );
-  }
-  unbuttonizeSupply(
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-    isTarget: (Dcard) => boolean
-  ) {
-    this.sub_buttonizeSupply( false, snapshot, cardList, myIndex, isTarget );
-  }
 
-
-  private sub_buttonizeTreasureInHand(
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-    buttonize: boolean
-  ) { // 手札の財宝カードをボタン化
-      const myTreasureCards
-        = snapshot.turnPlayerCards().HandCards
-            .filter( e => cardList[ e.cardListIndex ].cardTypes.includes('Treasure') )
-            .map( c => c.id );
-    if ( buttonize ) {
-      this.gameState.sendins.DCard.buttonizeCardsForPlayers(
-          myTreasureCards, [myIndex] );
-    } else {
-      this.gameState.sendins.DCard.unbuttonizeCardsForPlayers(
-          myTreasureCards, [myIndex] );
-    }
-  }
-  buttonizeTreasureInHand(
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-  ) { // 手札の財宝カードをボタン化
-    this.sub_buttonizeTreasureInHand( snapshot, cardList, myIndex, true );
-  }
-  unbuttonizeTreasureInHand(
-    snapshot: GameState,
-    cardList: CardProperty[],
-    myIndex: number,
-  ) { // 手札の財宝カードを非ボタン化
-    this.sub_buttonizeTreasureInHand( snapshot, cardList, myIndex, false );
-  }
 
 
 

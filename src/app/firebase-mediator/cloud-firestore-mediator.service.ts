@@ -123,10 +123,11 @@ export class CloudFirestoreMediatorService {
   };
 
   onlineGameCommunication: {
-    add:        ( newGameComm: GameCommunication       ) => firebase.database.ThenableReference,
-    remove:     ( roomId: string                       ) => Promise<void>,
-    sendMessage: ( roomId: string, message: ChatMessage ) => firebase.database.ThenableReference,
-    sendMove:    ( roomId: string, move: StateTransition     ) => firebase.database.ThenableReference,
+    add:         ( newGameComm: GameCommunication        ) => firebase.database.ThenableReference,
+    remove:      ( roomId: string                        ) => Promise<void>,
+    sendMessage: ( roomId: string, message: ChatMessage  ) => firebase.database.ThenableReference,
+    sendMove:    ( roomId: string, move: StateTransition ) => firebase.database.ThenableReference,
+    removeAllMoves: ( roomId: string ) => Promise<void>,
   };
 
 
@@ -393,9 +394,11 @@ export class CloudFirestoreMediatorService {
       remove:     ( roomId: string ) =>
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).remove( roomId ),
       sendMessage: ( roomId: string, message: ChatMessage ) =>
-        this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList` ).push( message ),
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList`).push( message ),
       sendMove:    ( roomId: string, move: StateTransition ) =>
-        this.afdb.list( `${this.fdPath.onlineGameCommunicationList}/${roomId}/moves` ).push( move ),
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/moves`).push( move ),
+      removeAllMoves: ( roomId: string ) =>
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/moves`).remove(),
     };
 
   }
