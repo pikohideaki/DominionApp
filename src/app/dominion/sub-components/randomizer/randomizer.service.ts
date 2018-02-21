@@ -76,8 +76,8 @@ export class RandomizerService {
         return { valid: false, selectedCards: selectedCardsTemp };
       }
       const cardIndex = this.utils.removeIf( CardsInSelectedSets_Shuffled, e => (
-               e.data.cost.debt   === 0
-            && e.data.cost.potion === 0
+               e.data.cost.debt   <= 0
+            && e.data.cost.potion <= 0
             && e.data.cost.coin   >=  2
             && e.data.cost.coin   <=  3 ) ).index;
       selectedCardsTemp.BaneCard = [cardIndex];

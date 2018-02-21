@@ -29,8 +29,7 @@ export class GameResultDetailDialogComponent implements OnInit {
   selectedCards$: Observable<SelectedCards>;
   selectedExpansionNameList$: Observable<string[]>;
 
-  // firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/data/data/gameResultList/';
-  firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/dominionapps/data/data/gameResultList/';
+  firebasePath = 'https://console.firebase.google.com/u/0/project/dominionapps/database/dominionapps/data/prod/gameResultList/';
 
 
   constructor(

@@ -11,7 +11,7 @@ import { Component, OnInit } from '@angular/core';
           (change)="changeVP( $event.target.valueAsNumber )" >
       </mat-form-field>
     </div>
-    <div mat-dialog-actions class='actionButtons'>
+    <div mat-dialog-actions class='action-buttons'>
       <span class="margined-element">
         <button mat-raised-button
             [mat-dialog-close]="newVP"

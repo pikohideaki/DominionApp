@@ -108,7 +108,7 @@ export class MyRandomizerGroupService {
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    this.myGrp$.subscribe( val => console.log('myGrp$', val ) );
+    // this.myGrp$.subscribe( val => console.log('myGrp$', val ) );
 
     this.myGrpId$.subscribe( val => {
         this.myGrpId = val;

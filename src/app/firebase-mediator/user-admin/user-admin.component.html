@@ -1,4 +1,5 @@
-<div class="bodyWithoutHeader loginFormWrapper">
+<div class="body loginFormWrapper"
+    [class.full-screen]="isFullscreen$ | async">
   <mat-tab-group class="center-window">
     <mat-tab label="ログイン">
       <app-login></app-login>

@@ -62,8 +62,8 @@ export class GameRoom {
     const addCard = ( cardListIndex: number, placePath: (string|number)[] ) => {
       const card = new DCard();
       card.id = serialNumber++;
-      card.cardListIndex = cardListIndex;
-      card.faceUp   = seq0( this.numberOfPlayers ).map( _ => true );
+      card.cardProperty = cardPropertyList[ cardListIndex ];
+      card.faceUp   = seq0( this.numberOfPlayers ).map( _ => true  );
       card.isButton = seq0( this.numberOfPlayers ).map( _ => false );
 
       let ref: any = this.initialState.DCards;
@@ -131,7 +131,10 @@ export class GameRoom {
       }
 
       // face up own HandCards
-      playerCards.HandCards.forEach( c => c.faceUp[index] = true );
+      playerCards.HandCards.forEach( c => {
+        c.faceUp  [index] = true;
+        c.isButton[index] = c.cardProperty.cardTypes.includes('Action');
+      });
 
       // this.sortHandCards( index, cardpropertyList );
 

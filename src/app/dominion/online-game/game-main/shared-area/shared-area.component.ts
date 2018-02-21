@@ -1,27 +1,40 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
+// import {
+//   trigger,
+//   state,
+//   style,
+//   animate,
+//   transition
+// } from '@angular/animations';
+
 import { MyGameRoomService } from '../my-game-room.service';
-import { GameStateService } from '../game-state.service';
+import { GameStateService } from '../game-state-services/game-state.service';
 import { DCard, BasicCards, KingdomCards } from '../../../../classes/game-state';
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 
 @Component({
   selector: 'app-shared-area',
   templateUrl: './shared-area.component.html',
-  styleUrls: ['./shared-area.component.css']
+  styleUrls: ['./shared-area.component.css'],
+  // animations: [
+  //   trigger( 'fade', [
+  //     state('fadeIn',  style({ marginTop:  0, opacity: 1   })),
+  //     state('fadeOut', style({ marginTop: 30, opacity: 0.1 })),
+  //     transition('fadeIn <=> fadeOut', animate('100ms ease-out') ),
+  //   ] )
+  // ]
 })
 export class SharedAreaComponent implements OnInit {
-  Prosperity$: Observable<boolean>
-    = this.myGameRoomService.myGameRoom$.map( e => e.selectedCards.Prosperity );
-  private BasicCards$: Observable<BasicCards>
-    = this.gameStateService.BasicCards$;
-  private KingdomCards$: Observable<KingdomCards>
-    = this.gameStateService.KingdomCards$;
-  trashPile$: Observable<DCard[]>
-    = this.gameStateService.trashPile$;
+  Prosperity$           = this.myGameRoomService.Prosperity$;
+  private BasicCards$   = this.gameStateService.BasicCards$;
+  private KingdomCards$ = this.gameStateService.KingdomCards$;
+  trashPile$            = this.gameStateService.trashPile$;
 
+  @Input() showCardProperty$: Observable<boolean>;
+  @Input() cardSizeRatio: number = 1;
   @Output() private cardClicked = new EventEmitter<any>();
 
   BasicCards = {
@@ -39,6 +52,10 @@ export class SharedAreaComponent implements OnInit {
   KingdomCards = this.utils.seq0(10).map( i => this.KingdomCards$.map( e => e[i] ) );
 
 
+  fade = 'fadeIn';
+
+
+
   constructor(
     private utils: UtilitiesService,
     private myGameRoomService: MyGameRoomService,
@@ -53,7 +70,13 @@ export class SharedAreaComponent implements OnInit {
   ngOnInit() {
   }
 
-  onClick( value ) {
+  onCardClick( value ) {
     this.cardClicked.emit( value );
   }
+
+
+  // toggleFade() {
+  //   console.log('triggerAnimation', this.fade);
+  //   this.fade = (this.fade === 'fadeIn' ? 'fadeOut' : 'fadeIn');
+  // }
 }

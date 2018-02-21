@@ -69,7 +69,6 @@ export class GameResult {
 
   constructor( databaseKey?: string, initObj?: {
     timeStamp:                 number,
-    no:                        number,
     place:                     string,
     players:                   PlayerResultRanked[],
     memo:                      string,
@@ -80,7 +79,7 @@ export class GameResult {
     this.databaseKey        = databaseKey;
 
     if ( !initObj ) return;
-    this.no      = ( initObj.no || 0 );
+    this.no      = 0;
     this.date    = new Date( initObj.timeStamp || Date.now() );
     this.place   = ( initObj.place || '' );
     this.players = ( initObj.players || [] ).map( e => new PlayerResultRanked(e) );

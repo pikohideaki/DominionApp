@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { isDevMode } from '@angular/core';
+// import { isDevMode } from '@angular/core';
 
-import { Observable      } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
 
@@ -41,19 +41,25 @@ export class AddGameGroupComponent implements OnInit {
   numberOfPlayers$ = this.myUserInfo.onlineGame.numberOfPlayers$;
   isSelectedExpansions$ = this.myUserInfo.onlineGame.isSelectedExpansions$;
 
-  formIsInvalid$: Observable<boolean>
-    = Observable.combineLatest(
-          this.numberOfPlayers$, this.isSelectedExpansions$,
-          (numberOfPlayers, isSelectedExpansions) =>
-            !this.utils.isInRange( numberOfPlayers, 2, 7)
-             || isSelectedExpansions.every( e => !e ) );
-
   // app-randomizer
   private selectedCardsSource = new BehaviorSubject<SelectedCards>( new SelectedCards() );
   selectedCards$ = this.selectedCardsSource.asObservable();
 
   private BlackMarketPileShuffledSource = new BehaviorSubject<BlackMarketPileCard[]>([]);
   BlackMarketPileShuffled$ = this.BlackMarketPileShuffledSource.asObservable();
+
+  private preparingDialogSource = new BehaviorSubject<boolean>(false);
+  preparingDialog$ = this.preparingDialogSource.asObservable();
+
+  disableMakeRoomButton$: Observable<boolean>
+    = Observable.combineLatest(
+        this.numberOfPlayers$.map( e => !this.utils.isInRange( e, 2, 7) ),
+        this.isSelectedExpansions$.map( list => list.every( e => !e ) ),
+        this.selectedCards$.map( e => e.isEmpty() ),
+        this.preparingDialog$,
+        (...conditions: boolean[]) => conditions.some( e => e ) )
+      .startWith( true )
+      .distinctUntilChanged();
 
 
   constructor(
@@ -64,13 +70,13 @@ export class AddGameGroupComponent implements OnInit {
     private myUserInfo: MyUserInfoService,
     private addGameGroupService: AddGameGroupService
   ) {
-    if ( isDevMode() ) {
-      const selectedCards = this.selectedCardsSource.getValue();
-      selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
-      this.selectedCardsSource.next( selectedCards );
-      this.isSelectedExpansionsOnChange({ index: 1, checked: true });
-      console.log('selected test 10 KingdomCards');
-    }
+    // if ( isDevMode() ) {
+      // const selectedCards = this.selectedCardsSource.getValue();
+      // selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
+      // this.selectedCardsSource.next( selectedCards );
+      // this.isSelectedExpansionsOnChange({ index: 1, checked: true });
+      // console.log('selected test 10 KingdomCards');
+    // }
   }
 
   ngOnInit() {
@@ -106,7 +112,17 @@ export class AddGameGroupComponent implements OnInit {
     this.BlackMarketPileShuffledSource.next( value );
   }
 
-  async makeNewGameRoom(
+
+  async makeNewGameRoomClicked(
+    numberOfPlayers:      number,
+    isSelectedExpansions: boolean[]
+  ) {
+    this.preparingDialogSource.next( true );
+    await this.makeNewGameRoom( numberOfPlayers, isSelectedExpansions );
+    this.preparingDialogSource.next( false );
+  }
+
+  private async makeNewGameRoom(
     numberOfPlayers:      number,
     isSelectedExpansions: boolean[]
   ) {
@@ -122,12 +138,11 @@ export class AddGameGroupComponent implements OnInit {
     dialogRef.componentInstance.dialogRef = dialogRef;
     dialogRef.disableClose = true;
 
-    await this.utils.sleep(2);
-    await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
-    console.log('added testPlayer');
+    // await this.utils.sleep(2);
+    // await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
+    // console.log('added testPlayer');
 
     const result = await dialogRef.afterClosed().toPromise();
-
     if ( result === 'Cancel Clicked' ) {
       this.database.onlineGameRoom.remove( newRoom.databaseKey );
       this.database.onlineGameCommunication.remove( newRoom.gameRoomCommunicationId );

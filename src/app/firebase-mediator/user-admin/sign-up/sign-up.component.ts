@@ -81,6 +81,9 @@ export class SignUpComponent implements OnInit {
               roomId:               '',
               communicationId:      '',
               chatOpened:           true,
+              cardSizeAutoChange:   true,
+              cardSizeRatio:        1,
+              messageSpeed:         1,
             }
           } ) );
 

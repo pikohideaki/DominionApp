@@ -1,7 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
-import { Observable      } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -223,7 +223,6 @@ export class AddGameResultComponent implements OnInit {
     const indexToId = cardIndex => cardPropertyList[cardIndex].cardId;
 
     const newGameResult = new GameResult( null, {
-      no         : 0,
       timeStamp  : Date.now(),
       place      : place,
       memo       : memo,

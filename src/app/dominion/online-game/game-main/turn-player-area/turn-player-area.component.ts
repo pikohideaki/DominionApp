@@ -1,9 +1,9 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
 import { PlayerCards } from '../../../../classes/game-state';
-import { GameStateService } from '../game-state.service';
+import { GameStateService } from '../game-state-services/game-state.service';
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 
 
@@ -17,6 +17,8 @@ export class TurnPlayerAreaComponent implements OnInit {
   private turnPlayerCards$: Observable<PlayerCards>
     = this.gameStateService.turnPlayerCards$;
 
+  @Input() cardSizeRatio: number = 1;
+
   @Output() cardClicked = new EventEmitter<any>();
 
   turnPlayerCards = {
@@ -27,6 +29,8 @@ export class TurnPlayerAreaComponent implements OnInit {
     PlayArea$  : this.turnPlayerCards$.map( e => e.PlayArea  ),
     DiscardPileReveresed$ : this.turnPlayerCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
   };
+
+  turnPlayersName$ = this.gameStateService.turnPlayersName$;
 
 
 

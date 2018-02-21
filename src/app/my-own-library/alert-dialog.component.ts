@@ -9,7 +9,7 @@ import { Component, OnInit, Input } from '@angular/core';
     </div>
 
     <!-- buttons -->
-    <div mat-dialog-actions class="actionButtons">
+    <div mat-dialog-actions class="action-buttons">
       <span class="margined-element">
         <button mat-raised-button
           mat-dialog-close="yes"
@@ -19,7 +19,7 @@ import { Component, OnInit, Input } from '@angular/core';
       </span>
     </div>
   `,
-  styles: [` .actionButtons { justify-content: center; } `]
+  styles: [` .action-buttons { justify-content: center; } `]
 })
 export class AlertDialogComponent implements OnInit {
 

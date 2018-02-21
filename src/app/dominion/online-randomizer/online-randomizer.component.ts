@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
 import { MyRandomizerGroupService } from './my-randomizer-group.service';
+import { FullScreenService } from '../../my-own-library/full-screen.service';
 
 
 @Component({
@@ -17,11 +18,13 @@ export class OnlineRandomizerComponent implements OnInit {
   signedInToRandomizerGroup$: Observable<boolean>;
   myRandomizerGroupName$:     Observable<string>;
   BlackMarketIsUsed$:         Observable<boolean>;
+  isFullscreen$ = this.fullscreen.isFullscreen$;
 
 
   constructor(
     private myUserInfo: MyUserInfoService,
     private myRandomizerGroup: MyRandomizerGroupService,
+    private fullscreen: FullScreenService
   ) {
     this.signedIn$ = this.myUserInfo.signedIn$;
     this.signedInToRandomizerGroup$ = this.myUserInfo.signedInToRandomizerGroup$;

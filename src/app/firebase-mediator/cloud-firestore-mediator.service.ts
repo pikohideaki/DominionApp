@@ -20,14 +20,14 @@ import { GameState             } from '../classes/game-state';
 import { BlackMarketPileCard   } from '../classes/black-market-pile-card';
 import { ChatMessage           } from '../classes/chat-message';
 import { PlayerResult          } from '../classes/player-result';
-import { GameCommunication, StateTransition } from '../classes/game-room-communication';
+import { GameCommunication, UserInput } from '../classes/game-room-communication';
 import { NumberOfVictoryCards } from '../classes/number-of-victory-cards';
 
 
 @Injectable()
 export class CloudFirestoreMediatorService {
   fdPath = ( isDevMode() ? {
-    expansionNameList          : '/dev/data/expansionNameList',
+    expansionNameList           : '/dev/data/expansionNameList',
     cardPropertyList            : '/dev/data/cardPropertyList',
     scoringTable                : '/dev/data/scoreTable',
     users                       : '/dev/users',
@@ -36,7 +36,7 @@ export class CloudFirestoreMediatorService {
     onlineGameRoomsList         : '/dev/onlineGameRooms',
     onlineGameCommunicationList : '/dev/onlineGameCommunicationList',
   } : {
-    expansionNameList          : '/prod/data/expansionNameList',
+    expansionNameList           : '/prod/data/expansionNameList',
     cardPropertyList            : '/prod/data/cardPropertyList',
     scoringTable                : '/prod/data/scoreTable',
     users                       : '/prod/users',
@@ -70,6 +70,9 @@ export class CloudFirestoreMediatorService {
         roomId:               ( uid: string, value: string                 ) => Promise<void>,
         communicationId:      ( uid: string, value: string                 ) => Promise<void>,
         chatOpened:           ( uid: string, value: boolean                ) => Promise<void>,
+        cardSizeAutoChange:   ( uid: string, value: boolean                ) => Promise<void>,
+        cardSizeRatio:        ( uid: string, value: number                 ) => Promise<void>,
+        messageSpeed:         ( uid: string, value: number                 ) => Promise<void>,
       }
     }
   };
@@ -126,8 +129,11 @@ export class CloudFirestoreMediatorService {
     add:         ( newGameComm: GameCommunication        ) => firebase.database.ThenableReference,
     remove:      ( roomId: string                        ) => Promise<void>,
     sendMessage: ( roomId: string, message: ChatMessage  ) => firebase.database.ThenableReference,
-    sendMove:    ( roomId: string, move: StateTransition ) => firebase.database.ThenableReference,
-    removeAllMoves: ( roomId: string ) => Promise<void>,
+    sendUserInput:           ( roomId: string, userInput: UserInput ) => firebase.database.ThenableReference,
+    removeAllUserInput:      ( roomId: string ) => Promise<void>,
+    setThinkingState:        ( roomId: string, playerId: number, state: boolean ) => Promise<void>,
+    setTerminatedState:      ( roomId: string, state: boolean ) => Promise<void>,
+    setResultSubmittedState: ( roomId: string, state: boolean ) => Promise<void>,
   };
 
 
@@ -144,7 +150,7 @@ export class CloudFirestoreMediatorService {
 
     this.cardPropertyList$
       = afdb.list<CardProperty>( this.fdPath.cardPropertyList ).valueChanges()
-              .map( list => list.map( (e: any) => new CardProperty(e) ) )
+              .map( list => list.map( (e: any, i) => new CardProperty(i, e) ) )
               .first();
 
     this.users$
@@ -220,6 +226,15 @@ export class CloudFirestoreMediatorService {
 
           chatOpened: ( uid: string, value: boolean ) =>
             userSetProperty( uid, 'onlineGame/chatOpened', value ),
+
+          cardSizeAutoChange: ( uid: string, value: boolean ) =>
+            userSetProperty( uid, 'onlineGame/cardSizeAutoChange', value ),
+
+          cardSizeRatio: ( uid: string, value: number ) =>
+            userSetProperty( uid, 'onlineGame/cardSizeRatio', value ),
+
+          messageSpeed: ( uid: string, value: number ) =>
+            userSetProperty( uid, 'onlineGame/messageSpeed', value ),
         }
       }
     };
@@ -395,10 +410,18 @@ export class CloudFirestoreMediatorService {
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).remove( roomId ),
       sendMessage: ( roomId: string, message: ChatMessage ) =>
         this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList`).push( message ),
-      sendMove:    ( roomId: string, move: StateTransition ) =>
-        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/moves`).push( move ),
-      removeAllMoves: ( roomId: string ) =>
-        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/moves`).remove(),
+      sendUserInput:    ( roomId: string, userInput: UserInput ) =>
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/userInputList`).push( userInput ),
+      removeAllUserInput: ( roomId: string ) =>
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/userInputList`).remove()
+        .then( () =>
+          this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/resetGameClicked`).set( Date.now() ) ),
+      setThinkingState: ( roomId: string, playerId: number, state: boolean ) =>
+        this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/thinkingState/${playerId}`).set( state ),
+      setTerminatedState: ( roomId: string, state: boolean ) =>
+        this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/isTerminated`).set( state ),
+      setResultSubmittedState: ( roomId: string, state: boolean ) =>
+        this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/resultIsSubmitted`).set( state ),
     };
 
   }

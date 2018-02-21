@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FullScreenService } from '../../my-own-library/full-screen.service';
 
 @Component({
   selector: 'app-user-admin',
@@ -7,7 +8,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserAdminComponent implements OnInit {
 
-  constructor() { }
+  isFullscreen$ = this.fullscreen.isFullscreen$;
+
+
+  constructor(
+    private fullscreen: FullScreenService
+  ) { }
 
   ngOnInit() {
   }

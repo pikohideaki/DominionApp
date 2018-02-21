@@ -17,7 +17,9 @@ export class CardImageSizeSliderComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
-    this.default = this.value;
+    if ( this.default === undefined ) {
+      this.default = this.value;
+    }
   }
 
   changeCardSize( newValue ) {

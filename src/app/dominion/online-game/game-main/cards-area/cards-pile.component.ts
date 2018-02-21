@@ -8,20 +8,23 @@ import { CardProperty } from '../../../../classes/card-property';
 import { DCard } from '../../../../classes/game-state';
 import { MyGameRoomService } from '../my-game-room.service';
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
+import { MatDialog } from '@angular/material';
+import { CardPropertyDialogComponent } from '../../../sub-components/card-property-dialog/card-property-dialog.component';
 
 
 @Component({
   selector: 'app-cards-pile',
   templateUrl: './cards-pile.component.html',
-  styles: [],
+  styleUrls: ['./cards-area.css', './cards-pile.component.css'],
 })
 export class CardsPileComponent implements OnInit {
 
-  @Input() private DCardArray$: Observable<DCard[]>;
+  @Input() displaySize: boolean = true;
+  @Input() showCardProperty: boolean = false;
+  @Input() DCardArray$: Observable<DCard[]>;
   @Input() width: number;
   @Output() cardClicked = new EventEmitter<DCard>();
 
-  private cardPropertyList$ = this.database.cardPropertyList$;
   private myIndex$ = this.myGameRoomService.myIndex$;
 
   faceUp$:      Observable<boolean>;
@@ -33,10 +36,18 @@ export class CardsPileComponent implements OnInit {
   topDCard$:    Observable<DCard>;
 
 
+  DCardArraySize$:  Observable<number>;
+  topDCardCostStr$: Observable<string>;
+
+  tooltipNameStr$: Observable<string>;
+  tooltipSizeStr$: Observable<string>;
+  tooltipCostStr$: Observable<string>;
+
+
   constructor(
-    private database: CloudFirestoreMediatorService,
     private myGameRoomService: MyGameRoomService,
-    private utils: UtilitiesService
+    private utils: UtilitiesService,
+    private dialog: MatDialog
   ) {
   }
 
@@ -46,8 +57,6 @@ export class CardsPileComponent implements OnInit {
 
     this.topDCard$ = this.DCardArray$.map( DCardArray =>
         ( isEmpty( DCardArray ) ? new DCard() : DCardArray[0] ) );
-
-    // this.topDCard$.subscribe( val => console.log('topDCard', val ) );
 
     this.empty$ = this.DCardArray$.map( isEmpty ).distinctUntilChanged();
 
@@ -64,22 +73,35 @@ export class CardsPileComponent implements OnInit {
       .distinctUntilChanged();
 
     this.description$
-      // = this.topDCard$.map( topDCard => '' )
       = this.topDCard$.map( topDCard => topDCard.id.toString() )
           .distinctUntilChanged();
 
-    this.card$ = Observable.combineLatest(
-        this.cardPropertyList$,
-        this.topDCard$,
-        (cardPropertyList, topDCard) =>
-          cardPropertyList[ topDCard.cardListIndex ] );
+    this.card$ = this.topDCard$.map( c => c.cardProperty );
 
+    this.DCardArraySize$ = this.DCardArray$.map( e => e.length );
 
-    // this.card$.subscribe( e => console.log('card$', e ) );
-    // this.faceUp$.subscribe( e => console.log('faceUp$', e ) );
-    // this.isButton$.subscribe( e => console.log('isButton$', e ) );
-    // this.empty$.subscribe( e => console.log('empty$', e ) );
-    // this.description$.subscribe( e => console.log('description$', e ) );
+    this.topDCardCostStr$
+      = this.topDCard$.map( d => d.cardProperty.cost.toStr() );
+
+    this.tooltipNameStr$
+      = this.topDCard$.map( dcard => dcard.cardProperty.nameJp );
+
+    this.tooltipSizeStr$
+      = this.DCardArraySize$.map( size => `${size}枚` );
+
+    this.tooltipCostStr$
+      = this.topDCard$.map( dcard => {
+          const cost = dcard.cardProperty.cost;
+          let result = `コスト：${cost.coin}コイン`;
+          if ( cost.potion > 0 ) {
+            result += `，${cost.potion}ポーション`;
+          }
+          if ( cost.debt > 0 ) {
+            result += `，${cost.debt}借金`;
+          }
+          return result;
+        });
+
     // this.DCardArray$.subscribe( e => console.log('pile::DCardArray$', e ) );
   }
 
@@ -87,5 +109,10 @@ export class CardsPileComponent implements OnInit {
   onClickedIfIsButton( isButton: boolean, topCard: DCard ) {
     if ( !isButton ) return;
     this.cardClicked.emit( topCard );
+  }
+
+  openCardPropertyDialog( dcard: DCard ) {
+    const dialogRef = this.dialog.open( CardPropertyDialogComponent );
+    dialogRef.componentInstance.indiceInCardList$ = Observable.of( [dcard.cardProperty.indexInList] );
   }
 }

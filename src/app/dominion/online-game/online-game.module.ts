@@ -18,9 +18,17 @@ import { CardsPileComponent       } from './game-main/cards-area/cards-pile.comp
 import { CardsLinedUpComponent    } from './game-main/cards-area/cards-lined-up.component';
 import { TurnInfoComponent        } from './game-main/turn-info/turn-info.component';
 import { SharedAreaComponent      } from './game-main/shared-area/shared-area.component';
-import { OtherPlayerAreaComponent } from './game-main/other-player-area/other-player-area.component';
+import { OtherPlayerAreaComponent } from './game-main/other-players-area/other-players-area.component';
 import { TurnPlayerAreaComponent  } from './game-main/turn-player-area/turn-player-area.component';
-import { MyAreaComponent } from './game-main/my-area/my-area.component';
+import { MyAreaComponent          } from './game-main/my-area/my-area.component';
+import { SmallPlayerAreaComponent } from './game-main/other-players-area/small-player-area/small-player-area.component';
+import { GameConfigDialogComponent      } from './game-main/game-config/game-config.component';
+import { OnlineGameResultDialogComponent } from './game-main/online-game-result-dialog/online-game-result-dialog.component';
+import { UserInputLogDialogComponent } from './game-main/game-main.component';
+
+import { GameConfigService } from './game-main/game-config.service';
+import { OnlineGamePlayerCardsDialogComponent, EachPlayerCardsComponent } from './game-main/online-game-result-player-cards/online-game-result-player-cards.component';
+
 
 
 @NgModule({
@@ -37,6 +45,7 @@ import { MyAreaComponent } from './game-main/my-area/my-area.component';
     GameRoomListComponent,
     SignInToGameRoomDialogComponent,
     GameMainComponent,
+    UserInputLogDialogComponent,
     ChatComponent,
     CardsPileComponent,
     CardsLinedUpComponent,
@@ -51,6 +60,7 @@ import { MyAreaComponent } from './game-main/my-area/my-area.component';
     GameRoomListComponent,
     SignInToGameRoomDialogComponent,
     GameMainComponent,
+    UserInputLogDialogComponent,
     ChatComponent,
     CardsPileComponent,
     CardsLinedUpComponent,
@@ -59,9 +69,21 @@ import { MyAreaComponent } from './game-main/my-area/my-area.component';
     OtherPlayerAreaComponent,
     TurnPlayerAreaComponent,
     MyAreaComponent,
+    SmallPlayerAreaComponent,
+    GameConfigDialogComponent,
+    OnlineGameResultDialogComponent,
+    OnlineGamePlayerCardsDialogComponent,
+    EachPlayerCardsComponent,
   ],
   entryComponents: [
-    SignInToGameRoomDialogComponent
+    SignInToGameRoomDialogComponent,
+    GameConfigDialogComponent,
+    UserInputLogDialogComponent,
+    OnlineGameResultDialogComponent,
+    OnlineGamePlayerCardsDialogComponent,
+  ],
+  providers: [
+    GameConfigService,
   ]
 })
 export class OnlineGameModule { }

@@ -38,14 +38,13 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
    = Observable.combineLatest(
         this.card$, this.width$,
         (card, width) =>
-          ( card.isWideType() ? width * (15 / 23)
-                              : width * (23 / 15) ) )
+          Math.floor( width * ( card.isWideType() ? (15 / 23) : (23 / 15) ) ) )
       .distinctUntilChanged();
 
   borderWidth$:  Observable<number>
     = Observable.combineLatest(
         this.width$, this.height$,
-        (width, height) => (18 / 250) * Math.min( width, height ) );
+        (width, height) => (18 / 250) * Math.floor( Math.min( width, height ) ) );
 
   borderRadius$: Observable<number> = this.borderWidth$;
 
@@ -116,7 +115,7 @@ export class DominionCardImageComponent implements OnInit, OnChanges {
 
   private widthFromHeight( height ) {
     const card = this.cardSource.getValue();
-    return ( card.isWideType() ? height * (23 / 15) : height * (15 / 23) );
+    return Math.floor( height * ( card.isWideType() ? (23 / 15) : (15 / 23) ) );
   }
 
   onClicked() {

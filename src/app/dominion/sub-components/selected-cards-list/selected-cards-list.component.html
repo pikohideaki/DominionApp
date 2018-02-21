@@ -11,12 +11,8 @@
   <div *ngIf="!!data.cardPropertyList && !!data.selectedCards" class="supplyTable">
     <div class="Prosperity_DarkAges" *ngIf="!data.selectedCards.isEmpty()" >
       <mat-chip-list>
-        <mat-chip color="accent" [selected]="data.selectedCards.Prosperity" >
-          <span [class.Prosperity-not-selected]="!data.selectedCards.Prosperity">植民地場</span>
-        </mat-chip>
-        <mat-chip color="accent" [selected]="data.selectedCards.DarkAges"   >
-          <span [class.DarkAges-not-selected]="!data.selectedCards.DarkAges">避難所場</span>
-        </mat-chip>
+        <mat-chip *ngIf="data.selectedCards.Prosperity" color="accent" [selected]="true" >植民地場</mat-chip>
+        <mat-chip *ngIf="data.selectedCards.DarkAges"   color="accent" [selected]="true" >避難所場</mat-chip>
       </mat-chip-list>
     </div>
 

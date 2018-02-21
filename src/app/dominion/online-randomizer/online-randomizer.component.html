@@ -2,10 +2,13 @@
       signedIn:          signedIn$                  | async,
       signedInToGroup:   signedInToRandomizerGroup$ | async,
       groupName:         myRandomizerGroupName$     | async,
+      isFullscreen:      isFullscreen$              | async,
       BlackMarketIsUsed: BlackMarketIsUsed$         | async
     } as data">
 
-  <mat-sidenav-container class="sidenavContainer default-background-color">
+  <mat-sidenav-container
+      class="sidenavContainer default-background-color"
+      [class.full-screen]="data.isFullscreen">
     <mat-sidenav #sidenav class="sidenav">
       <app-randomizer-group-list [sidenav]="sidenav"> </app-randomizer-group-list>
     </mat-sidenav>

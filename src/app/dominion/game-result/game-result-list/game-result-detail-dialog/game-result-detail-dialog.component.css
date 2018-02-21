@@ -1,13 +1,8 @@
 /*to put button in the middle of dialog*/
-.actionButtons {
+.action-buttons {
   display: flex;
   justify-content: center;
   margin: 20px;
-}
-
-.container {
-  /* display: flex;
-  flex-wrap: wrap; */
 }
 
 

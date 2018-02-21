@@ -8,6 +8,7 @@ import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-
 
 import { GameRoom } from '../../../classes/game-room';
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { GameState } from '../../../classes/game-state';
 
 
 @Injectable()
@@ -18,6 +19,9 @@ export class MyGameRoomService {
           this.myUserInfo.onlineGame.roomId$,
           (list, id) => (list.find( e => e.databaseKey === id ) || new GameRoom()) );
 
+  initialState$: Observable<GameState>
+    = this.myGameRoom$.map( e => new GameState( e.initialState ) );
+
   myIndex$: Observable<number>
     = Observable.combineLatest(
           this.myGameRoom$.map( e => e.playersNameShuffled() ).distinctUntilChanged(),
@@ -25,13 +29,28 @@ export class MyGameRoomService {
           (playersName, myName) => playersName.findIndex( e => e === myName ) )
         .first();
 
+  playersNameShuffled$: Observable<string[]>
+    = this.myGameRoom$.map( e => e.playersNameShuffled() );
+
+  gameRoomCommunicationId$
+    = this.myGameRoom$.map( e => e.gameRoomCommunicationId )
+        .distinctUntilChanged();
+
+  Prosperity$
+    = this.myGameRoom$.map( e => e.selectedCards.Prosperity )
+        .startWith( false )
+        .distinctUntilChanged();
+
+  numberOfPlayers$: Observable<number>
+    = this.myGameRoom$.map( e => e.numberOfPlayers )
+        .distinctUntilChanged();
+
+
+
   constructor(
     private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
     private myUserInfo: MyUserInfoService
   ) {
-    // this.myIndex$.subscribe( val => console.log('myIndex', val) );
-    // this.myGameRoom$.map( e => e.playersNameShuffled() ).distinctUntilChanged()
-    //   .subscribe( val => console.log('playersName', val) );
   }
 }

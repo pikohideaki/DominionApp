@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
 import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';
+import { FullScreenService } from './my-own-library/full-screen.service';
 
 
 @Component({
@@ -17,13 +18,16 @@ export class AppComponent {
   signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
   myName$:   Observable<string>  = this.myUserInfo.name$;
 
+  isFullScreen$ = this.fullScreen.isFullscreen$;
+
 
   constructor(
     private snackBar: MatSnackBar,
     private afAuth: AngularFireAuth,
     private myUserInfo: MyUserInfoService,
     private autoBackup: AutoBackupOnFirebaseService,
-    private router: Router
+    private router: Router,
+    private fullScreen: FullScreenService
   ) {
     this.autoBackup.checkAndExecuteBackup();
   }

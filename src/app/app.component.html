@@ -1,9 +1,11 @@
 <ng-container *ngIf="{
-      signedIn: signedIn$ | async,
-      myName:   myName$   | async
+      signedIn:     signedIn$     | async,
+      isFullScreen: isFullScreen$ | async,
+      myName:       myName$       | async
     } as data">
 
-  <mat-toolbar color='primary' class='header box-shadow'>
+  <mat-toolbar *ngIf="!data.isFullScreen"
+      color='primary' class='header box-shadow'>
     <a mat-icon-button routerLink='/'> <mat-icon>home</mat-icon> </a>
 
     <div *ngIf="data.signedIn">
@@ -42,7 +44,7 @@
 
 
   <!--dummy-->
-  <mat-toolbar> </mat-toolbar>
+  <mat-toolbar *ngIf="!data.isFullScreen"> </mat-toolbar>
 
   <router-outlet></router-outlet>
 </ng-container>

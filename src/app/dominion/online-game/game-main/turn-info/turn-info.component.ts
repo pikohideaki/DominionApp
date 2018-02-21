@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { TurnInfo } from '../../../../classes/game-state';
-import { GameStateService } from '../game-state.service';
+import { GameStateService } from '../game-state-services/game-state.service';
 
 
 @Component({
@@ -12,23 +12,13 @@ import { GameStateService } from '../game-state.service';
 })
 export class TurnInfoComponent implements OnInit {
 
-  turnInfo$: Observable<TurnInfo>;
+  action$: Observable<number> = this.gameStateService.action$;
+  buy$:    Observable<number> = this.gameStateService.buy$;
+  coin$:   Observable<number> = this.gameStateService.coin$;
 
-  phaseCharacter$:  Observable<string>;
-  turnInfo_Action$: Observable<number>;
-  turnInfo_Buy$:    Observable<number>;
-  turnInfo_Coin$:   Observable<number>;
-
-  constructor(
-    private gameStateService: GameStateService
-  ) {
-    this.turnInfo$ = this.gameStateService.turnInfo$;
-  }
-
-
-  ngOnInit() {
-    this.phaseCharacter$  = this.turnInfo$.map( e => {
-          switch ( e.phase ) {
+  phaseCharacter$:  Observable<string>
+    = this.gameStateService.phase$.map( phase => {
+          switch ( phase ) {
             case ''            : return '';
             case 'StartOfTurn' : return '';
             case 'Action'      : return 'A';
@@ -39,12 +29,20 @@ export class TurnInfoComponent implements OnInit {
             case 'Night'       : return 'N';
             case 'CleanUp'     : return 'C';
             case 'EndOfTurn'   : return '';
+            case 'GameIsOver'  : return '';
             default :
-              throw new Error(`unknown phase name '${e.phase}'`);
+              throw new Error(`unknown phase name '${phase}'`);
           }
       });
-    this.turnInfo_Action$ = this.turnInfo$.map( e => e.action );
-    this.turnInfo_Buy$    = this.turnInfo$.map( e => e.buy    );
-    this.turnInfo_Coin$   = this.turnInfo$.map( e => e.coin   );
+
+
+
+  constructor(
+    private gameStateService: GameStateService
+  ) {
+  }
+
+
+  ngOnInit() {
   }
 }

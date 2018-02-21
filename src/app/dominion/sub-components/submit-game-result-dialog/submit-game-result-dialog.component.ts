@@ -1,8 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import 'rxjs/add/operator/takeWhile';
-
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameResult } from '../../../classes/game-result';
 
@@ -15,29 +12,21 @@ import { GameResult } from '../../../classes/game-result';
     './submit-game-result-dialog.component.css'
   ]
 })
-export class SubmitGameResultDialogComponent implements OnInit, OnDestroy {
-  private alive: boolean = true;
-
+export class SubmitGameResultDialogComponent implements OnInit {
   newGameResult: GameResult;  // input
 
 
   constructor(
-    private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
   ) {
   }
 
   ngOnInit() {
-    this.database.scoringTable$
-      .takeWhile( () => this.alive )
-      .subscribe( defaultScores => {
-        this.newGameResult.rankPlayers();
-        this.newGameResult.setScores( defaultScores );
-      });
-  }
-
-  ngOnDestroy() {
-    this.alive = false;
+    this.database.scoringTable$.first()
+    .subscribe( defaultScores => {
+      this.newGameResult.rankPlayers();
+      this.newGameResult.setScores( defaultScores );
+    });
   }
 
   submitGameResult() {

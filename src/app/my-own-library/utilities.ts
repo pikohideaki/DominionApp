@@ -86,7 +86,7 @@ export function isToday( date: Date ) {
 
 
 export function seq0( length: number, step: number = 1 ): number[] {
-  return this.numberSequence( 0, length, step );
+  return numberSequence( 0, length, step );
 }
 /**
  * @description (0, 5) => [0,1,2,3,4], (2,12,3) => [2,5,8,11]
@@ -96,7 +96,7 @@ export function seq0( length: number, step: number = 1 ): number[] {
  * @return the number sequence array
  */
 export function numSeq( start: number, length: number, step: number = 1 ): number[] {
-  return this.numberSequence( start, length, step );
+  return numberSequence( start, length, step );
 }
 export function numberSequence( start: number, length: number, step: number = 1 ): number[] {
   return Array.from( new Array(length) ).map( (_, i) => i * step + start );

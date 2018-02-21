@@ -2,97 +2,169 @@
       initialStateIsReady: initialStateIsReady$ | async,
       isMyTurn:            isMyTurn$            | async,
       chatOpened:          chatOpened$          | async,
-      gameSnapshot:        gameSnapshot$        | async,
       myIndex:             myIndex$             | async,
-      message:             message$             | async
+      messageForMe:        messageForMe$        | async,
+      cardSizeRatio:       cardSizeRatio$       | async,
+      gameIsOver:          gameIsOver$          | async,
+      isBuyPlayPhase:      isBuyPlayPhase$      | async,
+      isFullscreen:        isFullscreen$        | async,
+      myThinkingState:     myThinkingState$     | async,
+      devMode:             devMode$             | async
     } as data">
   <div class="body">
-    <div class="sidebar">
-      <button mat-button (click)="toggleSideNav( sidenav )"
-          matTooltip="show/hide messages" matTooltipPosition="after">
+    <div class="sidebar" [class.full-screen]="data.isFullscreen">
+      <button mat-button class="sidebar-button"
+          matTooltip="チャットを表示／非表示" matTooltipPosition="after"
+          (click)="toggleSideNav( sidenav )" >
         <mat-icon>textsms</mat-icon>
       </button>
-      <mat-button-toggle-group [vertical]="true" (change)="toggleAutoScroll( $event.value )">
-        <mat-button-toggle [value]="false" [checked]="!autoScroll"
-              matTooltip="auto scroll off" matTooltipPosition="after">
-          <mat-icon>pause</mat-icon>
-        </mat-button-toggle>
-        <mat-button-toggle [value]="true"  [checked]="autoScroll"
-              matTooltip="auto scroll on" matTooltipPosition="after">
-          <mat-icon>play_arrow</mat-icon>
-        </mat-button-toggle>
-      </mat-button-toggle-group>
+
+      <ng-container *ngIf="data.chatOpened" >
+        <button mat-button class="sidebar-button"
+            matTooltip="オートスクロール：オフ" matTooltipPosition="after"
+            [class.button-checked]="!autoScroll"
+            disableRipple
+            (click)="toggleAutoScroll( false )" >
+          <mat-icon>stop</mat-icon>
+        </button>
+        <button mat-button class="sidebar-button"
+            matTooltip="オートスクロール：オン" matTooltipPosition="after"
+            [class.button-checked]="autoScroll"
+            disableRipple
+            (click)="toggleAutoScroll( true )" >
+          <mat-icon>arrow_downwards</mat-icon>
+        </button>
+      </ng-container>
+
+      <button mat-button class="sidebar-button"
+          matTooltip="考慮中" matTooltipPosition="after"
+          (click)="toggleMyThinkingState( data.myThinkingState, data.myIndex )" >
+        <mat-icon>hourglass_full</mat-icon>
+      </button>
 
       <span class="spacer"></span>
 
       <ng-container>
-
-        <ng-container *ngIf="data.isMyTurn">
-          <button mat-button (click)="goToNextPhase( data.gameSnapshot )"
-              matTooltip="Go to next phase" matTooltipPosition="after">
+        <ng-container *ngIf="data.isMyTurn && !data.gameIsOver">
+          <button mat-button class="sidebar-button"
+              matTooltip="次のフェーズへ" matTooltipPosition="after"
+              (click)="goToNextPhase( data.myIndex )" >
             <mat-icon class="goToNextPhaseIcon">file_download</mat-icon>
           </button>
-          <button mat-button (click)="goToNextPlayer()"
-              matTooltip="Finish my turn" matTooltipPosition="after">
+          <button mat-button class="sidebar-button"
+              matTooltip="手番を終了する" matTooltipPosition="after"
+              (click)="finishMyTurn( data.myIndex )" >
             <mat-icon>forward</mat-icon>
           </button>
         </ng-container>
 
         <app-turn-info></app-turn-info>
 
-        <button mat-button (click)="sortMyHandCards( data.gameSnapshot, data.myIndex )"
-            matTooltip="Sort hand cards" matTooltipPosition="after">
+        <button *ngIf="!data.gameIsOver"
+            mat-button class="sidebar-button"
+            matTooltip="手札をソート" matTooltipPosition="after"
+            (click)="sortMyHandCards( data.myIndex )" >
           <mat-icon>sort</mat-icon>
         </button>
+        <button *ngIf="!data.gameIsOver && data.isBuyPlayPhase && data.isMyTurn"
+            mat-button class="sidebar-button"
+            matTooltip="基本財宝カードをすべてプレイ" matTooltipPosition="after"
+            (click)="playAllTreasures( data.myIndex )" >
+          <mat-icon>present_to_all</mat-icon>
+        </button>
 
-        <button mat-button (click)="incrementTurnCounter()">++</button>
-        <button mat-button (click)="logSnapshot()">log</button>
-        <button mat-button (click)="resetGame()">reset</button>
-        <!-- <button mat-button (click)="emit()">emit</button> -->
-        <!-- <button mat-button (click)="faceUpCards()">表</button>
-        <button mat-button (click)="faceDownCards()">裏</button> -->
+        <button mat-button class="sidebar-button"
+            matTooltip="カード情報確認ボタンを表示／非表示" matTooltipPosition="after"
+            (click)="toggleShowCardPropertyButtons()">
+          <mat-icon>description</mat-icon><!-- featured_video -->
+        </button>
+        <button mat-button class="sidebar-button"
+            matTooltip="設定" matTooltipPosition="after"
+            (click)="settings()">
+          <mat-icon>tune</mat-icon>
+        </button>
 
+        <!-- debug -->
+        <div *ngIf="data.devMode" class="dev-mode-box">
+          <button mat-button class="sidebar-button"
+              (click)="incrementTurnCounter( data.myIndex )">
+            <mat-icon>plus_one</mat-icon>
+          </button>
+          <button mat-button class="sidebar-button" (click)="logSnapshot()">
+            <mat-icon>camera_alt</mat-icon>
+          </button>
+          <button mat-button class="sidebar-button"
+              matTooltip="Log" matTooltipPosition="after"
+              (click)="userInputLog()">
+            log
+          </button>
+        </div>
       </ng-container>
     </div>
 
-    <mat-sidenav-container class="sidenavContainer">
+    <mat-sidenav-container class="sidenavContainer" [class.full-screen]="data.isFullscreen">
       <mat-sidenav #sidenav class="sidenav" mode="side" disableClose="true"
             [opened]="data.chatOpened" >
         <app-chat [autoScroll]="autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
-      <ng-container *ngIf="data.initialStateIsReady; then main; else loading"></ng-container>
-      <ng-template #loading>Loading...</ng-template>
-      <ng-template #main>
-        <div class="column">
-          <div class="upper-part">
-            <div class="shared-area_other-player-area">
-              <app-shared-area class="shared-area"
-                (cardClicked)="onCardClicked( $event )">
-              </app-shared-area>
-              <app-other-player-area
-                (cardClicked)="onCardClicked( $event )">
-              </app-other-player-area>
-            </div>
-            <div *ngIf="!data.isMyTurn">
-              <app-turn-player-area
-                (cardClicked)="onCardClicked( $event )">
-              </app-turn-player-area>
-            </div>
+      <div *ngIf="!data.initialStateIsReady" class="black-cover"></div>
+      <div class="right-side" [class.full-screen]="data.isFullscreen">
+        <div class="upper-part">
+          <div class="shared-area_other-players-area">
+            <app-shared-area class="shared-area"
+              [cardSizeRatio]="data.cardSizeRatio"
+              [showCardProperty$]="showCardProperty$"
+              (cardClicked)="onCardClick( data.myIndex, $event )">
+            </app-shared-area>
+            <app-other-players-area
+              class="other-players-area"
+              [cardSizeRatio]="data.cardSizeRatio"
+              (cardClicked)="onCardClick( data.myIndex, $event )">
+            </app-other-players-area>
           </div>
-          <div class="spacer"></div>
-          <div class="message-area-wrapper">
-            <div class="message-area">
-              {{data.message}}
-            </div>
-          </div>
-          <div class="my-area-wrapper">
-            <app-my-area
-              (cardClicked)="onCardClicked( $event )">
-            </app-my-area>
+          <div *ngIf="!data.isMyTurn">
+            <app-turn-player-area
+              [cardSizeRatio]="data.cardSizeRatio"
+              (cardClicked)="onCardClick( data.myIndex, $event )">
+            </app-turn-player-area>
           </div>
         </div>
-      </ng-template>
+        <div class="spacer"></div>
+        <div class="messageForMe-area-wrapper"
+            [class.is-my-turn]="data.isMyTurn">
+          <div class="messageForMe-area">
+            {{data.messageForMe}}
+          </div>
+        </div>
+        <div class="my-area-wrapper" [class.is-my-turn]="data.isMyTurn">
+          <app-my-area
+            [showCardProperty$]="showCardProperty$"
+            [cardSizeRatio]="data.cardSizeRatio"
+            (cardClicked)="onCardClick( data.myIndex, $event )">
+          </app-my-area>
+        </div>
+      </div>
     </mat-sidenav-container>
+
+    <div *ngIf="data.gameIsOver" class="game-result-bar"
+        [class.full-screen]="data.isFullscreen">
+      <button mat-button class="sidebar-button"
+          matTooltip="ゲーム結果" matTooltipPosition="before"
+          (click)="showGameResultDialog()" >
+        <mat-icon>format_list_numbered</mat-icon>
+      </button>
+      <button mat-button class="sidebar-button"
+          matTooltip="プレイヤーのカード一覧" matTooltipPosition="before"
+          (click)="showPlayerCards()" >
+        <mat-icon>view_comfy</mat-icon>
+      </button>
+      <span class="spacer"></span>
+      <button mat-button class="sidebar-button"
+          matTooltip="終了" matTooltipPosition="before"
+          (click)="exit()" >
+        <mat-icon>exit_to_app</mat-icon>
+      </button>
+    </div>
   </div>
 </ng-container>

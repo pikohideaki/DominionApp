@@ -1,4 +1,5 @@
-import { seq0, objectEntries, permutation, objectForEach } from '../my-own-library/utilities';
+import { seq0, objectEntries, permutation, objectForEach, filterRemove } from '../my-own-library/utilities';
+import { CardProperty, CardType } from './card-property';
 
 
 export function getDCardsByIdArray( idArray: (number[]|void), dcards: DCard[] ): DCard[] {
@@ -128,10 +129,17 @@ export class GameState {
         this.DCards.BlackMarketPile );
   }
 
+  isEmpty() {
+    return ( this.getAllDCards().length === 0 );
+  }
 
 
   getDCards( cardIdArray: number[] ): DCard[] {
     return getDCardsByIdArray( cardIdArray, this.getAllDCards() );
+  }
+
+  getDCard( cardId: number ): DCard {
+    return ( this.getDCards([cardId])[0] || new DCard() );
   }
 
   removeDCards( cardIdArray: number[] ) {
@@ -143,6 +151,36 @@ export class GameState {
     this.DCards.BlackMarketPile
       = this.DCards.BlackMarketPile.filter( c => !cardIdArray.includes(c.id) );
   }
+
+  emptyPiles( Prosperity: boolean, Alchemy: boolean = false ): number {
+    const Supplies = [].concat(
+        objectEntries( this.DCards.BasicCards ),
+        this.DCards.KingdomCards );
+    return Supplies.filter( e => e.length <= 0 ).length
+            - (Prosperity ? 0 : 2)
+            - (Alchemy ? 0 : 1);
+  }
+
+  gameIsOverConditions( Prosperity: boolean ): boolean {
+    // 使用しているサプライが3山なくなったら終了
+    /* [ToDo] 闇市場，廃墟などもカウント */
+    return ( this.DCards.BasicCards.Province.length <= 0
+        || (Prosperity && this.DCards.BasicCards.Colony.length <= 0)
+        || this.emptyPiles( Prosperity ) >= 3 );
+  }
+
+  gameIsOver( Prosperity: boolean ): boolean {
+    if ( this.isEmpty() ) return false;
+    return this.turnInfo.phase === 'GameIsOver'
+            && this.gameIsOverConditions( Prosperity );
+  }
+
+
+  disableAllButtons() {
+    this.getAllDCards()
+      .forEach( d => d.isButton.forEach( (_, i, ar) => ar[i] = false ) );
+  }
+
 }
 
 
@@ -157,7 +195,8 @@ export type Phase = ''
                     |'Night'
                     |'Night*'
                     |'CleanUp'
-                    |'EndOfTurn';
+                    |'EndOfTurn'
+                    |'GameIsOver';
 
 
 export type PlayerCardDirectory = 'Deck'
@@ -188,23 +227,25 @@ export type DCardPath = number
                             |'BlackMarketPile'
                           ;
 
+
+
 export class DCard {  // Dominion card
+  cardProperty:  CardProperty = new CardProperty();
   id:            number  = 0;
-  cardListIndex: number  = 0;
   faceUp:        boolean[] = [];
   isButton:      boolean[] = [];
   rotation:      number  = 0;  // 0 - 360
 
   constructor( dataObj?: {
+    cardProperty:  CardProperty,
     id:            number,
-    cardListIndex: number,
     faceUp:        boolean[],
     isButton:      boolean[],
     rotation:      number,
   } ) {
     if ( !dataObj ) return;
+    this.cardProperty  = ( (new CardProperty()).from( dataObj.cardProperty ) || new CardProperty() );
     this.id            = ( dataObj.id            || 0  );
-    this.cardListIndex = ( dataObj.cardListIndex || 0  );
     this.faceUp        = ( dataObj.faceUp        || [] );
     this.isButton      = ( dataObj.isButton      || [] );
     this.rotation      = ( dataObj.rotation      || 0  );
@@ -309,9 +350,26 @@ export class PlayerCards {
     });
   }
 
-  getDCards( cardIdArray?: number[] ): DCard[] {
+
+  sortByCardType( dcards: DCard[] ): DCard[] {
+    let sorted = dcards.sort( (a, b) => a.cardProperty.no - b.cardProperty.no );
+    let Actions, Treasures, Victories;
+    const f = (type: CardType) => ((d: DCard) => d.cardProperty.cardTypes.includes(type));
+    [Actions,   sorted] = filterRemove( sorted, f('Action')   );
+    [Treasures, sorted] = filterRemove( sorted, f('Treasure') );
+    [Victories, sorted] = filterRemove( sorted, f('Victory')  );
+    return [].concat( Actions, Treasures, Victories, sorted );
+  }
+
+  sortHandCards() {
+    this.HandCards = this.sortByCardType( this.HandCards );
+  }
+
+
+  getDCards( cardIdArray?: number[], sort: boolean = false ): DCard[] {
     const allDCards: DCard[] = [].concat( ...objectEntries( this ) );
-    return getDCardsByIdArray( cardIdArray, allDCards );
+    const dcards = getDCardsByIdArray( cardIdArray, allDCards );
+    return ( sort ? this.sortByCardType( dcards ) : dcards );
   }
 
   removeDCards( cardIdArray: number[] ) {
@@ -343,8 +401,8 @@ export class PlayerData {
 
 export class TurnInfo {
   phase:  Phase  = '';
-  action: number = 0;
-  buy:    number = 0;
+  action: number = 1;
+  buy:    number = 1;
   coin:   number = 0;
 
   constructor( dataObj?: {
@@ -355,8 +413,8 @@ export class TurnInfo {
   } ) {
     if ( !dataObj ) return;
     this.phase  = ( dataObj.phase  || '' );
-    this.action = ( dataObj.action || 0 );
-    this.buy    = ( dataObj.buy    || 0 );
+    this.action = ( dataObj.action || 1 );
+    this.buy    = ( dataObj.buy    || 1 );
     this.coin   = ( dataObj.coin   || 0 );
   }
 }

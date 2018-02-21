@@ -11,12 +11,18 @@ export class User {
     roomId:               string,
     communicationId:      string,
     chatOpened:           boolean,
+    cardSizeAutoChange:   boolean,
+    cardSizeRatio:        number,
+    messageSpeed:         number,
   } = {
     isSelectedExpansions: [],
     numberOfPlayers:      2,
     roomId:               '',
     communicationId:      '',
     chatOpened:           true,
+    cardSizeAutoChange:   true,
+    cardSizeRatio:        1,
+    messageSpeed:         1,
   };
 
   constructor( databaseKey?: string, initObj?: {
@@ -29,6 +35,9 @@ export class User {
         roomId:               string,
         communicationId:      string,
         chatOpened:           boolean,
+        cardSizeAutoChange:   boolean,
+        cardSizeRatio:        number,
+        messageSpeed:         number,
       }
   }) {
     this.databaseKey = ( databaseKey || '' );
@@ -43,5 +52,8 @@ export class User {
     this.onlineGame.roomId               = ( initObj.onlineGame.roomId               || '' );
     this.onlineGame.communicationId      = ( initObj.onlineGame.communicationId      || '' );
     this.onlineGame.chatOpened           = !!initObj.onlineGame.chatOpened;
+    this.onlineGame.cardSizeAutoChange   = !!initObj.onlineGame.cardSizeAutoChange;
+    this.onlineGame.cardSizeRatio        = ( initObj.onlineGame.cardSizeRatio        || 1  );
+    this.onlineGame.messageSpeed         = ( initObj.onlineGame.messageSpeed         || 1  );
   }
 }

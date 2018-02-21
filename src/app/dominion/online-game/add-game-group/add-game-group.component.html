@@ -1,20 +1,24 @@
 <ng-container *ngIf="{
-    numberOfPlayers:      numberOfPlayers$      | async,
-    isSelectedExpansions: isSelectedExpansions$ | async,
-    formIsInvalid:        formIsInvalid$        | async,
-    memo:                 memo$                 | async
+    numberOfPlayers:       numberOfPlayers$       | async,
+    isSelectedExpansions:  isSelectedExpansions$  | async,
+    disableMakeRoomButton: disableMakeRoomButton$ | async,
+    preparingDialog:       preparingDialog$       | async,
+    memo:                  memo$                  | async
   } as data">
 
 
 <div class="body-with-padding" >
   <span class="margined-element">
     <button mat-raised-button color='primary'
-      [disabled]="data.formIsInvalid"
-      (click)="makeNewGameRoom(
+      [disabled]="data.disableMakeRoomButton"
+      (click)="makeNewGameRoomClicked(
           data.numberOfPlayers,
           data.isSelectedExpansions )" >
       部屋を作成
     </button>
+  </span>
+  <span *ngIf="data.preparingDialog" class="margined-element">
+    準備中…
   </span>
 
   <hr>

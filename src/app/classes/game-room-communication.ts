@@ -1,79 +1,67 @@
 import { ChatMessage } from './chat-message';
 import { DCardPath } from './game-state';
+import { permutation } from '../my-own-library/utilities';
 
 export class GameCommunication {
-  databaseKey: string;
-  chatList:    ChatMessage[] = [];
-  moves:       StateTransition[]  = [];
+  databaseKey: string = '';
+
+  chatList:          ChatMessage[] = [];
+  userInputList:     UserInput[]   = [];
+  resetGameClicked:  number        = 0;
+  thinkingState:     boolean[]     = [];
+  isTerminated:      boolean       = false;
+  resultIsSubmitted: boolean       = false;
+
 
   constructor( databaseKey?: string, dataObj?: {
-      chatList: ChatMessage[],
-      moves:    StateTransition[],
+      chatList:          ChatMessage[],
+      userInputList:     UserInput[],
+      resetGameClicked:  number,
+      thinkingState:     boolean[],
+      isTerminated:      boolean,
+      resultIsSubmitted: boolean,
     }
   ) {
     this.databaseKey = ( databaseKey || '' );
 
     if ( !dataObj ) return;
-    this.chatList = ( dataObj.chatList || [] );
-    this.moves    = ( dataObj.moves    || [] );
+    this.chatList          = ( dataObj.chatList         || [] );
+    this.userInputList     = ( dataObj.userInputList    || [] );
+    this.resetGameClicked  = ( dataObj.resetGameClicked || 0  );
+    this.thinkingState     = ( dataObj.thinkingState    || [] );
+    this.isTerminated      = !!dataObj.isTerminated;
+    this.resultIsSubmitted = !!dataObj.resultIsSubmitted;
   }
 }
 
 
-export class StateTransition {
-  instruction: Instruction;
-  data: {
-    value?: any,
-    cardIdArray?: number[],
-    playerIdArray?: number[],
-    dest?: DCardPath[],
-    playerId?: number,
-  };
-  constructor( initObj?: StateTransition ) {
-    if ( !initObj ) return;
-    this.instruction = initObj.instruction;
-    this.data = initObj.data;
-  }
-}
 
-
-export type Instruction =  'increment turnCounter'
-                          |'set phase'
-                          |'set action'
-                          |'set buy'
-                          |'set coin'
-                          |'add action'
-                          |'add buy'
-                          |'add coin'
-                          |'set VPtoken of player'
-                          |'face up cards for players'
-                          |'face down cards for players'
-                          |'buttonize cards for players'
-                          |'unbuttonize cards for players'
-                          |'move cards to'
-                          |'face up cards for all players'
-                          |'face down cards for all players'
-                          |'buttonize cards for all players'
-                          |'unbuttonize cards for all players'
-                          |'trash'
-                          |'discard'
-                          |'play'
-                          |'gain'
-                          |'gain to'
-                          |'set aside';
-
-
-export type UserInput = ''
+export type UserInputCommand = ''
                        |'clicked card'
-                       |'clicked nextPhase'
-                       |'clicked turnEnd'
-                       |'clicked sortMyHandcards'
-                       ;
+                       |'clicked goToNextPhase'
+                       |'clicked finishMyTurn'
+                       |'clicked sortHandcards'
+                       |'play all treasures'
+                       |'increment turnCounter'  // test
+                      ;
 
-class GameRecord {
-  userInput: UserInput;
+export class UserInput {
+  command: UserInputCommand = '';
   data: {
+    playerId: number,
     clickedCardId?: number,
-    shuffledCardsId?: number[],
+    shuffleBy: number[]
   };
+
+  constructor(
+    command: UserInputCommand,
+    playerId: number,
+    clickedCardId?: number
+  ) {
+    this.command = (command || '');
+    this.data = { playerId: playerId, shuffleBy: permutation( 200 ) };
+    if ( clickedCardId !== undefined ) {
+      this.data.clickedCardId = clickedCardId;
+    }
+  }
 }

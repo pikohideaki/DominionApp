@@ -1,0 +1,39 @@
+
+.card-property-button-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+
+.card-image-wrapper {
+  position: relative;
+}
+
+.absolute-position {
+  position: absolute;
+  bottom: 5px;
+  left: 1px;
+  right: 1px;
+}
+
+
+.pile-info {
+  display: flex;
+  flex-direction: row;
+}
+
+
+.card-cost-coin,.dcard-array-size {
+  flex-grow: 0;
+  text-align: center;
+  font-size: 1.0em;
+  font-weight: bold;
+  padding: 2px;
+}
+.card-cost-coin {
+  color: #69501C;
+  background: #FFE37B;
+  border-radius: 15px;
+  border: 1px solid #f3ebaa;
+}
+

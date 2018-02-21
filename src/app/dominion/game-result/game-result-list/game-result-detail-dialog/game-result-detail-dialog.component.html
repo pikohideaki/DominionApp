@@ -2,7 +2,7 @@
 
   <h1 mat-dialog-title>結果</h1>
 
-  <div mat-dialog-content class="container">
+  <div mat-dialog-content>
     <div class="playerResult">
       <p>日付：
           {{gameResult.date.getFullYear()}}年
@@ -52,7 +52,7 @@
       [selectedCards$]="selectedCards$" >
     </app-selected-cards-list>
 
-    <div class='actionButtons'>
+    <div class='action-buttons'>
       <span class="margined-element">
         <a mat-raised-button
             color='accent'
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <div mat-dialog-actions class='actionButtons'>
+  <div mat-dialog-actions class='action-buttons'>
     <span class="margined-element">
       <button mat-raised-button
           mat-dialog-close="OK Clicked"

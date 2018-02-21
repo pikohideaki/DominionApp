@@ -6,7 +6,7 @@ import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/startWith';
 import 'rxjs/add/observable/combineLatest';
 
-import { GameCommunication, StateTransition, Instruction } from '../../../classes/game-room-communication';
+import { GameCommunication, UserInput, UserInputCommand } from '../../../classes/game-room-communication';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { ChatMessage } from '../../../classes/chat-message';
@@ -18,12 +18,17 @@ import { DCardPath } from '../../../classes/game-state';
 @Injectable()
 export class GameRoomCommunicationService {
 
-  private communicationId: string;
-  private myName: string = '';
+  private myName$: Observable<string>
+    = this.user.name$.first();
+  private communicationId$: Observable<string>
+    = this.user.onlineGame.communicationId$.first();
 
-  private ready$: Observable<boolean>;
-  chatList$: Observable<ChatMessage[]>;
-  moves$: Observable<StateTransition[]>;
+  chatList$:          Observable<ChatMessage[]>;
+  userInputList$:     Observable<UserInput[]>;
+  resetGameClicked$:  Observable<number>;
+  thinkingState$:     Observable<boolean[]>;
+  isTerminated$:      Observable<boolean>;
+  resultIsSubmitted$: Observable<boolean>;
 
 
   constructor(
@@ -34,66 +39,109 @@ export class GameRoomCommunicationService {
     private myGameRoomService: MyGameRoomService,
   ) {
     // observables
-    this.ready$
-      = this.user.onlineGame.roomId$
-          .first().map( _ => true )
-          .startWith( false );
 
     const gameRoomCommunication$
       = Observable.combineLatest(
           this.database.onlineGameCommunicationList$,
-          this.myGameRoomService.myGameRoom$.map( e => e.gameRoomCommunicationId ),
+          this.myGameRoomService.gameRoomCommunicationId$,
           (list, id) => list.find( e => e.databaseKey === id ) || new GameCommunication() );
 
     this.chatList$
-      = this.myGameRoomService.myGameRoom$.map( e => e.gameRoomCommunicationId )
+      = this.myGameRoomService.gameRoomCommunicationId$
           .switchMap( id =>
             this.afdb.list<ChatMessage>(
               `${this.database.fdPath.onlineGameCommunicationList}/${id}/chatList` )
             .valueChanges(['child_added']) )
           .distinctUntilChanged( (a, b) => a === b, x => x.length );
-            // .map( list => list.map( e => new ChatMessage(e) ) ) );
 
-    this.moves$
-      = this.myGameRoomService.myGameRoom$.map( e => e.gameRoomCommunicationId )
+    this.userInputList$
+      = this.myGameRoomService.gameRoomCommunicationId$
           .switchMap( id =>
-            this.afdb.list<StateTransition>(
-              `${this.database.fdPath.onlineGameCommunicationList}/${id}/moves` )
-            .valueChanges(['child_added', 'child_removed']) )
+            this.afdb.list<UserInput>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/userInputList` )
+            .valueChanges(['child_added']) )
           .distinctUntilChanged( (a, b) => a === b, x => x.length );
-            // .map( list => list.map( e => new MoveInGame(e) ) ) );
 
-    // subscriptions
-    this.user.onlineGame.communicationId$.subscribe( val => this.communicationId = val );
-    this.user.name$.subscribe( val => this.myName = val );
+    this.resetGameClicked$
+      = this.myGameRoomService.gameRoomCommunicationId$
+          .switchMap( id =>
+            this.afdb.object<number>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/resetGameClicked` )
+            .valueChanges() )
+          .distinctUntilChanged();
+
+    this.thinkingState$
+      = this.myGameRoomService.gameRoomCommunicationId$
+          .switchMap( id =>
+            this.afdb.list<boolean>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/thinkingState` )
+            .valueChanges() )
+          .filter( list => list !== undefined && list.length > 0 )
+          .distinctUntilChanged();
+
+    this.isTerminated$
+      = this.myGameRoomService.gameRoomCommunicationId$
+          .switchMap( id =>
+            this.afdb.object<boolean>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/isTerminated` )
+            .valueChanges() )
+          .distinctUntilChanged();
+
+    this.resultIsSubmitted$
+      = this.myGameRoomService.gameRoomCommunicationId$
+          .switchMap( id =>
+            this.afdb.object<boolean>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/resultIsSubmitted` )
+            .valueChanges() )
+          .distinctUntilChanged();
   }
+
 
   async sendMessage( messageString: string ) {
-    await this.ready$.filter( e => e ).toPromise();
-    const msg = new ChatMessage({ playerName: this.myName, content: messageString, timeStamp: Date.now() });
-    await this.database.onlineGameCommunication.sendMessage( this.communicationId, msg );
+    const communicationId = await this.communicationId$.toPromise();
+    const myName = await this.myName$.toPromise();
+    const msg = new ChatMessage({
+                  playerName: myName,
+                  content: messageString,
+                  timeStamp: Date.now()
+                });
+    await this.database.onlineGameCommunication
+            .sendMessage( communicationId, msg );
   }
 
-  async sendMove(
-    name: Instruction,
-    data: {
-      value?: any,
-      cardIdArray?: number[],
-      playerIdArray?: number[],
-      dest?: DCardPath[],
-      playerId?: number,
-    }
+  async sendUserInput(
+    userInputCommand: UserInputCommand,
+    playerId: number,
+    clickedCardId?: number
  ) {
-    await this.ready$.filter( e => e ).toPromise();
-    const move = new StateTransition();
-    move.instruction = name;
-    move.data = data;
-    await this.database.onlineGameCommunication.sendMove( this.communicationId, move );
+    const communicationId = await this.communicationId$.toPromise();
+    const userInput = new UserInput( userInputCommand, playerId, clickedCardId );
+    await this.database.onlineGameCommunication
+            .sendUserInput( communicationId, userInput );
   }
 
 
-  async removeAllMoves() {
-    await this.ready$.filter( e => e ).toPromise();
-    await this.database.onlineGameCommunication.removeAllMoves( this.communicationId );
+  async removeAllUserInput() {
+    const communicationId = await this.communicationId$.toPromise();
+    await this.database.onlineGameCommunication
+            .removeAllUserInput( communicationId );
+  }
+
+  async setThinkingState( playerId: number, state: boolean ) {
+    const communicationId = await this.communicationId$.toPromise();
+    await this.database.onlineGameCommunication
+            .setThinkingState( communicationId, playerId, state );
+  }
+
+  async setTerminatedState( state: boolean ) {
+    const communicationId = await this.communicationId$.toPromise();
+    await this.database.onlineGameCommunication
+            .setTerminatedState( communicationId, state );
+  }
+
+  async setResultSubmittedState( state: boolean ) {
+    const communicationId = await this.communicationId$.toPromise();
+    await this.database.onlineGameCommunication
+            .setResultSubmittedState( communicationId, state );
   }
 }

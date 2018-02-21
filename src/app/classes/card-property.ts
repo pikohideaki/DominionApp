@@ -1,7 +1,7 @@
 import { submatch } from '../my-own-library/utilities';
 
 
-type CardType = (
+export type CardType = (
        'Curse'
       |'Action'
       |'Treasure'
@@ -32,6 +32,7 @@ type CardType = (
     );
 
 export class CardProperty {
+  indexInList:         number = 0;
   no:                  number = 0;
   cardId:              string = '';
   nameJp:              string = '';
@@ -51,7 +52,7 @@ export class CardProperty {
   randomizerCandidate: boolean = false;
   linkId:              number = -1;
 
-  constructor( initObj?: {
+  constructor( indexInList?: number, initObj?: {
     no:                  number,
     cardId:              string,
     nameJp:              string,
@@ -71,6 +72,7 @@ export class CardProperty {
     randomizerCandidate: boolean,
     linkId:              number,
   }) {
+    this.indexInList = ( indexInList || 0 );
     if ( !initObj ) return;
 
     this.no                  = ( initObj.no            || 0 );
@@ -93,6 +95,11 @@ export class CardProperty {
     this.linkId              = ( initObj.linkId        || -1 );
   }
 
+  from( cardProperty: CardProperty ): CardProperty {
+    Object.keys( cardProperty ).forEach( key => this[key] = cardProperty[key] );
+    this.cost = new CardCost( cardProperty.cost );
+    return this;
+  }
 
   isWideType(): boolean {
     return (
@@ -106,6 +113,7 @@ export class CardProperty {
 
   transformAll(): any {
     return {
+      indexInList         : this.indexInList,
       no                  : this.no,
       cardId              : this.cardId,
       nameJp              : this.nameJp,
@@ -128,6 +136,20 @@ export class CardProperty {
       implemented         : transform( 'implemented', this.implemented ),
       randomizerCandidate : transform( 'randomizerCandidate', this.randomizerCandidate ),
     };
+  }
+
+
+  isBasicTreasure(): boolean {
+    return ( this.cardId === 'Copper'
+          || this.cardId === 'Silver'
+          || this.cardId === 'Gold'
+          || this.cardId === 'Platinum'
+          || this.cardId === 'Harem'
+          || this.cardId === 'Stash'
+          || this.cardId === 'Humble_Castle'
+          || this.cardId === 'Pasture'
+          || this.cardId === 'Pouch'
+    );
   }
 }
 
@@ -171,6 +193,7 @@ export function transform( property: string, value ) {
     case 'randomizerCandidate' :
       return ( value ?  '〇' : '×' );
 
+    case 'indexInList' :
     case 'no' :
     case 'cardId' :
     case 'expansionName' :
@@ -209,7 +232,7 @@ export class CardCost {
 
   toStr(): string {
     let result = '';
-    if ( this.coin > 0 || ( this.potion === 0 && this.debt === 0 ) ) {
+    if ( this.coin > 0 || ( this.potion <= 0 && this.debt <= 0 ) ) {
       result += this.coin.toString();
     }
     if ( this.potion > 0 ) {

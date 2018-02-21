@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Observable      } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -27,6 +27,9 @@ export class MyUserInfoService {
     roomId$:               Observable<string>,
     communicationId$:      Observable<string>,
     chatOpened$:           Observable<boolean>,
+    cardSizeAutoChange$:   Observable<boolean>,
+    cardSizeRatio$:        Observable<number>,
+    messageSpeed$:         Observable<number>,
   };
 
   signedInToRandomizerGroup$: Observable<boolean>;
@@ -80,6 +83,15 @@ export class MyUserInfoService {
       chatOpened$ :
         this.myUserInfo$.map( e => e.onlineGame.chatOpened )
           .distinctUntilChanged(),
+      cardSizeAutoChange$ :
+        this.myUserInfo$.map( e => e.onlineGame.cardSizeAutoChange )
+          .distinctUntilChanged(),
+      cardSizeRatio$ :
+        this.myUserInfo$.map( e => e.onlineGame.cardSizeRatio )
+          .distinctUntilChanged(),
+      messageSpeed$ :
+        this.myUserInfo$.map( e => e.onlineGame.messageSpeed )
+          .distinctUntilChanged(),
     };
 
     this.signedInToRandomizerGroup$
@@ -122,5 +134,17 @@ export class MyUserInfoService {
   setOnlineGameChatOpened( value: boolean ) {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.chatOpened( this.uid, value );
+  }
+  setOnlineGameCardSizeAutoChange( value: boolean ) {
+    if ( !this.uid ) return Promise.resolve();
+    return this.database.user.set.onlineGame.cardSizeAutoChange( this.uid, value );
+  }
+  setOnlineGameCardSizeRatio( value: number ) {
+    if ( !this.uid ) return Promise.resolve();
+    return this.database.user.set.onlineGame.cardSizeRatio( this.uid, value );
+  }
+  setOnlineGameMessageSpeed( value: number ) {
+    if ( !this.uid ) return Promise.resolve();
+    return this.database.user.set.onlineGame.messageSpeed( this.uid, value );
   }
 }

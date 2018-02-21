@@ -20,8 +20,8 @@
 }
 
 .trashPile {
-  height : 160px;
-  width: 100px;
+  /* height : 160px;
+  width: 100px; */
   margin: 5px;
   background-image: url(/assets/img/trashArea.jpg);
   background-size: cover;
@@ -32,3 +32,8 @@
 .card-pile {
   margin: 2px;
 }
+/* .animation-test {
+  background-color: black;
+  width: 55px;
+  height: 85px;
+} */

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 
-import { Observable      } from 'rxjs/Observable';
+import { Observable } from 'rxjs/Observable';
 import { Subject         } from 'rxjs/Subject';
 import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/takeWhile';

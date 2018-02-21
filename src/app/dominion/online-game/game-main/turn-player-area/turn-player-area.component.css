@@ -25,3 +25,7 @@
 .HandCards {
   flex: 1;
 }
+
+.players-name {
+  padding: 5px;
+}

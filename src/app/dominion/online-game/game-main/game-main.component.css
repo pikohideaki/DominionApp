@@ -3,19 +3,28 @@
 }
 
 /********* side bar ***************/
-.sidebar {
-  height: calc(100vh - 64px);
+
+.sidebar,.game-result-bar {
   background-color: #B4B4B4;
   flex-basis: 48px;
   flex-grow: 0;
   display: flex;
   flex-direction: column;
 }
+.sidebar:not(.full-screen),.game-result-bar:not(.full-screen) {
+  height: var(--main-height-without-toolbar);
+}
+.sidebar.full-screen,.game-result-bar.full-screen {
+  height: var(--main-height);
+}
 
-.sidebar button {
+.sidebar-button {
   padding: 0;
   margin: 5px 0;
   min-width: 48px;
+}
+.sidebar-button.button-checked {
+  background-color: rgb(224, 224, 224);
 }
 
 .goToNextPhaseIcon {
@@ -24,10 +33,15 @@
 
 /********* side navi ***************/
 .sidenavContainer {
-  height: calc(100vh - 64px);
   background-color: #F3EBAA;
   flex-basis: 800px;
   flex-grow: 1;
+}
+.sidenavContainer:not(.full-screen) {
+  height: var(--main-height-without-toolbar);
+}
+.sidenavContainer.full-screen {
+  height: var(--main-height);
 }
 
 .sidenav {
@@ -37,7 +51,7 @@
 
 /*****************************************************/
 
-.shared-area_other-player-area {
+.shared-area_other-players-area {
   display: flex;
   flex-direction: row;
 }
@@ -49,20 +63,29 @@
   overflow-y: scroll;
 }
 
-.column {
-  height: calc(100vh - 64px);
+.right-side {
   flex-grow: 0;
   display: flex;
   flex-direction: column;
 }
-.my-area-wrapper,.message-area-wrapper {
+.right-side:not(.full-screen) {
+  height: var(--main-height-without-toolbar);
+}
+.right-side.full-screen {
+  height: var(--main-height);
+}
+
+.my-area-wrapper,.messageForMe-area-wrapper {
+  background-color: rgb(193, 193, 193);
+}
+.my-area-wrapper.is-my-turn,.messageForMe-area-wrapper.is-my-turn {
   background-color: rgb(216, 172, 12); /*rgb(234, 197, 61)  rgb(236, 197, 139); */
 }
 
-.message-area-wrapper {
+.messageForMe-area-wrapper {
   padding: 6px;
 }
-.message-area {
+.messageForMe-area {
   border-radius: 5px;
   height: 28px;
   width: 100%;
@@ -70,4 +93,20 @@
   padding: 3px 8px;
   color: black;
   font-family: sans-serif;
+}
+
+.black-cover {
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+
+.other-players-area {
+  max-width: 50%;
+}
+
+.dev-mode-box {
+  background-color: #8da1ff;
 }

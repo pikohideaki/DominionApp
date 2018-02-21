@@ -3,8 +3,11 @@
 }
 
 /*sidenav*/
-.sidenavContainer {
-  height: calc(100vh - 64px);
+.sidenavContainer:not(.full-screen) {
+  height: var(--main-height-without-toolbar);
+}
+.sidenavContainer.full-screen {
+  height: var(--main-height);
 }
 
 .sidenavMain {

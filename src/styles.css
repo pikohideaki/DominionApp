@@ -2,6 +2,12 @@
 
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+:root {
+  --toolbar-height: 64px;
+  --main-height: 100vh;
+  --main-height-without-toolbar: calc(100vh - var(--toolbar-height) );
+}
+
 * {
   font-family: "Helvetica","Arial",sans-serif;
   box-sizing: border-box;

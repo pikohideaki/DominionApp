@@ -7,7 +7,7 @@ import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';
 import { SelectedCards } from '../../../classes/selected-cards';
 import { GameRoom } from '../../../classes/game-room';
-import { GameCommunication } from '../../../classes/game-room-communication';
+import { GameCommunication, UserInput } from '../../../classes/game-room-communication';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
 import { ChatMessage } from '../../../classes/chat-message';
 import { TurnInfo } from '../../../classes/game-state';
@@ -38,7 +38,6 @@ export class AddGameGroupService {
     memo: string,
     selectCards: SelectedCards
   ) {
-
     const newRoom = new GameRoom();
     {
       newRoom.numberOfPlayers      = numberOfPlayers;
@@ -50,7 +49,7 @@ export class AddGameGroupService {
       newRoom.initDecks();
       newRoom.initialState.setNumberOfPlayers( numberOfPlayers );
       newRoom.initialState.turnInfo = new TurnInfo({
-            phase:  'StartOfTurn',
+            phase:  '',
             action: 1,
             buy:    1,
             coin:   0
@@ -59,6 +58,9 @@ export class AddGameGroupService {
 
     {
       const newComm = new GameCommunication();
+      newComm.thinkingState = this.utils.seq0( numberOfPlayers ).map( _ => false );
+      // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
+      newComm.userInputList.push( new UserInput( 'clicked goToNextPhase', 0 ) );
       const result = await this.database.onlineGameCommunication.add( newComm );
       newRoom.gameRoomCommunicationId = result.key;
     }

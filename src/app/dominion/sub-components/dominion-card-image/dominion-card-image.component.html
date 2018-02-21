@@ -16,20 +16,31 @@
   <ng-container *ngIf="data.empty; then emptyCard; else main"></ng-container>
   <ng-template #emptyCard>
     <div class="dominionCard" #emptyCard>
-      <img [src]="data.sourceDir" [width]="data.width" [height]="data.height">
+      <div>
+        <img [src]="data.sourceDir" [width]="data.width" [height]="data.height">
+      </div>
       <div *ngIf="description?.length > 0" class="description">{{description}}</div>
     </div>
   </ng-template>
   <ng-template #main>
-    <div class="dominionCard"
-        [class.faceUp]="data.faceUp"
-        [class.faceDown]="!data.faceUp"
-        [class.pointer]="data.isButton"
-        (click)="onClicked()">
-      <img [src]="data.sourceDir" [width]="data.width" [height]="data.height"
-          class="image-box box-shadow"
-          [style.border-width.px]="data.borderWidth"
-          [style.border-radius.px]="data.borderRadius">
+    <div class="dominionCard">
+      <div class="box-shadow"
+            [class.faceUp]="data.faceUp"
+            [class.faceDown]="!data.faceUp"
+            [class.pointer]="data.isButton"
+            [class.is-button]="data.isButton"
+            [style.width.px]="data.width"
+            [style.height.px]="data.height"
+            [style.border-width.px]="data.borderWidth"
+            [style.border-radius.px]="data.borderRadius"
+            (click)="onClicked()">
+        <img class="image-box"
+            [src]="data.sourceDir"
+            [width]="data.width"
+            [height]="data.height"
+            [style.border-width.px]="data.borderWidth"
+            [style.border-radius.px]="data.borderRadius">
+      </div>
       <div *ngIf="description?.length > 0" class="description">{{description}}</div>
     </div>
   </ng-template>

@@ -254,9 +254,7 @@ export class UtilitiesService {
   }
 
   permutation( n: number ): number[] {
-    const ar = new Array<number>(n);
-    for ( let i = 0; i < n; ++i ) { ar[i] = i; }
-    return this.getShuffled( ar );
+    return this.getShuffled( this.seq0(n) );
   }
 
 

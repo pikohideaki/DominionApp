@@ -5,7 +5,12 @@
   align-items: center;
 }
 
-.bodyWithoutHeader {
-  height: calc(100vh - 64px);  /* subtract header height */
+.body{
   width: 100vw;
+}
+.body:not(.full-screen) {
+  height: var(--main-height-without-toolbar);  /* subtract header height */
+}
+.body.full-screen {
+  height: var(--main-height);  /* subtract header height */
 }

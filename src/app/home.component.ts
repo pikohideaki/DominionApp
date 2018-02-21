@@ -1,4 +1,4 @@
-import { Component, OnInit, isDevMode } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { MyUserInfoService } from './firebase-mediator/my-user-info.service';
@@ -26,28 +26,27 @@ export class HomeComponent implements OnInit {
   constructor(
     private myUserInfo: MyUserInfoService
   ) {
-    console.log('Online Game page is hidden');
     this.apps$ = this.myUserInfo.signedIn$.map( signedIn => [
         {
           routerLink: '/online-game',
-          inService:  signedIn && isDevMode(),
+          inService:  signedIn,
           title:      'Online Game',
           subtitle:   'Dominion オンライン対戦',
-          description: ( signedIn ? '' : '（※要ログイン）'),
+          description: `※Chrome推奨${( signedIn ? '' : '、要ログイン')}`,
         },
         {
           routerLink: '/online-randomizer',
           inService:  signedIn,
           title:      'Randomizer Online',
           subtitle:   'サプライ生成＆ゲーム結果追加（グループ同期機能付き）',
-          description: ( signedIn ? '' : '（※要ログイン）'),
+          description: `※Chrome推奨${( signedIn ? '' : '、要ログイン')}`,
         },
         {
           routerLink: '/game-result',
           inService: signedIn,
           title: 'Game Result List',
           subtitle: '成績表',
-          description: ( signedIn ? '' : '（※要ログイン）'),
+          description: ( signedIn ? '' : '※要ログイン'),
         },
         { routerLink: '/cardlist' , inService: true, title: 'Card List', subtitle: 'カード一覧表', },
         { routerLink: '/rulebooks', inService: true, title: 'RuleBooks', subtitle: 'Dominionのルールブック(PDF)', },

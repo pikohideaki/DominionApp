@@ -2,7 +2,8 @@
       uid:                uid$                          | async,
       myName:             myName$                       | async,
       myNameYomi:         myNameYomi$                   | async,
-      groupListWithUsers: randomizerGroupListWithUsers$ | async
+      groupListWithUsers: randomizerGroupListWithUsers$ | async,
+      isFullscreen:       isFullscreen$                 | async
     } as data">
 
   <button mat-button color="primary" id="closeSideNavBtn" (click)="closeSideNav()">
@@ -10,7 +11,9 @@
   </button>
   <div class="clear"></div>
 
-  <div class="body-with-padding sideBarBody" (click)="backgroundClicked()">
+  <div class="body-with-padding sideBarBody"
+      [class.full-screen]="data.isFullscreen"
+      (click)="backgroundClicked()">
     <div id="addGroup">
       <mat-form-field>
         <input matInput
