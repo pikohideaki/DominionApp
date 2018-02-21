@@ -23,7 +23,6 @@ import { GameConfigDialogComponent } from './game-config/game-config.component';
 import { OnlineGameResultDialogComponent } from './online-game-result-dialog/online-game-result-dialog.component';
 import { Router } from '@angular/router';
 import { ConfirmDialogComponent } from '../../../my-own-library/confirm-dialog.component';
-import { FullScreenService } from '../../../my-own-library/full-screen.service';
 import { UserInput } from '../../../classes/game-room-communication';
 import { Subscription } from 'rxjs/Subscription';
 
@@ -58,7 +57,6 @@ export class GameMainComponent implements OnInit, OnDestroy {
   chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
   autoScroll: boolean = true;
   cardSizeRatio$ = this.myUserInfo.onlineGame.cardSizeRatio$;
-  isFullscreen$ = this.fullscreen.isFullscreen$;
 
   private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
   initialStateIsReady$
@@ -99,7 +97,6 @@ export class GameMainComponent implements OnInit, OnDestroy {
     private gameMessage: GameMessageService,
     private transitStateService: TransitStateService,
     private router: Router,
-    private fullscreen: FullScreenService,
     private config: GameConfigService,
     private submitGameResultService: SubmitGameResultService,
   ) {

@@ -10,11 +10,8 @@
   cursor: pointer;
 }
 
-.sideBarBody:not(.full-screen) {
+.sideBarBody {
   height: calc(var(--main-height-without-toolbar) - 40px);
-}
-.sideBarBody.full-screen {
-  height: calc(var(--main-height) - 40px);
 }
 
 #closeSideNavBtn {

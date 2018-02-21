@@ -10,12 +10,7 @@
   flex-grow: 0;
   display: flex;
   flex-direction: column;
-}
-.sidebar:not(.full-screen),.game-result-bar:not(.full-screen) {
   height: var(--main-height-without-toolbar);
-}
-.sidebar.full-screen,.game-result-bar.full-screen {
-  height: var(--main-height);
 }
 
 .sidebar-button {
@@ -36,12 +31,7 @@
   background-color: #F3EBAA;
   flex-basis: 800px;
   flex-grow: 1;
-}
-.sidenavContainer:not(.full-screen) {
   height: var(--main-height-without-toolbar);
-}
-.sidenavContainer.full-screen {
-  height: var(--main-height);
 }
 
 .sidenav {
@@ -67,12 +57,7 @@
   flex-grow: 0;
   display: flex;
   flex-direction: column;
-}
-.right-side:not(.full-screen) {
   height: var(--main-height-without-toolbar);
-}
-.right-side.full-screen {
-  height: var(--main-height);
 }
 
 .my-area-wrapper,.messageForMe-area-wrapper {

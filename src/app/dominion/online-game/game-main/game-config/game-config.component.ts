@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import * as screenfull from 'screenfull';
 
 import { GameConfigService } from '../game-config.service';
 import { TransitStateService } from '../game-state-services/transit-state.service';
@@ -22,17 +21,12 @@ export class GameConfigDialogComponent implements OnInit {
   resetGameKeyword: number = Date.now() % 10000;
   input: number = 0;
 
-  fullScreenState: string = 'OFF';
-
 
   constructor(
     private config: GameConfigService
   ) { }
 
   ngOnInit() {
-    screenfull.onchange( () =>
-      this.fullScreenState = (screenfull.isFullscreen ? 'ON' : 'OFF' ) );
-
   }
 
   inputStringOnChange( value: number ) {

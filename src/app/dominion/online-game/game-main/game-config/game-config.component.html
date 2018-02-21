@@ -15,11 +15,11 @@
   </div>
 
   <div mat-dialog-content class="content">
-    <div class="box">
+    <!-- <div class="box">
       <mat-checkbox appToggleFullscreen [value]="fullScreenState">
         フルスクリーン
       </mat-checkbox>
-    </div>
+    </div> -->
 
     <app-card-image-size-slider
       [default]="100"
@@ -50,15 +50,6 @@
       ：{{data.messageSpeed}}倍速
       <button mat-raised-button (click)="resetMessageSpeed()">reset</button>
     </div>
-
-    <!-- <div class="box">
-      <mat-checkbox
-          [value]="(devMode$ | async)"
-          (change)="devModeChecked( $event.checked )">
-        開発モード
-      </mat-checkbox>
-    </div> -->
-
 
     <div class="box">
       <p>ゲームを初期状態に戻すには、

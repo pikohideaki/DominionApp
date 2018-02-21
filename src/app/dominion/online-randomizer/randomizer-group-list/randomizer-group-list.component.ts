@@ -15,7 +15,6 @@ import { RandomizerGroup       } from '../../../classes/randomizer-group';
 import { User                  } from '../../../classes/user';
 import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-values';
 import { BlackMarketPhase      } from '../../../classes/black-market-phase.enum';
-import { FullScreenService } from '../../../my-own-library/full-screen.service';
 
 
 @Component({
@@ -48,16 +47,13 @@ export class RandomizerGroupListComponent implements OnInit {
   showWrongPasswordAlert = false;
   selectedGroupId = '';
 
-  isFullscreen$ = this.fullscreen.isFullscreen$;
-
 
   constructor(
     public snackBar: MatSnackBar,
     private utils: UtilitiesService,
     private myUserInfo: MyUserInfoService,
     private database: CloudFirestoreMediatorService,
-    private myRandomizerGroup: MyRandomizerGroupService,
-    private fullscreen: FullScreenService
+    private myRandomizerGroup: MyRandomizerGroupService
   ) {
   }
 

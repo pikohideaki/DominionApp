@@ -17,8 +17,6 @@ import { ItemsPerPageComponent } from './data-table/items-per-page.component';
 import { PagenationComponent   } from './data-table/pagenation/pagenation.component';
 import { DataTableComponent   } from './data-table/data-table.component';
 import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-date-picker.component';
-import { ToggleFullscreenDirective } from './toggle-fullscreen.directive';
-import { FullScreenService } from './full-screen.service';
 
 
 @NgModule({
@@ -37,7 +35,6 @@ import { FullScreenService } from './full-screen.service';
     ItemsPerPageComponent,
     PagenationComponent,
     MultipleDatePickerComponent,
-    ToggleFullscreenDirective,
   ],
   declarations: [
     MessageDialogComponent,
@@ -49,11 +46,9 @@ import { FullScreenService } from './full-screen.service';
     ItemsPerPageComponent,
     PagenationComponent,
     MultipleDatePickerComponent,
-    ToggleFullscreenDirective,
   ],
   providers: [
     UtilitiesService,
-    FullScreenService,
   ],
   entryComponents: [
     MessageDialogComponent,

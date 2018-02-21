@@ -3,11 +3,8 @@
 }
 
 /*sidenav*/
-.sidenavContainer:not(.full-screen) {
+.sidenavContainer {
   height: var(--main-height-without-toolbar);
-}
-.sidenavContainer.full-screen {
-  height: var(--main-height);
 }
 
 .sidenavMain {

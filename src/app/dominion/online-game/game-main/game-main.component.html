@@ -7,12 +7,11 @@
       cardSizeRatio:       cardSizeRatio$       | async,
       gameIsOver:          gameIsOver$          | async,
       isBuyPlayPhase:      isBuyPlayPhase$      | async,
-      isFullscreen:        isFullscreen$        | async,
       myThinkingState:     myThinkingState$     | async,
       devMode:             devMode$             | async
     } as data">
   <div class="body">
-    <div class="sidebar" [class.full-screen]="data.isFullscreen">
+    <div class="sidebar">
       <button mat-button class="sidebar-button"
           matTooltip="チャットを表示／非表示" matTooltipPosition="after"
           (click)="toggleSideNav( sidenav )" >
@@ -102,14 +101,14 @@
       </ng-container>
     </div>
 
-    <mat-sidenav-container class="sidenavContainer" [class.full-screen]="data.isFullscreen">
+    <mat-sidenav-container class="sidenavContainer">
       <mat-sidenav #sidenav class="sidenav" mode="side" disableClose="true"
             [opened]="data.chatOpened" >
         <app-chat [autoScroll]="autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
       <div *ngIf="!data.initialStateIsReady" class="black-cover"></div>
-      <div class="right-side" [class.full-screen]="data.isFullscreen">
+      <div class="right-side">
         <div class="upper-part">
           <div class="shared-area_other-players-area">
             <app-shared-area class="shared-area"
@@ -147,8 +146,7 @@
       </div>
     </mat-sidenav-container>
 
-    <div *ngIf="data.gameIsOver" class="game-result-bar"
-        [class.full-screen]="data.isFullscreen">
+    <div *ngIf="data.gameIsOver" class="game-result-bar">
       <button mat-button class="sidebar-button"
           matTooltip="ゲーム結果" matTooltipPosition="before"
           (click)="showGameResultDialog()" >
