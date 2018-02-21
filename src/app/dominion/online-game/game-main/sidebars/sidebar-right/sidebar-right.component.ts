@@ -1,0 +1,56 @@
+import { Component, OnInit, Input } from '@angular/core';
+import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material';
+
+import { Observable } from 'rxjs/Observable';
+
+import { GameResult } from '../../../../../classes/game-result';
+
+import { ConfirmDialogComponent } from '../../../../../my-own-library/confirm-dialog.component';
+import { OnlineGameResultDialogComponent } from '../../dialogs/online-game-result-dialog/online-game-result-dialog.component';
+import { OnlineGamePlayerCardsDialogComponent } from '../../dialogs/online-game-result-player-cards-dialog/online-game-result-player-cards-dialog.component';
+import { GameStateService } from '../../services/game-state-services/game-state.service';
+import { MyGameRoomService } from '../../services/my-game-room.service';
+
+
+@Component({
+  selector: 'app-sidebar-right',
+  templateUrl: './sidebar-right.component.html',
+  styleUrls: ['./sidebar-right.component.css']
+})
+export class SideBarRightComponent implements OnInit {
+
+  @Input() gameResult$: Observable<GameResult>;
+
+
+  constructor(
+    private dialog: MatDialog,
+    private gameStateService: GameStateService,
+    private myGameRoomService: MyGameRoomService,
+    private router: Router
+  ) { }
+
+  ngOnInit() {
+  }
+
+
+  showGameResultDialog() {
+    const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
+    dialogRef.componentInstance.gameResult$ = this.gameResult$;
+  }
+
+  showPlayerCards() {
+    const dialogRef = this.dialog.open( OnlineGamePlayerCardsDialogComponent );
+    dialogRef.componentInstance.allPlayersCards$ = this.gameStateService.allPlayersCards$;
+    dialogRef.componentInstance.playersName$ = this.myGameRoomService.playersNameShuffled$;
+  }
+
+  exit() {
+    const dialogRef = this.dialog.open( ConfirmDialogComponent );
+    dialogRef.componentInstance.message
+      = '退室しますか？（退室しても新しいゲームを始めるまではこの画面に戻ることができます。）';
+    dialogRef.afterClosed().subscribe( yn => {
+      if ( yn === 'yes' ) this.router.navigate( ['/online-game'] );
+    });
+  }
+}

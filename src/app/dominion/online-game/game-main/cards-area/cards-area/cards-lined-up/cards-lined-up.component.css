@@ -1,0 +1,8 @@
+.card-images-lined-up {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.card-image-in-line {
+  padding: 0 4px 2px 0;
+}

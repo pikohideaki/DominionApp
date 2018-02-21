@@ -1,0 +1,60 @@
+<ng-container *ngIf="{
+    Aside:            myCards.Aside$    | async,
+    PlayArea:         myCards.PlayArea$ | async,
+    showCardProperty: showCardProperty$ | async,
+    isMyTurn:         isMyTurn$         | async
+  } as data">
+
+<div class="body">
+  <div class="PlayArea_Aside">
+    <div *ngIf="data.isMyTurn || data.PlayArea?.length > 0"
+        class="card-area box-shadow PlayArea"
+        [class.is-my-turn]="data.isMyTurn">
+      <app-cards-lined-up
+        [showCardProperty]="data.showCardProperty"
+        [DCardArray$]="myCards.PlayArea$"
+        [width]="70 * cardSizeRatio"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+    <div *ngIf="data.isMyTurn || data.Aside?.length > 0"
+        class="card-area box-shadow Aside"
+        [class.is-my-turn]="data.isMyTurn">
+      <app-cards-lined-up
+        [showCardProperty]="data.showCardProperty"
+        [DCardArray$]="myCards.Aside$"
+        [width]="70 * cardSizeRatio"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+  </div>
+
+  <div class="Deck_HandCards_DiscardPile">
+    <div class="card-area box-shadow Deck" [class.is-my-turn]="data.isMyTurn">
+      <app-cards-pile
+        [displaySize]="true"
+        [DCardArray$]="myCards.Deck$"
+        [width]="70 * cardSizeRatio"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+    <div class="card-area box-shadow HandCards" [class.is-my-turn]="data.isMyTurn">
+      <app-cards-lined-up
+        [defaultArrayLength]="5"
+        [showCardProperty]="data.showCardProperty"
+        [DCardArray$]="myCards.HandCards$"
+        [width]="70 * cardSizeRatio"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-lined-up>
+    </div>
+    <div class="card-area box-shadow DiscardPile" [class.is-my-turn]="data.isMyTurn">
+      <app-cards-pile
+        [displaySize]="false"
+        [DCardArray$]="myCards.DiscardPileReveresed$"
+        [width]="70 * cardSizeRatio"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
+    </div>
+  </div>
+</div>
+</ng-container>

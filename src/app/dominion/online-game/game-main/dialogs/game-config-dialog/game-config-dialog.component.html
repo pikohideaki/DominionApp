@@ -1,0 +1,86 @@
+<ng-container *ngIf="{
+      devMode:            devMode$            | async,
+      messageSpeed:       messageSpeed$       | async,
+      cardSizeRatio:      cardSizeRatio$      | async,
+      cardSizeAutoChange: cardSizeAutoChange$ | async
+    } as data">
+
+
+  <div mat-dialog-title class="title-bar">
+    <span>設定</span>
+    <span class="spacer"></span>
+    <button mat-icon-button (click)="toggleDevMode( data.devMode )">
+      <mat-icon>developer_mode</mat-icon>
+    </button>
+  </div>
+
+  <div mat-dialog-content class="content">
+    <!-- <div class="box">
+      <mat-checkbox appToggleFullscreen [value]="fullScreenState">
+        フルスクリーン
+      </mat-checkbox>
+    </div> -->
+
+    <app-card-image-size-slider
+        [default]="100"
+        [max]="150"
+        [min]="50"
+        [value]="data.cardSizeRatio * 100"
+        (valueChange)="setCardSizeRatio( $event )" >
+      <span>：{{data.cardSizeRatio}}倍</span>
+    </app-card-image-size-slider>
+
+    <div class="box">
+      <mat-checkbox
+          [value]="data.cardSizeAutoChange"
+          (change)="cardSizeAutoChangeChecked( $event.checked )">
+        カードサイズ自動変更
+      </mat-checkbox>
+    </div>
+
+    <div class="box">
+      メッセージ表示速度
+      <mat-slider
+          [min]="30"
+          [max]="300"
+          [value]="data.messageSpeed * 100"
+          [step]="10"
+          (input)="setMessageSpeed( $event.value )">
+      </mat-slider>
+      <span>：{{data.messageSpeed}}倍速</span>
+      <button mat-raised-button (click)="resetMessageSpeed()">reset</button>
+    </div>
+
+    <div class="box">
+      <p>ゲームを初期状態に戻すには、
+        下の数字を入力した後「ゲームをリセット」を押してください。
+      </p>
+      <p>ゲームを強制終了して結果画面に移るには、
+        下の数字を入力した後「ゲームを強制終了」を押してください。
+      </p>
+      <div class="center">
+        <span class="reset-game-password">{{resetGameKeyword}}</span>
+        <mat-input-container class="new-message-input-box">
+          <input matInput
+              type="number"
+              (input)="inputStringOnChange( $event.target.valueAsNumber )"
+              placeholder="数字を入力">
+        </mat-input-container>
+      </div>
+    </div>
+  </div>
+
+  <div mat-dialog-actions class="center">
+    <button mat-raised-button mat-dialog-close="yes" color='primary'>
+      OK
+    </button>
+    <button mat-raised-button mat-dialog-close="resetGame" color='warn'
+        [disabled]="resetGameKeyword !== input">
+      ゲームをリセット
+    </button>
+    <button mat-raised-button mat-dialog-close="terminateGame" color='warn'
+        [disabled]="resetGameKeyword !== input">
+      ゲームを強制終了
+    </button>
+  </div>
+</ng-container>

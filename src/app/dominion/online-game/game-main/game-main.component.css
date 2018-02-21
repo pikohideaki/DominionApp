@@ -1,83 +1,11 @@
+:root {
+  --sidebar-width: 48px;
+}
+
+
 .body {
   display: flex;
-}
-
-/********* side bar ***************/
-
-.sidebar,.game-result-bar {
-  background-color: #B4B4B4;
-  flex-basis: 48px;
-  flex-grow: 0;
-  display: flex;
-  flex-direction: column;
   height: var(--main-height-without-toolbar);
-}
-
-.sidebar-button {
-  padding: 0;
-  margin: 5px 0;
-  min-width: 48px;
-}
-.sidebar-button.button-checked {
-  background-color: rgb(224, 224, 224);
-}
-
-.goToNextPhaseIcon {
-  transform: rotate( -90deg );
-}
-
-/********* side navi ***************/
-.sidenavContainer {
-  background-color: #F3EBAA;
-  flex-basis: 800px;
-  flex-grow: 1;
-  height: var(--main-height-without-toolbar);
-}
-
-.sidenav {
-  max-width: 400px;
-}
-
-
-/*****************************************************/
-
-.shared-area_other-players-area {
-  display: flex;
-  flex-direction: row;
-}
-.shared-area {
-  flex: 1;
-}
-
-.upper-part {
-  overflow-y: scroll;
-}
-
-.right-side {
-  flex-grow: 0;
-  display: flex;
-  flex-direction: column;
-  height: var(--main-height-without-toolbar);
-}
-
-.my-area-wrapper,.messageForMe-area-wrapper {
-  background-color: rgb(193, 193, 193);
-}
-.my-area-wrapper.is-my-turn,.messageForMe-area-wrapper.is-my-turn {
-  background-color: rgb(216, 172, 12); /*rgb(234, 197, 61)  rgb(236, 197, 139); */
-}
-
-.messageForMe-area-wrapper {
-  padding: 6px;
-}
-.messageForMe-area {
-  border-radius: 5px;
-  height: 28px;
-  width: 100%;
-  background-color: white;
-  padding: 3px 8px;
-  color: black;
-  font-family: sans-serif;
 }
 
 .black-cover {
@@ -87,11 +15,83 @@
   background-color: rgba(0, 0, 0, 0.5);
 }
 
-
-.other-players-area {
-  max-width: 50%;
+/********* side bar ***************/
+.sidebar,.game-result-bar {
+  flex-basis: 48px;
+  flex-grow: 0;
 }
 
-.dev-mode-box {
-  background-color: #8da1ff;
+/********* side navi ***************/
+.sidenavContainer {
+  background-color: #F3EBAA;
+  flex-basis: 800px;
+  flex-grow: 1;
+  height: 100%;
+
+}
+
+
+/*****************************************************/
+
+.main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: calc( 100vw - 2 * var(--sidebar-width) );
+}
+
+.main .upper-part {
+  overflow-y: auto;
+}
+
+.main
+  .upper-part
+  .shared-area_other-players-area {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.main
+  .upper-part
+  .shared-area_other-players-area
+  .shared-area {
+  flex: 1;
+  flex-basis: 400px;
+}
+
+.main
+  .upper-part
+  .shared-area_other-players-area
+  .other-players-area {
+  flex-basis: 360px;
+}
+
+
+
+/* .main .my-card-area {
+  overflow-y: auto;
+  max-height: 50%;
+} */
+
+.main .my-area {
+  background-color: rgb(193, 193, 193);
+}
+.main .my-area.is-my-turn {
+  background-color: rgb(216, 172, 12); /*rgb(234, 197, 61)  rgb(236, 197, 139); */
+}
+
+.main .messageForMe-area-wrapper {
+  padding: 6px;
+}
+
+.main
+  .messageForMe-area-wrapper
+  .messageForMe-area {
+  border-radius: 5px;
+  height: 28px;
+  width: 100%;
+  background-color: white;
+  padding: 3px 8px;
+  color: black;
+  font-family: sans-serif;
 }

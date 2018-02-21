@@ -4,6 +4,8 @@
   top: 0;
   left: 0;
   z-index: 100;
+}
+.header-height {
   height: var(--toolbar-height);
 }
 

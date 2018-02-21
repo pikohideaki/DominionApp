@@ -3,36 +3,26 @@ import { MatDialog } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
+import { Subscription } from 'rxjs/Subscription';
 
-import { CardProperty } from '../../../classes/card-property';
-import { DCard, GameState, PlayerCards } from '../../../classes/game-state';
+import { DCard } from '../../../classes/game-state';
+
+import { MessageDialogComponent } from '../../../my-own-library/message-dialog.component';
+import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
 
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyGameRoomService } from './my-game-room.service';
-import { GameRoomCommunicationService } from './game-room-communication.service';
-import { GameMessageService } from './game-message.service';
-
-// game-state-services
-import { GameStateService         } from './game-state-services/game-state.service';
-import { GameStateShortcutService } from './game-state-services/game-state-shortcut.service';
-import { GameLoopService          } from './game-state-services/game-loop.service';
-import { TransitStateService      } from './game-state-services/transit-state.service';
-
-import { GameConfigDialogComponent } from './game-config/game-config.component';
-import { OnlineGameResultDialogComponent } from './online-game-result-dialog/online-game-result-dialog.component';
-import { Router } from '@angular/router';
-import { ConfirmDialogComponent } from '../../../my-own-library/confirm-dialog.component';
-import { UserInput } from '../../../classes/game-room-communication';
-import { Subscription } from 'rxjs/Subscription';
-
-import { MessageDialogComponent } from '../../../my-own-library/message-dialog.component';
-import { OnlineGamePlayerCardsDialogComponent } from './online-game-result-player-cards/online-game-result-player-cards.component';
-
+import { MyGameRoomService } from './services/my-game-room.service';
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
-import { GameConfigService } from './game-config.service';
 import { VictoryPointsCalculatorService } from '../../sub-components/victory-points-calculator/victory-points-calculator.service';
-import { SubmitGameResultService } from './submit-game-result.service';
+
+import { GameRoomCommunicationService } from './services/game-room-communication.service';
+import { GameMessageService           } from './services/game-message.service';
+import { SubmitGameResultService      } from './services/submit-game-result.service';
+import { GameStateService             } from './services/game-state-services/game-state.service';
+import { GameStateShortcutService     } from './services/game-state-services/game-state-shortcut.service';
+import { GameLoopService              } from './services/game-state-services/game-loop.service';
+import { TransitStateService          } from './services/game-state-services/transit-state.service';
 
 
 @Component({
@@ -54,24 +44,29 @@ import { SubmitGameResultService } from './submit-game-result.service';
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive = true;
 
-  chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
-  autoScroll: boolean = true;
-  cardSizeRatio$ = this.myUserInfo.onlineGame.cardSizeRatio$;
+  messageForMe$       = this.gameMessage.messageForMe$;
+  myIndex$            = this.myGameRoomService.myIndex$;
+  isMyTurn$           = this.gameStateService.isMyTurn$;
+  gameIsOver$         = this.gameStateService.gameIsOver$;
+  gameResult$ = this.submitGameResultService.gameResult$;
 
   private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
   initialStateIsReady$
     = this.initialStateIsReadySource.asObservable().distinctUntilChanged();
 
-  myIndex$ = this.myGameRoomService.myIndex$;
-  isMyTurn$ = this.gameStateService.isMyTurn$;
-  messageForMe$ = this.gameMessage.messageForMe$;
-  gameIsOver$ = this.gameStateService.gameIsOver$;
-  isBuyPlayPhase$ = this.gameStateService.phase$.map( e => e === 'BuyPlay' );
+  private userInputSubscription: Subscription;
 
+  // view config
+  chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
+  cardSizeRatio$ = this.myUserInfo.onlineGame.cardSizeRatio$;
   private showCardPropertySource = new BehaviorSubject<boolean>(false);
   showCardProperty$ = this.showCardPropertySource.asObservable();
 
-  private userInputSubscription: Subscription;
+  // left sidebar
+  private autoScrollSource = new BehaviorSubject<boolean>(true);
+  autoScroll$ = this.autoScrollSource.asObservable();
+
+  isBuyPlayPhase$ = this.gameStateService.phase$.map( e => e === 'BuyPlay' );
 
   myThinkingState$
     = Observable.combineLatest(
@@ -79,12 +74,9 @@ export class GameMainComponent implements OnInit, OnDestroy {
           this.myIndex$,
           (list, myIndex) => list[ myIndex ] );
 
-  private gameResult$
-    = this.submitGameResultService.gameResult$;
+  private logSnapshotSource = new BehaviorSubject<void>(null);  // debug
 
-  // debug
-  private logSnapshotSource = new BehaviorSubject<void>(null);
-  devMode$ = this.config.devMode$;
+
 
 
   constructor(
@@ -96,8 +88,6 @@ export class GameMainComponent implements OnInit, OnDestroy {
     private gameRoomCommunication: GameRoomCommunicationService,
     private gameMessage: GameMessageService,
     private transitStateService: TransitStateService,
-    private router: Router,
-    private config: GameConfigService,
     private submitGameResultService: SubmitGameResultService,
   ) {
     this.startProcessing();
@@ -146,9 +136,15 @@ export class GameMainComponent implements OnInit, OnDestroy {
         .withLatestFrom(
             this.myGameRoomService.myIndex$,
             this.gameStateService.turnPlayerIndex$,
-            this.gameStateService.gameState$,
-            this.initialStateIsReady$ )
-      .subscribe( ([_, ...data]) => console.log(...data) );
+            this.initialStateIsReady$,
+            this.gameStateService.gameState$ )
+      .subscribe( ([_, myIndex, turnPlayerIndex, initialStateIsReady, gameState]) =>
+          console.log(
+              `myIndex = ${myIndex}`,
+              `turnPlayerIndex = ${turnPlayerIndex}`,
+              `initialStateIsReady = ${initialStateIsReady}`,
+              gameState
+            ) );
   }
 
   ngOnInit() {
@@ -180,32 +176,27 @@ export class GameMainComponent implements OnInit, OnDestroy {
   }
 
 
-
-  // dialogs
-  private async showChangeTurnDialog( name: string ) {
-    const dialogRef = this.dialog.open( MessageDialogComponent );
-    dialogRef.componentInstance.message = `${name}のターン`;
-    await this.utils.sleep(1);
-    dialogRef.close();
-  }
-
-
- // left side-bar
+ // left sidebar
   async toggleSideNav( sidenav ) {
     this.myUserInfo.setOnlineGameChatOpened( (await sidenav.toggle()).type === 'open' );
   }
 
-  toggleAutoScroll( value: boolean ) {
-    this.autoScroll = value;
+  autoScrollChange( value: boolean ) {
+    this.autoScrollSource.next( value );
   }
 
   toggleShowCardPropertyButtons() {
     this.showCardPropertySource.next( !this.showCardPropertySource.getValue() );
   }
 
-  toggleMyThinkingState( currentState: boolean, myIndex: number ) {
-    this.gameRoomCommunication.setThinkingState( myIndex, !currentState );
+  logSnapshot() {  // developer mode only
+    this.logSnapshotSource.next(null);
   }
+
+  initialStateIsReadyChange( value: boolean ) {
+    this.initialStateIsReadySource.next( value );
+  }
+
 
 
   // ゲーム操作
@@ -213,132 +204,16 @@ export class GameMainComponent implements OnInit, OnDestroy {
     this.gameRoomCommunication.sendUserInput('clicked card', myIndex, dcard.id );
   }
 
-  goToNextPhase( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', myIndex );
+  private async showChangeTurnDialog( name: string ) {
+    const dialogRef = this.dialog.open( MessageDialogComponent );
+    dialogRef.componentInstance.message = `${name}のターン`;
+    await this.utils.sleep(1);
+    dialogRef.close();
   }
 
-  finishMyTurn( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked finishMyTurn', myIndex );
-  }
-
-  sortMyHandCards( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked sortHandcards', myIndex );
-  }
-
-  playAllTreasures( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('play all treasures', myIndex );
-  }
-
-
-  // 設定
-  async settings() {
-    const dialogRef = this.dialog.open( GameConfigDialogComponent );
-    const result = await dialogRef.afterClosed().toPromise();
-    if ( result === 'terminateGame' ) {
-      this.gameRoomCommunication.setTerminatedState( true );
-    }
-    if ( result === 'resetGame' ) {
-      this.gameRoomCommunication.setTerminatedState( false );
-      this.initialStateIsReadySource.next( false );
-      await this.gameRoomCommunication.removeAllUserInput();
-      // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
-      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0 );
-    }
-  }
-
-
-  // right side-bar
   showGameResultDialog() {
     const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
     dialogRef.componentInstance.gameResult$ = this.gameResult$;
   }
 
-  showPlayerCards() {
-    const dialogRef = this.dialog.open( OnlineGamePlayerCardsDialogComponent );
-    dialogRef.componentInstance.allPlayersCards$ = this.gameStateService.allPlayersCards$;
-    dialogRef.componentInstance.playersName$ = this.myGameRoomService.playersNameShuffled$;
-  }
-
-  exit() {
-    const dialogRef = this.dialog.open( ConfirmDialogComponent );
-    dialogRef.componentInstance.message
-      = '退室しますか？（退室しても新しいゲームを始めるまではこの画面に戻ることができます。）';
-    dialogRef.afterClosed().subscribe( yn => {
-      if ( yn === 'yes' ) this.router.navigate( ['/online-game'] );
-    });
-  }
-
-
-
-  // developper moder
-  incrementTurnCounter( myIndex ) {
-    this.gameRoomCommunication.sendUserInput('increment turnCounter', myIndex );
-  }
-
-  logSnapshot() {
-    this.logSnapshotSource.next(null);
-  }
-
-  userInputLog() {
-    const dialogRef = this.dialog.open( UserInputLogDialogComponent );
-    dialogRef.componentInstance.gameState$
-      = this.gameStateService.gameState$;
-    dialogRef.componentInstance.playersNameShuffled$
-      = this.myGameRoomService.playersNameShuffled$;
-    dialogRef.componentInstance.userInputList$
-      = this.gameRoomCommunication.userInputList$;
-  }
-
-}
-
-
-
-@Component({
-  selector: 'app-user-input-log-dialog',
-  template: `
-    <div mat-dialog-title>
-      ログ
-    </div>
-    <div mat-dialog-content>
-      <div *ngIf="(userInputLog$ | async) as userInputLog">
-        <div *ngFor="let userInput of userInputLog">
-          {{userInput.playerName}},
-          "{{userInput.command}}",
-          {{userInput.clickedCardName}} (id = {{userInput.clickedCardId}});
-        </div>
-      </div>
-    </div>
-    <div mat-dialog-actions class="center">
-      <button mat-raised-button mat-dialog-close="" color='primary'>
-        OK
-      </button>
-    </div>
-  `,
-  styles: [` .center { justify-content: center; } `]
-})
-export class UserInputLogDialogComponent implements OnInit {
-  userInputList$: Observable<UserInput[]>;
-  playersNameShuffled$: Observable<string[]>;
-  gameState$: Observable<GameState>;
-
-  userInputLog$;
-
-  constructor(
-  ) { }
-
-  ngOnInit() {
-    this.userInputLog$
-      = Observable.combineLatest(
-            this.userInputList$,
-            this.playersNameShuffled$,
-            this.gameState$,
-            (userInputList, playerNames, gameState) =>
-              userInputList.map( userInput => ({
-                playerName:      playerNames[ userInput.data.playerId ],
-                command:         userInput.command,
-                clickedCardId:   userInput.data.clickedCardId,
-                clickedCardName: gameState.getDCard( userInput.data.clickedCardId ).cardProperty.nameJp,
-              }))
-          );
-  }
 }

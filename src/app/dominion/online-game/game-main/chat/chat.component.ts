@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { ChatMessage } from '../../../../classes/chat-message';
 import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
-import { GameRoomCommunicationService } from '../game-room-communication.service';
+import { GameRoomCommunicationService } from '../services/game-room-communication.service';
 
 
 @Component({

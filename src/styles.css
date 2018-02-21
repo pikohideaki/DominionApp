@@ -3,7 +3,7 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
 :root {
-  --toolbar-height: 64px;
+  --toolbar-height: 56px;
   --main-height: 100vh;
   --main-height-without-toolbar: calc(100vh - var(--toolbar-height) );
 }
