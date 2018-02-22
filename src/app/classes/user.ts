@@ -14,6 +14,8 @@ export class User {
     cardSizeAutoChange:   boolean,
     cardSizeRatio:        number,
     messageSpeed:         number,
+    autoSort:             boolean,
+    autoPlayAllTreasures: boolean,
   } = {
     isSelectedExpansions: [],
     numberOfPlayers:      2,
@@ -23,6 +25,8 @@ export class User {
     cardSizeAutoChange:   true,
     cardSizeRatio:        1,
     messageSpeed:         1,
+    autoSort:             true,
+    autoPlayAllTreasures: false,
   };
 
   constructor( databaseKey?: string, initObj?: {
@@ -38,6 +42,8 @@ export class User {
         cardSizeAutoChange:   boolean,
         cardSizeRatio:        number,
         messageSpeed:         number,
+        autoSort:             boolean,
+        autoPlayAllTreasures: boolean,
       }
   }) {
     this.databaseKey = ( databaseKey || '' );
@@ -55,5 +61,7 @@ export class User {
     this.onlineGame.cardSizeAutoChange   = !!initObj.onlineGame.cardSizeAutoChange;
     this.onlineGame.cardSizeRatio        = ( initObj.onlineGame.cardSizeRatio        || 1  );
     this.onlineGame.messageSpeed         = ( initObj.onlineGame.messageSpeed         || 1  );
+    this.onlineGame.autoSort             = !!initObj.onlineGame.autoSort;
+    this.onlineGame.autoPlayAllTreasures = !!initObj.onlineGame.autoPlayAllTreasures;
   }
 }

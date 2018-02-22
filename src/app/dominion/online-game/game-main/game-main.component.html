@@ -1,12 +1,14 @@
 <ng-container *ngIf="{
-      chatOpened:          chatOpened$          | async,
-      autoScroll:          autoScroll$          | async,
-      initialStateIsReady: initialStateIsReady$ | async,
-      cardSizeRatio:       cardSizeRatio$       | async,
-      myIndex:             myIndex$             | async,
-      isMyTurn:            isMyTurn$            | async,
-      messageForMe:        messageForMe$        | async,
-      gameIsOver:          gameIsOver$          | async
+      chatOpened:           chatOpened$           | async,
+      autoScroll:           autoScroll$           | async,
+      initialStateIsReady:  initialStateIsReady$  | async,
+      cardSizeRatio:        cardSizeRatio$        | async,
+      autoSort:             autoSort$             | async,
+      autoPlayAllTreasures: autoPlayAllTreasures$ | async,
+      myIndex:              myIndex$              | async,
+      isMyTurn:             isMyTurn$             | async,
+      messageForMe:         messageForMe$         | async,
+      gameIsOver:           gameIsOver$           | async
     } as data">
 
   <div class="body">
@@ -41,18 +43,30 @@
             <app-shared-area class="shared-area"
               [cardSizeRatio]="data.cardSizeRatio"
               [showCardProperty$]="showCardProperty$"
-              (cardClicked)="onCardClick( data.myIndex, $event )">
+              (cardClicked)="onCardClick(
+                                data.myIndex,
+                                $event,
+                                data.autoSort,
+                                data.autoPlayAllTreasures )">
             </app-shared-area>
             <app-other-players-area
               class="other-players-area"
               [cardSizeRatio]="data.cardSizeRatio"
-              (cardClicked)="onCardClick( data.myIndex, $event )">
+              (cardClicked)="onCardClick(
+                                data.myIndex,
+                                $event,
+                                data.autoSort,
+                                data.autoPlayAllTreasures )">
             </app-other-players-area>
           </div>
           <div *ngIf="!data.isMyTurn">
             <app-turn-player-area
               [cardSizeRatio]="data.cardSizeRatio"
-              (cardClicked)="onCardClick( data.myIndex, $event )">
+              (cardClicked)="onCardClick(
+                                data.myIndex,
+                                $event,
+                                data.autoSort,
+                                data.autoPlayAllTreasures )">
             </app-turn-player-area>
           </div>
         </div>
@@ -67,7 +81,11 @@
           <app-my-area
             [showCardProperty$]="showCardProperty$"
             [cardSizeRatio]="data.cardSizeRatio"
-            (cardClicked)="onCardClick( data.myIndex, $event )">
+            (cardClicked)="onCardClick(
+                              data.myIndex,
+                              $event,
+                              data.autoSort,
+                              data.autoPlayAllTreasures )">
           </app-my-area>
         </div>
       </div>

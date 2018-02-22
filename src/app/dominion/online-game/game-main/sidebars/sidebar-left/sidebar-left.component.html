@@ -1,12 +1,14 @@
 <ng-container *ngIf="{
-      myIndex:         myIndex$         | async,
-      isMyTurn:        isMyTurn$        | async,
-      gameIsOver:      gameIsOver$      | async,
-      chatOpened:      chatOpened$      | async,
-      isBuyPlayPhase:  isBuyPlayPhase$  | async,
-      myThinkingState: myThinkingState$ | async,
-      autoScroll:      autoScroll$      | async,
-      devMode:         devMode$         | async
+      myIndex:              myIndex$              | async,
+      isMyTurn:             isMyTurn$             | async,
+      gameIsOver:           gameIsOver$           | async,
+      chatOpened:           chatOpened$           | async,
+      isBuyPlayPhase:       isBuyPlayPhase$       | async,
+      myThinkingState:      myThinkingState$      | async,
+      autoScroll:           autoScroll$           | async,
+      devMode:              devMode$              | async,
+      autoSort:             autoSort$             | async,
+      autoPlayAllTreasures: autoPlayAllTreasures$ | async
     } as data">
 
 <div class="body">
@@ -45,12 +47,12 @@
     <ng-container *ngIf="data.isMyTurn && !data.gameIsOver">
       <button mat-button class="sidebar-button"
           matTooltip="次のフェーズへ" matTooltipPosition="after"
-          (click)="goToNextPhase( data.myIndex )" >
+          (click)="goToNextPhase( data.myIndex, data.autoSort, data.autoPlayAllTreasures )" >
         <mat-icon style="transform: rotate( -90deg )">file_download</mat-icon>
       </button>
       <button mat-button class="sidebar-button"
           matTooltip="手番を終了する" matTooltipPosition="after"
-          (click)="finishMyTurn( data.myIndex )" >
+          (click)="finishMyTurn( data.myIndex, data.autoSort )" >
         <mat-icon>forward</mat-icon>
       </button>
     </ng-container>
@@ -66,7 +68,7 @@
     <button *ngIf="!data.gameIsOver && data.isBuyPlayPhase && data.isMyTurn"
         mat-button class="sidebar-button"
         matTooltip="基本財宝カードをすべてプレイ" matTooltipPosition="after"
-        (click)="playAllTreasures( data.myIndex )" >
+        (click)="playAllTreasures( data.myIndex, data.autoSort )" >
       <mat-icon>present_to_all</mat-icon>
     </button>
 

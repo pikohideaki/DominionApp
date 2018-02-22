@@ -114,10 +114,17 @@ export class GameRoomCommunicationService {
   async sendUserInput(
     userInputCommand: UserInputCommand,
     playerId: number,
+    autoSort: boolean,
+    autoPlayAllTreasures: boolean,
     clickedCardId?: number
  ) {
     const communicationId = await this.communicationId$.toPromise();
-    const userInput = new UserInput( userInputCommand, playerId, clickedCardId );
+    const userInput = new UserInput(
+                            userInputCommand,
+                            playerId,
+                            autoSort,
+                            autoPlayAllTreasures,
+                            clickedCardId );
     await this.database.onlineGameCommunication
             .sendUserInput( communicationId, userInput );
   }

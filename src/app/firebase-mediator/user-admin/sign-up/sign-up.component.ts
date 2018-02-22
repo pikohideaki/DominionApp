@@ -84,6 +84,8 @@ export class SignUpComponent implements OnInit {
               cardSizeAutoChange:   true,
               cardSizeRatio:        1,
               messageSpeed:         1,
+              autoSort:             true,
+              autoPlayAllTreasures: true,
             }
           } ) );
 

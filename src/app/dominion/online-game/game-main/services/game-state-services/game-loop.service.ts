@@ -47,7 +47,7 @@ export class GameLoopService {
           turnInfo.action = 1;
           turnInfo.buy    = 1;
           turnInfo.coin   = 0;
-          turnInfo.phase = 'StartOfTurn';
+          turnInfo.phase  = 'StartOfTurn';
           break;
         }
 
@@ -72,6 +72,12 @@ export class GameLoopService {
 
         case 'BuyPlay': {
           printPhase('BuyPlay');
+          // 自動で財宝カードをプレイ
+          // if ( userInput.data.autoPlayAllTreasures ) {
+          //   await this.shortcut.playAllTreasures(
+          //       gameState, userInput.data.playerId, userInput.data.shuffleBy );
+          // }
+
           const treasureCards = turnPlayerCards.HandCards.filter( c =>
               c.cardProperty.cardTypes.includes('Treasure') );
 

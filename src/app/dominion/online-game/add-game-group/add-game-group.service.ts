@@ -60,7 +60,7 @@ export class AddGameGroupService {
       const newComm = new GameCommunication();
       newComm.thinkingState = this.utils.seq0( numberOfPlayers ).map( _ => false );
       // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
-      newComm.userInputList.push( new UserInput( 'clicked goToNextPhase', 0 ) );
+      newComm.userInputList.push( new UserInput( 'clicked goToNextPhase', 0, true, false ) );
       const result = await this.database.onlineGameCommunication.add( newComm );
       newRoom.gameRoomCommunicationId = result.key;
     }

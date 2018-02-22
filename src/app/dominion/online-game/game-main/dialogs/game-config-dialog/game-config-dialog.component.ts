@@ -13,10 +13,12 @@ import { GameStateService    } from '../../services/game-state-services/game-sta
 })
 export class GameConfigDialogComponent implements OnInit {
 
-  cardSizeAutoChange$ = this.config.cardSizeAutoChange$;
-  cardSizeRatio$      = this.config.cardSizeRatio$;
-  messageSpeed$       = this.config.messageSpeed$;
-  devMode$            = this.config.devMode$;
+  cardSizeAutoChange$   = this.config.cardSizeAutoChange$;
+  cardSizeRatio$        = this.config.cardSizeRatio$;
+  messageSpeed$         = this.config.messageSpeed$;
+  devMode$              = this.config.devMode$;
+  autoSort$             = this.config.autoSort$;
+  autoPlayAllTreasures$ = this.config.autoPlayAllTreasures$;
 
   resetGameKeyword: number = Date.now() % 10000;
   input: number = 0;
@@ -51,5 +53,13 @@ export class GameConfigDialogComponent implements OnInit {
 
   resetMessageSpeed() {
     this.config.setMessageSpeed( 1.0 );
+  }
+
+  setAutoSort( value: boolean ) {
+    this.config.setAutoSort( value );
+  }
+
+  setAutoPlayAllTreasures( value: boolean ) {
+    this.config.setAutoPlayAllTreasures( value );
   }
 }

@@ -33,7 +33,9 @@ export class SideBarLeftComponent implements OnInit {
   @Output() toggleSideNav                 = new EventEmitter<void>();
   @Output() initialStateIsReadyChange     = new EventEmitter<boolean>();
 
-  devMode$ = this.config.devMode$;
+  devMode$              = this.config.devMode$;
+  autoSort$             = this.config.autoSort$;
+  autoPlayAllTreasures$ = this.config.autoPlayAllTreasures$;
 
 
   constructor(
@@ -61,20 +63,24 @@ export class SideBarLeftComponent implements OnInit {
     this.gameRoomCommunication.setThinkingState( myIndex, !currentState );
   }
 
-  goToNextPhase( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', myIndex );
+  goToNextPhase( myIndex: number, autoSort: boolean, autoPlayAllTreasures: boolean ) {
+    this.gameRoomCommunication.sendUserInput(
+        'clicked goToNextPhase', myIndex, autoSort, autoPlayAllTreasures );
   }
 
-  finishMyTurn( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked finishMyTurn', myIndex );
+  finishMyTurn( myIndex: number, autoSort: boolean ) {
+    this.gameRoomCommunication.sendUserInput(
+        'clicked finishMyTurn', myIndex, autoSort, false );
   }
 
   sortMyHandCards( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('clicked sortHandcards', myIndex );
+    this.gameRoomCommunication.sendUserInput(
+        'clicked sortHandcards', myIndex, true, false );
   }
 
-  playAllTreasures( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput('play all treasures', myIndex );
+  playAllTreasures( myIndex: number, autoSort: boolean ) {
+    this.gameRoomCommunication.sendUserInput(
+        'play all treasures', myIndex, autoSort, false );
   }
 
   toggleShowCardPropertyButtonsClicked() {
@@ -91,8 +97,8 @@ export class SideBarLeftComponent implements OnInit {
       this.gameRoomCommunication.setTerminatedState( false );
       this.initialStateIsReadyChange.emit( false );
       await this.gameRoomCommunication.removeAllUserInput();
-      // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
-      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0 );
+      // 最初のプレイヤーは自動でgoToNextPhaseを1回発動
+      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0, true, false );
     }
   }
 
@@ -100,7 +106,7 @@ export class SideBarLeftComponent implements OnInit {
 
   // developer mode
   incrementTurnCounter( myIndex ) {
-    this.gameRoomCommunication.sendUserInput('increment turnCounter', myIndex );
+    this.gameRoomCommunication.sendUserInput('increment turnCounter', myIndex, true, false );
   }
 
   logSnapshotClicked() {

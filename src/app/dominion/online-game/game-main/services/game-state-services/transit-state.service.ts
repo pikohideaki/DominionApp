@@ -60,11 +60,12 @@ export class TransitStateService {
   async transitState(
     userInput: UserInput,
     currState: GameState,
-    Prosperity: boolean
+    Prosperity: boolean,
   ): Promise<void> {
     // 現在のゲーム状態をコピー
     const nextState = new GameState( this.utils.copyObject( currState ) );
     // console.log('transitState', nextState);
+    const pid = userInput.data.playerId;
 
     // コマンドの処理
     switch ( userInput.command ) {
@@ -78,7 +79,7 @@ export class TransitStateService {
         break;
 
       case 'clicked finishMyTurn':
-        await this.shortcut.cleanUp( nextState, userInput.data.playerId, userInput.data.shuffleBy );
+        await this.shortcut.cleanUp( nextState, pid, userInput.data.shuffleBy );
         if ( nextState.gameIsOverConditions( Prosperity ) ) {
           nextState.turnInfo.phase = 'GameIsOver';
         } else {
@@ -88,11 +89,11 @@ export class TransitStateService {
         break;
 
       case 'clicked sortHandcards':
-        this.shortcut.sortHandCards( nextState, userInput.data.playerId );
+        this.shortcut.sortHandCards( nextState, pid );
         break;
 
       case 'play all treasures':
-        await this.shortcut.playAllTreasures( nextState, userInput.data.playerId, userInput.data.shuffleBy );
+        await this.shortcut.playAllTreasures( nextState, pid, userInput.data.shuffleBy );
         break;
 
       case 'clicked card':
@@ -106,6 +107,11 @@ export class TransitStateService {
 
     // フェーズごとの処理
     await this.gameloop.phaseAction( nextState, userInput, Prosperity );
+
+    // 自動で手札をソート
+    if ( userInput.data.autoSort ) {
+      this.shortcut.sortHandCards( nextState, pid );
+    }
 
     this.gameState.setGameState( nextState );
     this.setNextGameState( nextState );

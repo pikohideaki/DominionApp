@@ -1,8 +1,10 @@
 <ng-container *ngIf="{
-      devMode:            devMode$            | async,
-      messageSpeed:       messageSpeed$       | async,
-      cardSizeRatio:      cardSizeRatio$      | async,
-      cardSizeAutoChange: cardSizeAutoChange$ | async
+      devMode:              devMode$              | async,
+      messageSpeed:         messageSpeed$         | async,
+      cardSizeRatio:        cardSizeRatio$        | async,
+      cardSizeAutoChange:   cardSizeAutoChange$   | async,
+      autoSort:             autoSort$             | async,
+      autoPlayAllTreasures: autoPlayAllTreasures$ | async
     } as data">
 
 
@@ -32,7 +34,7 @@
 
     <div class="box">
       <mat-checkbox
-          [value]="data.cardSizeAutoChange"
+          [checked]="data.cardSizeAutoChange"
           (change)="cardSizeAutoChangeChecked( $event.checked )">
         カードサイズ自動変更
       </mat-checkbox>
@@ -49,6 +51,23 @@
       </mat-slider>
       <span>：{{data.messageSpeed}}倍速</span>
       <button mat-raised-button (click)="resetMessageSpeed()">reset</button>
+    </div>
+
+    <div class="box">
+      <mat-checkbox
+          [checked]="data.autoSort"
+          (change)="setAutoSort( $event.checked )">
+        手札を自動でソート
+      </mat-checkbox>
+    </div>
+
+    <div class="box">
+      <mat-checkbox
+          [checked]="data.autoPlayAllTreasures"
+          (change)="setAutoPlayAllTreasures( $event.checked )"
+          [disabled]="true">
+        購入フェーズの初めに財宝カードを自動でプレイ
+      </mat-checkbox>
     </div>
 
     <div class="box">

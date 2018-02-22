@@ -44,11 +44,11 @@ import { TransitStateService          } from './services/game-state-services/tra
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive = true;
 
-  messageForMe$       = this.gameMessage.messageForMe$;
-  myIndex$            = this.myGameRoomService.myIndex$;
-  isMyTurn$           = this.gameStateService.isMyTurn$;
-  gameIsOver$         = this.gameStateService.gameIsOver$;
-  gameResult$ = this.submitGameResultService.gameResult$;
+  messageForMe$ = this.gameMessage.messageForMe$;
+  myIndex$      = this.myGameRoomService.myIndex$;
+  isMyTurn$     = this.gameStateService.isMyTurn$;
+  gameIsOver$   = this.gameStateService.gameIsOver$;
+  gameResult$   = this.submitGameResultService.gameResult$;
 
   private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
   initialStateIsReady$
@@ -57,8 +57,10 @@ export class GameMainComponent implements OnInit, OnDestroy {
   private userInputSubscription: Subscription;
 
   // view config
-  chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
-  cardSizeRatio$ = this.myUserInfo.onlineGame.cardSizeRatio$;
+  chatOpened$           = this.myUserInfo.onlineGame.chatOpened$;
+  cardSizeRatio$        = this.myUserInfo.onlineGame.cardSizeRatio$;
+  autoSort$             = this.myUserInfo.onlineGame.autoSort$;
+  autoPlayAllTreasures$ = this.myUserInfo.onlineGame.autoPlayAllTreasures$;
   private showCardPropertySource = new BehaviorSubject<boolean>(false);
   showCardProperty$ = this.showCardPropertySource.asObservable();
 
@@ -200,8 +202,14 @@ export class GameMainComponent implements OnInit, OnDestroy {
 
 
   // ゲーム操作
-  onCardClick( myIndex: number, dcard: DCard ) {
-    this.gameRoomCommunication.sendUserInput('clicked card', myIndex, dcard.id );
+  onCardClick(
+    myIndex: number,
+    dcard: DCard,
+    autoSort: boolean,
+    autoPlayAllTreasures: boolean
+  ) {
+    this.gameRoomCommunication.sendUserInput(
+        'clicked card', myIndex, autoSort, autoPlayAllTreasures, dcard.id );
   }
 
   private async showChangeTurnDialog( name: string ) {
