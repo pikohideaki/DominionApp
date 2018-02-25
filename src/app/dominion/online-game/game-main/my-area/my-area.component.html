@@ -1,0 +1,66 @@
+<ng-container *ngIf="{
+      isMyTurn:             isMyTurn$             | async,
+      isBuyPlayPhase:       isBuyPlayPhase$       | async,
+      messageForMe:         messageForMe$         | async,
+      messageForMeList:     messageForMeList$     | async,
+      myIndex:              myIndex$              | async,
+      myThinkingState:      myThinkingState$      | async,
+      autoSort:             autoSort$             | async,
+      gameIsOver:           gameIsOver$           | async
+    } as data">
+
+<div class="body" [class.is-my-turn]="data.isMyTurn">
+
+  <div class="bar">
+    <button mat-icon-button id="show-message-history-button"
+        (click)="showMessageHistory( data.messageForMeList )">
+      <mat-icon>list</mat-icon>
+    </button>
+    <div class="messageForMe-area">
+      {{data.messageForMe || '　'}}
+    </div>
+
+    <div class="buttons-area">
+      <button mat-icon-button class="sidebar-button"
+          matTooltipPosition="above" matTooltip="考慮中"
+          (click)="toggleMyThinkingState( data.myThinkingState, data.myIndex )" >
+        <mat-icon>hourglass_full</mat-icon>
+      </button>
+
+      <button *ngIf="!data.gameIsOver"
+          mat-icon-button class="sidebar-button"
+          matTooltipPosition="above" matTooltip="手札をソート"
+          (click)="sortMyHandCards( data.myIndex )">
+        <mat-icon>sort</mat-icon>
+      </button>
+
+      <ng-container *ngIf="data.isMyTurn && !data.gameIsOver">
+        <button *ngIf="data.isBuyPlayPhase"
+            mat-icon-button class="sidebar-button"
+            matTooltipPosition="above" matTooltip="基本財宝カードをすべてプレイ"
+            (click)="playAllTreasures( data.myIndex, data.autoSort )" >
+          <mat-icon>present_to_all</mat-icon>
+        </button>
+        <button mat-icon-button class="sidebar-button"
+            matTooltipPosition="above" matTooltip="次のフェーズへ"
+            (click)="goToNextPhase( data.myIndex, data.autoSort )" >
+          <mat-icon style="transform: rotate( -90deg )">file_download</mat-icon>
+        </button>
+        <button mat-icon-button class="sidebar-button"
+            matTooltipPosition="above" matTooltip="手番を終了する"
+            (click)="finishMyTurn( data.myIndex, data.autoSort )" >
+          <mat-icon>forward</mat-icon>
+        </button>
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="my-card-area">
+    <app-my-card-area
+      [showCardProperty$]="showCardProperty$"
+      (cardClicked)="onCardClick( $event )">
+    </app-my-card-area>
+  </div>
+
+</div>
+</ng-container>

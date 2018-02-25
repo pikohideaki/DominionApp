@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
 
 import { DCard, BasicCards, KingdomCards } from '../../../../../classes/game-state';
@@ -7,6 +6,8 @@ import { DCard, BasicCards, KingdomCards } from '../../../../../classes/game-sta
 import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateService  } from '../../services/game-state-services/game-state.service';
+import { GameConfigService } from '../../services/game-config.service';
+
 
 @Component({
   selector: 'app-shared-area',
@@ -14,14 +15,18 @@ import { GameStateService  } from '../../services/game-state-services/game-state
   styleUrls: ['./shared-area.component.css'],
 })
 export class SharedAreaComponent implements OnInit {
-  Prosperity$           = this.myGameRoomService.Prosperity$;
+
+  @Input() showCardProperty$: Observable<boolean>;
+  @Output() cardClicked = new EventEmitter<DCard>();
+
+  cardSizeRatio$ = this.config.cardSizeRatio$;
+  width$ = this.cardSizeRatio$.map( ratio => ratio * 70 );
+  myIndex$ = this.gameRoomService.myIndex$;
+
+  Prosperity$           = this.gameRoomService.Prosperity$;
   private BasicCards$   = this.gameStateService.BasicCards$;
   private KingdomCards$ = this.gameStateService.KingdomCards$;
   trashPile$            = this.gameStateService.trashPile$;
-
-  @Input() showCardProperty$: Observable<boolean>;
-  @Input() cardSizeRatio: number = 1;
-  @Output() private cardClicked = new EventEmitter<any>();
 
   BasicCards = {
     Copper$   : this.BasicCards$.map( e => e.Copper   ),
@@ -38,31 +43,18 @@ export class SharedAreaComponent implements OnInit {
   KingdomCards = this.utils.seq0(10).map( i => this.KingdomCards$.map( e => e[i] ) );
 
 
-  fade = 'fadeIn';
-
-
-
   constructor(
     private utils: UtilitiesService,
-    private myGameRoomService: MyGameRoomService,
+    private gameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
+    private config: GameConfigService,
   ) {
-    // this.BasicCards$   .subscribe( val => console.log('this.BasicCards$'   , val ) );
-    // this.KingdomCards$ .subscribe( val => console.log('this.KingdomCards$' , val ) );
-    // this.Prosperity$   .subscribe( val => console.log('this.Prosperity$'   , val ) );
-    // this.trashPile$    .subscribe( val => console.log('this.trashPile$'    , val ) );
   }
 
   ngOnInit() {
   }
 
-  onCardClick( value ) {
-    this.cardClicked.emit( value );
+  onClick( dcard: DCard ) {
+    this.cardClicked.emit( dcard );
   }
-
-
-  // toggleFade() {
-  //   console.log('triggerAnimation', this.fade);
-  //   this.fade = (this.fade === 'fadeIn' ? 'fadeOut' : 'fadeIn');
-  // }
 }

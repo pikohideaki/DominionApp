@@ -1,0 +1,58 @@
+<ng-container *ngIf="{
+      empty:          empty$          | async,
+      DCard:          DCard$          | async,
+      faceUp:         faceUp$         | async,
+      isButton:       isButton$       | async,
+      width:          width$          | async,
+      fontSize:       fontSize$       | async,
+      DCardArraySize: DCardArraySize$ | async,
+      DCardCostStr:   DCardCostStr$   | async,
+      tooltipSizeStr: tooltipSizeStr$ | async,
+      tooltipNameStr: tooltipNameStr$ | async,
+      tooltipCostStr: tooltipCostStr$ | async
+    } as data">
+
+  <ng-container *ngIf="!data.DCard || data.empty; then emptyCard; else Card"></ng-container>
+  <ng-template #emptyCard>
+    <app-dominion-card-image
+      [width]="data.width"
+      [empty]="true">
+    </app-dominion-card-image>
+  </ng-template>
+  <ng-template #Card>
+    <div class="card-image-wrapper">
+      <app-dominion-card-image
+        [matTooltip]="data.tooltipNameStr" matTooltipPosition="below"
+        [matTooltipDisabled]="!data.faceUp"
+        [card]="data.DCard.cardProperty"
+        [faceUp]="data.faceUp"
+        [isButton]="data.isButton"
+        [width]="data.width"
+        [empty]="false"
+        (cardClicked)="onClicked( data.DCard )" >
+      </app-dominion-card-image>
+      <div class="pile-info absolute-position" *ngIf="!data.empty">
+        <div *ngIf="data.faceUp"
+            class="card-cost-coin"
+            [matTooltip]="data.tooltipCostStr" matTooltipPosition="below"
+            [style.fontSize.em]="data.fontSize">
+          {{data.DCardCostStr}}
+        </div>
+        <div class="spacer"></div>
+        <div *ngIf="showArraySize"
+            class="dcard-array-size"
+            [matTooltip]="data.tooltipSizeStr" matTooltipPosition="below"
+            [style.fontSize.em]="data.fontSize">
+          {{data.DCardArraySize}}
+        </div>
+      </div>
+    </div>
+    <div *ngIf="showCardProperty && data.faceUp"
+        class="card-property-button-wrapper">
+      <button mat-icon-button
+          (click)="openCardPropertyDialog( data.DCard )">
+        <mat-icon>description</mat-icon>
+      </button>
+    </div>
+  </ng-template>
+</ng-container>

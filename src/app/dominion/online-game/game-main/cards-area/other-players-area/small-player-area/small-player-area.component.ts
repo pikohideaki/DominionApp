@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
 
-import { PlayerCards } from '../../../../../../classes/game-state';
+import { DCard } from '../../../../../../classes/game-state';
 
 import { UtilitiesService } from '../../../../../../my-own-library/utilities.service';
-import { GameStateService  } from '../../../services/game-state-services/game-state.service';
 import { MyGameRoomService } from '../../../services/my-game-room.service';
+import { GameStateService  } from '../../../services/game-state-services/game-state.service';
+import { GameConfigService } from '../../../services/game-config.service';
 
 
 @Component({
@@ -16,23 +16,24 @@ import { MyGameRoomService } from '../../../services/my-game-room.service';
 })
 export class SmallPlayerAreaComponent implements OnInit {
 
-  @Input() cardSizeRatio: number = 1;
+  @Output() cardClicked = new EventEmitter<DCard>();
+
+  width$ = this.config.cardSizeRatio$.map( ratio => ratio * 40 );
+  myIndex$ = this.gameRoomService.myIndex$;
+  turnPlayerIndex$ = this.gameStateService.turnPlayerIndex$;
+
   @Input() playerName: string;
   @Input() playerIndex: number;
   @Input() thinkingState: boolean = false;
-
-  turnPlayerIndex$ = this.gameStateService.turnPlayerIndex$;
-  myIndex$ = this.myGameRoomService.myIndex$;
-
-  @Output() cardClicked = new EventEmitter<any>();
 
   playerCards;
 
 
   constructor(
     private utils: UtilitiesService,
-    private myGameRoomService: MyGameRoomService,
-    private gameStateService: GameStateService
+    private gameStateService: GameStateService,
+    private gameRoomService: MyGameRoomService,
+    private config: GameConfigService,
   ) {
   }
 
@@ -50,10 +51,9 @@ export class SmallPlayerAreaComponent implements OnInit {
       PlayArea$  : playerCards$.map( e => e.PlayArea  ),
       DiscardPileReveresed$ : playerCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
     };
-
   }
 
-  onCardClick( value ) {
-    this.cardClicked.emit( value );
+  onClick( dcard: DCard ) {
+    this.cardClicked.emit( dcard );
   }
 }

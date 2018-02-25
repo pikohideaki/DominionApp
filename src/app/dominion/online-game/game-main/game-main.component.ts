@@ -25,6 +25,9 @@ import { GameLoopService              } from './services/game-state-services/gam
 import { TransitStateService          } from './services/game-state-services/transit-state.service';
 
 
+
+
+
 @Component({
   providers: [
     MyGameRoomService,
@@ -39,16 +42,17 @@ import { TransitStateService          } from './services/game-state-services/tra
   ],
   selector: 'app-game-main',
   templateUrl: './game-main.component.html',
-  styleUrls: ['./game-main.component.css']
+  styleUrls: ['./game-main.component.css'],
 })
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive = true;
 
-  messageForMe$ = this.gameMessage.messageForMe$;
-  myIndex$      = this.myGameRoomService.myIndex$;
-  isMyTurn$     = this.gameStateService.isMyTurn$;
-  gameIsOver$   = this.gameStateService.gameIsOver$;
-  gameResult$   = this.submitGameResultService.gameResult$;
+  messageForMe$     = this.gameMessage.messageForMeWithTime$;
+  messageForMeList$ = this.gameMessage.messageForMeList$;
+  myIndex$          = this.myGameRoomService.myIndex$;
+  isMyTurn$         = this.gameStateService.isMyTurn$;
+  gameIsOver$       = this.gameStateService.gameIsOver$;
+  gameResult$       = this.submitGameResultService.gameResult$;
 
   private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
   initialStateIsReady$
@@ -57,10 +61,8 @@ export class GameMainComponent implements OnInit, OnDestroy {
   private userInputSubscription: Subscription;
 
   // view config
-  chatOpened$           = this.myUserInfo.onlineGame.chatOpened$;
-  cardSizeRatio$        = this.myUserInfo.onlineGame.cardSizeRatio$;
-  autoSort$             = this.myUserInfo.onlineGame.autoSort$;
-  autoPlayAllTreasures$ = this.myUserInfo.onlineGame.autoPlayAllTreasures$;
+  chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
+  autoSort$   = this.myUserInfo.onlineGame.autoSort$;
   private showCardPropertySource = new BehaviorSubject<boolean>(false);
   showCardProperty$ = this.showCardPropertySource.asObservable();
 
@@ -77,8 +79,6 @@ export class GameMainComponent implements OnInit, OnDestroy {
           (list, myIndex) => list[ myIndex ] );
 
   private logSnapshotSource = new BehaviorSubject<void>(null);  // debug
-
-
 
 
   constructor(
@@ -167,8 +167,13 @@ export class GameMainComponent implements OnInit, OnDestroy {
     this.userInputSubscription
       = this.transitStateService.gameData$
           .takeWhile( () => this.alive )
-          .subscribe( ([[userInput, currState], Prosperity]) =>
-            this.transitStateService.transitState( userInput, currState, Prosperity ) );
+          .subscribe( ([[userInput, currState], myIndex, playersNameList, Prosperity]) =>
+            this.transitStateService.transitState(
+                userInput,
+                currState,
+                myIndex,
+                playersNameList,
+                Prosperity ) );
 
     const initialState = await this.myGameRoomService.initialState$.first().toPromise();
     this.gameStateService.setGameState( initialState );
@@ -206,10 +211,9 @@ export class GameMainComponent implements OnInit, OnDestroy {
     myIndex: number,
     dcard: DCard,
     autoSort: boolean,
-    autoPlayAllTreasures: boolean
   ) {
     this.gameRoomCommunication.sendUserInput(
-        'clicked card', myIndex, autoSort, autoPlayAllTreasures, dcard.id );
+        'clicked card', myIndex, autoSort, dcard.id );
   }
 
   private async showChangeTurnDialog( name: string ) {
@@ -223,5 +227,4 @@ export class GameMainComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
     dialogRef.componentInstance.gameResult$ = this.gameResult$;
   }
-
 }

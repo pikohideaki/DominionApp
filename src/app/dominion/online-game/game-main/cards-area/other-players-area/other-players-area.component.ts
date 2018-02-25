@@ -22,7 +22,6 @@ import { GameRoomCommunicationService } from '../../services/game-room-communica
           <app-small-player-area
               [playerIndex]="playerIndex"
               [playerName]="name"
-              [cardSizeRatio]="cardSizeRatio"
               [thinkingState]="data.thinkingState[ playerIndex ]"
               (cardClicked)="onCardClick( $event )">
           </app-small-player-area>
@@ -40,7 +39,6 @@ export class OtherPlayerAreaComponent implements OnInit {
   thinkingState$: Observable<boolean[]>
     = this.communication.thinkingState$;
 
-  @Input() cardSizeRatio: number = 1;
   @Output() cardClicked = new EventEmitter<any>();
 
 

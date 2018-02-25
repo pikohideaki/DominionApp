@@ -29,9 +29,8 @@ export class MyUserInfoService {
     chatOpened$:           Observable<boolean>,
     cardSizeAutoChange$:   Observable<boolean>,
     cardSizeRatio$:        Observable<number>,
-    messageSpeed$:         Observable<number>,
+    messageMillisec$:      Observable<number>,
     autoSort$:             Observable<boolean>,
-    autoPlayAllTreasures$: Observable<boolean>,
   };
 
   signedInToRandomizerGroup$: Observable<boolean>;
@@ -91,14 +90,11 @@ export class MyUserInfoService {
       cardSizeRatio$ :
         this.myUserInfo$.map( e => e.onlineGame.cardSizeRatio )
           .distinctUntilChanged(),
-      messageSpeed$ :
-        this.myUserInfo$.map( e => e.onlineGame.messageSpeed )
+      messageMillisec$ :
+        this.myUserInfo$.map( e => e.onlineGame.messageMillisec )
           .distinctUntilChanged(),
       autoSort$ :
         this.myUserInfo$.map( e => e.onlineGame.autoSort )
-          .distinctUntilChanged(),
-      autoPlayAllTreasures$ :
-        this.myUserInfo$.map( e => e.onlineGame.autoPlayAllTreasures )
           .distinctUntilChanged(),
     };
 
@@ -151,16 +147,12 @@ export class MyUserInfoService {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.cardSizeRatio( this.uid, value );
   }
-  setOnlineGameMessageSpeed( value: number ) {
+  setOnlineGameMessageMillisec( millisec: number ) {
     if ( !this.uid ) return Promise.resolve();
-    return this.database.user.set.onlineGame.messageSpeed( this.uid, value );
+    return this.database.user.set.onlineGame.messageMillisec( this.uid, millisec );
   }
   setOnlineGameAutoSort( value: boolean ) {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.autoSort( this.uid, value );
-  }
-  setOnlineGameAutoPlayAllTreasures( value: boolean ) {
-    if ( !this.uid ) return Promise.resolve();
-    return this.database.user.set.onlineGame.autoPlayAllTreasures( this.uid, value );
   }
 }

@@ -9,9 +9,8 @@ export class GameConfigService {
 
   cardSizeAutoChange$   = this.user.onlineGame.cardSizeAutoChange$;
   cardSizeRatio$        = this.user.onlineGame.cardSizeRatio$;
-  messageSpeed$         = this.user.onlineGame.messageSpeed$;
+  messageMillisec$      = this.user.onlineGame.messageMillisec$;
   autoSort$             = this.user.onlineGame.autoSort$;
-  autoPlayAllTreasures$ = this.user.onlineGame.autoPlayAllTreasures$;
 
   private devModeSource = new BehaviorSubject<boolean>(false);
   devMode$ = this.devModeSource.asObservable();
@@ -30,8 +29,8 @@ export class GameConfigService {
     this.user.setOnlineGameCardSizeRatio( value );
   }
 
-  setMessageSpeed( value: number ) {
-    this.user.setOnlineGameMessageSpeed( value );
+  setMessageMillisec( millisec: number ) {
+    this.user.setOnlineGameMessageMillisec( millisec );
   }
 
   setDevMode( value: boolean ) {
@@ -42,7 +41,4 @@ export class GameConfigService {
     this.user.setOnlineGameAutoSort( value );
   }
 
-  setAutoPlayAllTreasures( value: boolean ) {
-    this.user.setOnlineGameAutoPlayAllTreasures( value );
-  }
 }

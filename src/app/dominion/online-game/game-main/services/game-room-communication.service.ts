@@ -40,8 +40,6 @@ export class GameRoomCommunicationService {
     private database: CloudFirestoreMediatorService,
     private myGameRoomService: MyGameRoomService,
   ) {
-    // observables
-
     const gameRoomCommunication$
       = Observable.combineLatest(
           this.database.onlineGameCommunicationList$,
@@ -115,7 +113,6 @@ export class GameRoomCommunicationService {
     userInputCommand: UserInputCommand,
     playerId: number,
     autoSort: boolean,
-    autoPlayAllTreasures: boolean,
     clickedCardId?: number
  ) {
     const communicationId = await this.communicationId$.toPromise();
@@ -123,7 +120,6 @@ export class GameRoomCommunicationService {
                             userInputCommand,
                             playerId,
                             autoSort,
-                            autoPlayAllTreasures,
                             clickedCardId );
     await this.database.onlineGameCommunication
             .sendUserInput( communicationId, userInput );

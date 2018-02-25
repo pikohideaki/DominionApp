@@ -20,17 +20,21 @@
       <div *ngIf="data.PlayArea?.length > 0"
           class="CardArea box-shadow PlayArea">
         <app-cards-lined-up
+          [showCardProperty]="false"
           [DCardArray$]="playerCards.PlayArea$"
-          [width]="40 * cardSizeRatio"
-          (cardClicked)="onCardClick( $event )" >
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick( $event )" >
         </app-cards-lined-up>
       </div>
       <div *ngIf="data.Aside?.length > 0"
           class="CardArea box-shadow Aside">
         <app-cards-lined-up
+          [showCardProperty]="false"
           [DCardArray$]="playerCards.Aside$"
-          [width]="40 * cardSizeRatio"
-          (cardClicked)="onCardClick( $event )" >
+          [myIndex$]="myIndex$"
+          [width$]="width$"
+          (cardClicked)="onClick( $event )" >
         </app-cards-lined-up>
       </div>
     </div>
@@ -38,26 +42,32 @@
     <div class="Deck_HandCards_DiscardPile">
       <div class="CardArea box-shadow Deck">
         <app-cards-pile
-          [displaySize]="true"
-          [DCardArray$]="playerCards.Deck$"
-          [width]="40 * cardSizeRatio"
-          (cardClicked)="onCardClick( $event )" >
+        [showArraySize]="true"
+        [showCardProperty]="false"
+        [DCardArray$]="playerCards.Deck$"
+        [myIndex$]="myIndex$"
+        [width$]="width$"
+        (cardClicked)="onClick( $event )" >
         </app-cards-pile>
       </div>
       <div class="CardArea box-shadow HandCards">
         <app-cards-lined-up
-          [defaultArrayLength]="5"
+          [showCardProperty]="false"
           [DCardArray$]="playerCards.HandCards$"
-          [width]="40 * cardSizeRatio"
-          (cardClicked)="onCardClick( $event )" >
+          [myIndex$]="myIndex$"
+          [defaultArrayLength]="5"
+          [width$]="width$"
+          (cardClicked)="onClick( $event )" >
         </app-cards-lined-up>
       </div>
       <div class="CardArea box-shadow DiscardPile">
         <app-cards-pile
-          [displaySize]="false"
-          [DCardArray$]="playerCards.DiscardPileReveresed$"
-          [width]="40 * cardSizeRatio"
-          (cardClicked)="onCardClick( $event )" >
+        [showArraySize]="false"
+        [showCardProperty]="false"
+        [DCardArray$]="playerCards.DiscardPileReveresed$"
+        [myIndex$]="myIndex$"
+        [width$]="width$"
+        (cardClicked)="onClick( $event )" >
         </app-cards-pile>
       </div>
     </div>

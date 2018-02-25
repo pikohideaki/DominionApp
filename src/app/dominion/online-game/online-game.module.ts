@@ -23,15 +23,18 @@ import { CardsPileComponent       } from './game-main/cards-area/cards-area/card
 import { CardsLinedUpComponent    } from './game-main/cards-area/cards-area/cards-lined-up/cards-lined-up.component';
 import { SharedAreaComponent      } from './game-main/cards-area/shared-area/shared-area.component';
 import { TurnPlayerAreaComponent  } from './game-main/cards-area/turn-player-area/turn-player-area.component';
-import { MyAreaComponent          } from './game-main/cards-area/my-area/my-area.component';
+import { MyCardAreaComponent          } from './game-main/cards-area/my-card-area/my-card-area.component';
 import { OtherPlayerAreaComponent } from './game-main/cards-area/other-players-area/other-players-area.component';
 import { SmallPlayerAreaComponent } from './game-main/cards-area/other-players-area/small-player-area/small-player-area.component';
 
 import { GameConfigDialogComponent      } from './game-main/dialogs/game-config-dialog/game-config-dialog.component';
 import { OnlineGameResultDialogComponent } from './game-main/dialogs/online-game-result-dialog/online-game-result-dialog.component';
 import { OnlineGamePlayerCardsDialogComponent, EachPlayerCardsComponent } from './game-main/dialogs/online-game-result-player-cards-dialog/online-game-result-player-cards-dialog.component';
+import { MessageForMeListDialogComponent } from './game-main/dialogs/message-for-me-dialog-list.component';
 
 import { GameConfigService } from './game-main/services/game-config.service';
+import { MyAreaComponent } from './game-main/my-area/my-area.component';
+import { CardImageWrapperComponent } from './game-main/cards-area/cards-area/card-image-wrapper/card-image-wrapper.component';
 
 
 @NgModule({
@@ -48,6 +51,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     GameRoomListComponent,
     SignInToGameRoomDialogComponent,
     GameMainComponent,
+    MessageForMeListDialogComponent,
     UserInputLogDialogComponent,
     ChatComponent,
     CardsPileComponent,
@@ -63,6 +67,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     GameRoomListComponent,
     SignInToGameRoomDialogComponent,
     GameMainComponent,
+    MessageForMeListDialogComponent,
     UserInputLogDialogComponent,
     ChatComponent,
     CardsPileComponent,
@@ -71,7 +76,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     SharedAreaComponent,
     OtherPlayerAreaComponent,
     TurnPlayerAreaComponent,
-    MyAreaComponent,
+    MyCardAreaComponent,
     SmallPlayerAreaComponent,
     GameConfigDialogComponent,
     OnlineGameResultDialogComponent,
@@ -79,6 +84,8 @@ import { GameConfigService } from './game-main/services/game-config.service';
     EachPlayerCardsComponent,
     SideBarLeftComponent,
     SideBarRightComponent,
+    MyAreaComponent,
+    CardImageWrapperComponent,
   ],
   entryComponents: [
     SignInToGameRoomDialogComponent,
@@ -86,6 +93,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     UserInputLogDialogComponent,
     OnlineGameResultDialogComponent,
     OnlineGamePlayerCardsDialogComponent,
+    MessageForMeListDialogComponent,
   ],
   providers: [
     GameConfigService,

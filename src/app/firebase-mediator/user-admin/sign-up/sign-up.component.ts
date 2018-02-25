@@ -77,15 +77,14 @@ export class SignUpComponent implements OnInit {
             randomizerGroupId: '',
             onlineGame: {
               isSelectedExpansions: expansionNameList.map( _ => true ),
-              numberOfPlayers:       2,
+              numberOfPlayers:      2,
               roomId:               '',
               communicationId:      '',
               chatOpened:           true,
               cardSizeAutoChange:   true,
               cardSizeRatio:        1,
-              messageSpeed:         1,
+              messageMillisec:      1,
               autoSort:             true,
-              autoPlayAllTreasures: true,
             }
           } ) );
 

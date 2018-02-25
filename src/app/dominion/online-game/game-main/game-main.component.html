@@ -2,12 +2,9 @@
       chatOpened:           chatOpened$           | async,
       autoScroll:           autoScroll$           | async,
       initialStateIsReady:  initialStateIsReady$  | async,
-      cardSizeRatio:        cardSizeRatio$        | async,
       autoSort:             autoSort$             | async,
-      autoPlayAllTreasures: autoPlayAllTreasures$ | async,
       myIndex:              myIndex$              | async,
       isMyTurn:             isMyTurn$             | async,
-      messageForMe:         messageForMe$         | async,
       gameIsOver:           gameIsOver$           | async
     } as data">
 
@@ -15,12 +12,8 @@
     <div class="sidebar">
       <app-sidebar-left
           [autoScroll$]="autoScroll$"
-          [isBuyPlayPhase$]="isBuyPlayPhase$"
           [myIndex$]="myIndex$"
-          [isMyTurn$]="isMyTurn$"
-          [gameIsOver$]="gameIsOver$"
           [chatOpened$]="chatOpened$"
-          [myThinkingState$]="myThinkingState$"
           (toggleSideNav)="toggleSideNav( sidenav )"
           (autoScrollChange)="autoScrollChange( $event )"
           (logSnapshot)="logSnapshot()"
@@ -41,51 +34,33 @@
         <div class="upper-part">
           <div class="shared-area_other-players-area">
             <app-shared-area class="shared-area"
-              [cardSizeRatio]="data.cardSizeRatio"
               [showCardProperty$]="showCardProperty$"
-              (cardClicked)="onCardClick(
-                                data.myIndex,
-                                $event,
-                                data.autoSort,
-                                data.autoPlayAllTreasures )">
+              (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-shared-area>
             <app-other-players-area
               class="other-players-area"
-              [cardSizeRatio]="data.cardSizeRatio"
-              (cardClicked)="onCardClick(
-                                data.myIndex,
-                                $event,
-                                data.autoSort,
-                                data.autoPlayAllTreasures )">
+              (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-other-players-area>
           </div>
           <div *ngIf="!data.isMyTurn">
             <app-turn-player-area
-              [cardSizeRatio]="data.cardSizeRatio"
-              (cardClicked)="onCardClick(
-                                data.myIndex,
-                                $event,
-                                data.autoSort,
-                                data.autoPlayAllTreasures )">
+              (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-turn-player-area>
           </div>
         </div>
         <div class="spacer"></div>
-        <div class="my-area messageForMe-area-wrapper"
-            [class.is-my-turn]="data.isMyTurn">
-          <div class="messageForMe-area">
-            <span> {{data.messageForMe}} </span>
-          </div>
-        </div>
-        <div class="my-area my-card-area" [class.is-my-turn]="data.isMyTurn">
+        <div class="my-area">
           <app-my-area
+            [isMyTurn$]="isMyTurn$"
+            [messageForMe$]="messageForMe$"
+            [messageForMeList$]="messageForMeList$"
+            [myIndex$]="myIndex$"
+            [autoSort$]="autoSort$"
             [showCardProperty$]="showCardProperty$"
-            [cardSizeRatio]="data.cardSizeRatio"
-            (cardClicked)="onCardClick(
-                              data.myIndex,
-                              $event,
-                              data.autoSort,
-                              data.autoPlayAllTreasures )">
+            [isBuyPlayPhase$]="isBuyPlayPhase$"
+            [gameIsOver$]="gameIsOver$"
+            [myThinkingState$]="myThinkingState$"
+            (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
           </app-my-area>
         </div>
       </div>

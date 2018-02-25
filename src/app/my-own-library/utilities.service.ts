@@ -50,6 +50,10 @@ export class UtilitiesService {
   }
 
 
+  randInt( min: number, max: number ) {
+    return Math.round( Math.random() * (max - min) + min );
+  }
+
 
   /* localStorage */
   localStorage_set( key: string, value: any ) {
@@ -153,28 +157,25 @@ export class UtilitiesService {
   }
 
   toYMD( date: Date, delimiter: string = '/' ): string {
-    const padzero = ( str => ('00' + str).slice(-2) );
     return date.getFullYear()
-        + delimiter
-        + padzero(date.getMonth() + 1)
-        + delimiter
-        + padzero(date.getDate());
+         + delimiter
+         + (date.getMonth() + 1).toString().padStart( 2, '0' )
+         + delimiter
+         + date.getDate().toString().padStart( 2, '0' );
   }
 
   toHM( date: Date, delimiter: string = ':' ): string {
-    const padzero = ( str => ('00' + str).slice(-2) );
-    return padzero(date.getHours())
-        + delimiter
-        + padzero(date.getMinutes());
+    return date.getHours().toString().padStart( 2, '0' )
+         + delimiter
+         + date.getMinutes().toString().padStart( 2, '0' );
   }
 
   toHMS( date: Date, delimiter: string = ':' ): string {
-    const padzero = ( str => ('00' + str).slice(-2) );
-    return padzero(date.getHours())
-        + delimiter
-        + padzero(date.getMinutes())
-        + delimiter
-        + padzero(date.getSeconds());
+    return date.getHours().toString().padStart( 2, '0' )
+         + delimiter
+         + date.getMinutes().toString().padStart( 2, '0' )
+         + delimiter
+         + date.getSeconds().toString().padStart( 2, '0' );
   }
 
   toYMDHMS( date: Date ): string {
@@ -224,10 +225,8 @@ export class UtilitiesService {
 
   /* float */
   roundAt( val: number, precision: number ) {
-    const digit = Math.pow(10, precision);
-    val *= digit;
-    val = Math.round( val );
-    return val / digit;
+    const digit = 10 ** precision;
+    return Math.round( val * digit ) / digit;
   }
 
 

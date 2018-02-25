@@ -12,40 +12,15 @@
 .multiple-date-picker,.picker-days-row,.picker-days-week-row,.picker-top-row {
   width:100%;
 }
-/*
-.picker-top-row>div {
-  display:inline-block;
-} */
-
 
 .picker-top-row {
   display: flex;
   justify-content: space-between;
 }
 
-/*
-.picker-navigate {
-  width:16.66%;
-}
-
-.picker-navigate:hover {
-  cursor:pointer;
-}
-
-.picker-navigate.disabled,.picker-navigate.disabled:hover {
-  color:#ddd;
-  cursor:default;
-} */
-
-/* .picker-month {
-  width:66.66%;
-} */
-
 .picker-days-row>td,.picker-days-week-row>th {
-  width:14.28%;
-  min-width:14.28%;
-  /* display:inline-block; */
-  /* min-width: 40px; */
+  width: calc(100% / 7);
+  min-width: calc(100% / 7);
 }
 .picker-days-week-row>th {
   cursor: pointer;
@@ -58,7 +33,6 @@
 .picker-day {
   background-color:#fff;
   border:1px solid #eee;
-  /* box-sizing:border-box; */
   color:#000;
 }
 
@@ -68,8 +42,8 @@
 
 
 .picker-day:not(.picker-off):not(.picker-empty):hover {
-  background-color:#C6000B;
-  color:#fff;
+  /* background-color:#C6000B;
+  color:#fff; */
   cursor:pointer;
 }
 

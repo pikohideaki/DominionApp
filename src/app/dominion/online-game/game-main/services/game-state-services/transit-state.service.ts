@@ -38,8 +38,15 @@ export class TransitStateService {
   private transitStateResult$
     = this.transitStateResultSource.asObservable().skip(1);
 
-  gameData$ = Observable.zip( this.userInput$, this.transitStateResult$ )
-                .withLatestFrom( this.myGameRoom.Prosperity$ );
+  gameData$
+    = Observable
+        .zip(
+          this.userInput$,
+          this.transitStateResult$ )
+        .withLatestFrom(
+          this.myGameRoom.myIndex$,
+          this.myGameRoom.playersNameShuffled$,
+          this.myGameRoom.Prosperity$ );
 
 
   constructor(
@@ -58,14 +65,17 @@ export class TransitStateService {
 
 
   async transitState(
-    userInput: UserInput,
-    currState: GameState,
-    Prosperity: boolean,
+    userInput:       UserInput,
+    currState:       GameState,
+    myIndex:         number,
+    playersNameList: string[],
+    Prosperity:      boolean,
   ): Promise<void> {
     // 現在のゲーム状態をコピー
     const nextState = new GameState( this.utils.copyObject( currState ) );
     // console.log('transitState', nextState);
     const pid = userInput.data.playerId;
+    const playersName = playersNameList[ pid ];
 
     // コマンドの処理
     switch ( userInput.command ) {
@@ -75,11 +85,16 @@ export class TransitStateService {
         break;
 
       case 'clicked goToNextPhase':
-        nextState.turnInfo.phase = this.shortcut.nextPhase( nextState.turnInfo.phase );
+        nextState.turnInfo.phase
+          = this.shortcut.nextPhase( nextState.turnInfo.phase );
         break;
 
       case 'clicked finishMyTurn':
-        await this.shortcut.cleanUp( nextState, pid, userInput.data.shuffleBy );
+        await this.shortcut.cleanUp(
+                nextState,
+                pid,
+                playersName,
+                userInput.data.shuffleBy );
         if ( nextState.gameIsOverConditions( Prosperity ) ) {
           nextState.turnInfo.phase = 'GameIsOver';
         } else {
@@ -93,11 +108,15 @@ export class TransitStateService {
         break;
 
       case 'play all treasures':
-        await this.shortcut.playAllTreasures( nextState, pid, userInput.data.shuffleBy );
+        await this.shortcut.playAllTreasures(
+                nextState,
+                pid,
+                playersName,
+                userInput.data.shuffleBy );
         break;
 
       case 'clicked card':
-        await this.shortcut.onCardClick( nextState, userInput );
+        await this.shortcut.onCardClick( nextState, userInput, playersName );
         break;
 
       default:
@@ -106,7 +125,11 @@ export class TransitStateService {
     }
 
     // フェーズごとの処理
-    await this.gameloop.phaseAction( nextState, userInput, Prosperity );
+    await this.gameloop.phaseAction(
+            nextState,
+            userInput,
+            Prosperity,
+            playersName );
 
     // 自動で手札をソート
     if ( userInput.data.autoSort ) {

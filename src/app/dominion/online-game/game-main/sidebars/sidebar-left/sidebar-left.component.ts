@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs/Observable';
 
 import { GameConfigDialogComponent } from '../../dialogs/game-config-dialog/game-config-dialog.component';
 import { UserInputLogDialogComponent } from './user-input-log-dialog.component';
@@ -21,21 +22,18 @@ export class SideBarLeftComponent implements OnInit {
   @Input()  autoScroll$;
   @Output() autoScrollChange = new EventEmitter<boolean>();
 
+
   @Input() myIndex$;
-  @Input() isMyTurn$;
-  @Input() gameIsOver$;
   @Input() chatOpened$;
-  @Input() isBuyPlayPhase$;
-  @Input() myThinkingState$;
 
   @Output() logSnapshot                   = new EventEmitter<void>();
   @Output() toggleShowCardPropertyButtons = new EventEmitter<void>();
   @Output() toggleSideNav                 = new EventEmitter<void>();
   @Output() initialStateIsReadyChange     = new EventEmitter<boolean>();
 
-  devMode$              = this.config.devMode$;
-  autoSort$             = this.config.autoSort$;
-  autoPlayAllTreasures$ = this.config.autoPlayAllTreasures$;
+  devMode$ = this.config.devMode$;
+
+  newChatMessageAlert$: Observable<boolean>;
 
 
   constructor(
@@ -47,6 +45,12 @@ export class SideBarLeftComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.newChatMessageAlert$
+      = Observable.combineLatest(
+            this.chatOpened$.filter( e => e === true ).startWith( true ),
+            this.gameRoomCommunication.chatList$.filter( list => list.length > 0 ),
+            (onOpen, receivedNewMessage) => 0 )
+          .withLatestFrom( this.chatOpened$, (_, chatOpened) => !chatOpened );
   }
 
 
@@ -57,30 +61,6 @@ export class SideBarLeftComponent implements OnInit {
 
   toggleAutoScroll( value: boolean ) {
     this.autoScrollChange.emit( value );
-  }
-
-  toggleMyThinkingState( currentState: boolean, myIndex: number ) {
-    this.gameRoomCommunication.setThinkingState( myIndex, !currentState );
-  }
-
-  goToNextPhase( myIndex: number, autoSort: boolean, autoPlayAllTreasures: boolean ) {
-    this.gameRoomCommunication.sendUserInput(
-        'clicked goToNextPhase', myIndex, autoSort, autoPlayAllTreasures );
-  }
-
-  finishMyTurn( myIndex: number, autoSort: boolean ) {
-    this.gameRoomCommunication.sendUserInput(
-        'clicked finishMyTurn', myIndex, autoSort, false );
-  }
-
-  sortMyHandCards( myIndex: number ) {
-    this.gameRoomCommunication.sendUserInput(
-        'clicked sortHandcards', myIndex, true, false );
-  }
-
-  playAllTreasures( myIndex: number, autoSort: boolean ) {
-    this.gameRoomCommunication.sendUserInput(
-        'play all treasures', myIndex, autoSort, false );
   }
 
   toggleShowCardPropertyButtonsClicked() {
@@ -98,7 +78,7 @@ export class SideBarLeftComponent implements OnInit {
       this.initialStateIsReadyChange.emit( false );
       await this.gameRoomCommunication.removeAllUserInput();
       // 最初のプレイヤーは自動でgoToNextPhaseを1回発動
-      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0, true, false );
+      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0, true );
     }
   }
 
@@ -106,7 +86,7 @@ export class SideBarLeftComponent implements OnInit {
 
   // developer mode
   incrementTurnCounter( myIndex ) {
-    this.gameRoomCommunication.sendUserInput('increment turnCounter', myIndex, true, false );
+    this.gameRoomCommunication.sendUserInput('increment turnCounter', myIndex, true );
   }
 
   logSnapshotClicked() {

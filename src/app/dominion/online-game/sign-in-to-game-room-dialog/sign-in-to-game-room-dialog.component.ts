@@ -46,7 +46,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
     this.playersName$
       = this.database.onlineGameRooms$
           .map( list => ( list.find( e => e.databaseKey === this.newRoom.databaseKey )
-                            || new GameRoom() ).playersNameShuffled() )
+                            || new GameRoom() ).playersName )
           .startWith([]);
 
     const selectingRoomRemoved$

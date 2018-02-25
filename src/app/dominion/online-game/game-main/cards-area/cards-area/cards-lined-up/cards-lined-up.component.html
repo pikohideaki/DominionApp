@@ -1,48 +1,33 @@
 <ng-container *ngIf="{
-      widthModified: widthModified$ | async,
-      myIndex:       myIndex$       | async,
-      DCardArray:    DCardArray$    | async
+      widthShrunk:  widthShrunk$  | async,
+      lineMinWidth: lineMinWidth$ | async,
+      empty:        empty$        | async,
+      indice:       indice$       | async
     } as data">
 
-<ng-container
-    *ngIf="!data.DCardArray || data.DCardArray.length === 0
-            then emptyCard; else Card">
-</ng-container>
-<ng-template #emptyCard>
-  <app-dominion-card-image
-    [width]="width"
-    [empty]="true">
-  </app-dominion-card-image>
-</ng-template>
-<ng-template #Card>
-  <!-- <div class="card-images-lined-up" [style.minWidth.px]="defaultArrayLength * (width + 4)"> -->
-  <div class="card-images-lined-up">
-    <div *ngFor="let DCard of data.DCardArray">
-      <div class="card-image-wrapper card-image-in-line"
-          [matTooltip]="DCard.cardProperty.nameJp" matTooltipPosition="above"
-          [matTooltipDisabled]="!DCard.faceUp[ data.myIndex ]">
-        <app-dominion-card-image
-          [card]="DCard.cardProperty"
-          [width]="data.widthModified"
-          [faceUp]="DCard.faceUp[ data.myIndex ]"
-          [isButton]="DCard.isButton[ data.myIndex ]"
-          (cardClicked)="onClicked( DCard )">
-          <!-- [description]="DCard.id.toString()" -->
-        </app-dominion-card-image>
-        <div class="pile-info absolute-position">
-          <div *ngIf="DCard.faceUp[ data.myIndex ]" class="card-cost-coin">
-            {{DCard.cardProperty.cost.toStr()}}
-          </div>
-          <div class="spacer"></div>
-        </div>
+  <div class="card-images-lined-up"
+      [style.minWidth.px]="data.lineMinWidth" >
+
+    <ng-container *ngIf="data.empty; then emptyCard; else Card"></ng-container>
+    <ng-template #emptyCard>
+      <app-dominion-card-image
+        [width]="data.widthShrunk"
+        [empty]="true">
+      </app-dominion-card-image>
+    </ng-template>
+    <ng-template #Card>
+      <div *ngFor="let index of data.indice"
+          class="card-image-in-line" [style.paddingRight.px]="padding">
+        <app-card-image-wrapper
+          [showArraySize]="false"
+          [showCardProperty]="showCardProperty"
+          [width$]="widthShrunk$"
+          [myIndex$]="myIndex$"
+          [DCardArray$]="DCardArray$"
+          [indexInArray]="index"
+          (cardClicked)="onClicked( $event )" >
+        </app-card-image-wrapper>
       </div>
-      <div *ngIf="showCardProperty && DCard.faceUp[ data.myIndex ]" class="card-property-button-wrapper">
-        <button mat-icon-button
-            (click)="openCardPropertyDialog( DCard )">
-          <mat-icon>description</mat-icon><!-- featured_video -->
-        </button>
-      </div>
-    </div>
+    </ng-template>
   </div>
-</ng-template>
 </ng-container>

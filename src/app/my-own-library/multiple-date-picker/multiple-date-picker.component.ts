@@ -4,6 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/takeWhile';
+import 'rxjs/add/operator/startWith';
 
 import { UtilitiesService } from '../utilities.service';
 
@@ -20,6 +21,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
   @Input() filterFunction = (e => true);
   @Input() dayLabelLanguage: 'eng'|'jp' = 'eng';
   @Input() initialDateList$: Observable<Date[]>;
+  @Output() selectedDatesChange = new EventEmitter<Date[]>();
 
   dayStrings: string[];
   weeks$: Observable<{ date: Date, selected: boolean }[][]>;
@@ -31,7 +33,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
 
   private selectedDateValuesSource = new BehaviorSubject<number[]>([]);
   private selectedDateValues$ = this.selectedDateValuesSource.asObservable().startWith([]);
-  @Output() selectedDatesChange = new EventEmitter<Date[]>();
+
 
 
   constructor(
@@ -54,8 +56,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
             };
           });
           return weeks;
-        }
-    );
+        } );
 
     this.selectedDateValues$
       .map( list => list.map( e => new Date(e) )
@@ -75,14 +76,16 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
         break;
     }
 
-    this.initialDateList$.first().subscribe( initialDateList => {
-      const initialDateValuesUniq
-        = this.utils.uniq(
-            initialDateList
-              .map( e => this.utils.getMidnightOfDate(e) )
-              .map( e => e.valueOf() ) );
-      this.selectedDateValuesSource.next( initialDateValuesUniq );
-    });
+    if ( !!this.initialDateList$ ) {
+      this.initialDateList$.first().subscribe( initialDateList => {
+        const initialDateValuesUniq
+          = this.utils.uniq(
+              initialDateList
+                .map( e => this.utils.getMidnightOfDate(e) )
+                .map( e => e.valueOf() ) );
+        this.selectedDateValuesSource.next( initialDateValuesUniq );
+      });
+    }
   }
 
   ngOnDestroy() {

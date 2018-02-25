@@ -6,23 +6,35 @@
   flex-flow: row nowrap;
   justify-content: flex-start;
 }
-
+.BasicCards_KingdomCards {
+  flex: 1;
+}
+.trashPile-area {
+  flex-grow: 0;
+  padding: 3px;
+}
 
 .BasicCards,.KingdomCards {
-  margin: 5px;
+  padding: 3px;
+}
+
+.BasicCards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
+}
+.treasures,.victories {
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
 }
 
-.BasicCards_KingdomCards {
-  flex: 1;
+.KingdomCards {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: flex-start;
 }
-
 .trashPile {
-  /* height : 160px;
-  width: 100px; */
-  margin: 5px;
   background-image: url(/assets/img/trashArea.jpg);
   background-size: cover;
   padding-top : 35px;
@@ -30,10 +42,5 @@
 }
 
 .card-pile {
-  margin: 2px;
+  padding: 2px;
 }
-/* .animation-test {
-  background-color: black;
-  width: 55px;
-  height: 85px;
-} */

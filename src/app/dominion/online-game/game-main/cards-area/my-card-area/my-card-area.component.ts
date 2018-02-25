@@ -10,30 +10,31 @@ import { GameConfigService } from '../../services/game-config.service';
 
 
 @Component({
-  selector: 'app-turn-player-area',
-  templateUrl: './turn-player-area.component.html',
-  styleUrls: ['./turn-player-area.component.css']
+  selector: 'app-my-card-area',
+  templateUrl: './my-card-area.component.html',
+  styleUrls: ['./my-card-area.component.css']
 })
-export class TurnPlayerAreaComponent implements OnInit {
+export class MyCardAreaComponent implements OnInit {
 
+  @Input() showCardProperty$: Observable<boolean>;
   @Output() cardClicked = new EventEmitter<DCard>();
 
-  width$ = this.config.cardSizeRatio$.map( ratio => ratio * 50 );
+  width$ = this.config.cardSizeRatio$.map( ratio => ratio * 70 );
   myIndex$ = this.gameRoomService.myIndex$;
+  isMyTurn$ = this.gameStateService.isMyTurn$;
 
-  private turnPlayerCards$: Observable<PlayerCards>
-    = this.gameStateService.turnPlayerCards$;
+  private myCards$: Observable<PlayerCards>
+    = this.gameStateService.myCards$;
 
-  turnPlayerCards = {
-    Aside$     : this.turnPlayerCards$.map( e => e.Aside     ),
-    Deck$      : this.turnPlayerCards$.map( e => e.Deck      ),
-    HandCards$ : this.turnPlayerCards$.map( e => e.HandCards ),
-    Open$      : this.turnPlayerCards$.map( e => e.Open      ),
-    PlayArea$  : this.turnPlayerCards$.map( e => e.PlayArea  ),
-    DiscardPileReveresed$ : this.turnPlayerCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
+  myCards = {
+    Aside$     : this.myCards$.map( e => e.Aside     ),
+    Deck$      : this.myCards$.map( e => e.Deck      ),
+    HandCards$ : this.myCards$.map( e => e.HandCards ),
+    Open$      : this.myCards$.map( e => e.Open      ),
+    PlayArea$  : this.myCards$.map( e => e.PlayArea  ),
+    DiscardPileReveresed$ : this.myCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
   };
 
-  turnPlayersName$ = this.gameStateService.turnPlayersName$;
 
 
   constructor(

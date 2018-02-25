@@ -72,9 +72,8 @@ export class CloudFirestoreMediatorService {
         chatOpened:           ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeAutoChange:   ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeRatio:        ( uid: string, value: number                 ) => Promise<void>,
-        messageSpeed:         ( uid: string, value: number                 ) => Promise<void>,
+        messageMillisec:      ( uid: string, value: number                 ) => Promise<void>,
         autoSort:             ( uid: string, value: boolean                ) => Promise<void>,
-        autoPlayAllTreasures: ( uid: string, value: boolean                ) => Promise<void>,
       }
     }
   };
@@ -235,14 +234,12 @@ export class CloudFirestoreMediatorService {
           cardSizeRatio: ( uid: string, value: number ) =>
             userSetProperty( uid, 'onlineGame/cardSizeRatio', value ),
 
-          messageSpeed: ( uid: string, value: number ) =>
-            userSetProperty( uid, 'onlineGame/messageSpeed', value ),
+          messageMillisec: ( uid: string, value: number ) =>
+            userSetProperty( uid, 'onlineGame/messageMillisec', value ),
 
           autoSort: ( uid: string, value: boolean ) =>
             userSetProperty( uid, 'onlineGame/autoSort', value ),
 
-          autoPlayAllTreasures: ( uid: string, value: boolean ) =>
-            userSetProperty( uid, 'onlineGame/autoPlayAllTreasures', value ),
         }
       }
     };

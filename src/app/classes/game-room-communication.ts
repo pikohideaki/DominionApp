@@ -48,26 +48,23 @@ export type UserInputCommand = ''
 export class UserInput {
   command: UserInputCommand = '';
   data: {
-    playerId:             number,
-    shuffleBy:            number[],
-    autoSort:             boolean,
-    autoPlayAllTreasures: boolean,
-    clickedCardId?:       number,
+    playerId:       number,
+    shuffleBy:      number[],
+    autoSort:       boolean,
+    clickedCardId?: number,
   };
 
   constructor(
-    command: UserInputCommand,
-    playerId:             number,
-    autoSort:             boolean,
-    autoPlayAllTreasures: boolean,
-    clickedCardId?:       number,
+    command:        UserInputCommand,
+    playerId:       number,
+    autoSort:       boolean,
+    clickedCardId?: number,
   ) {
     this.command = (command || '');
     this.data = {
-        playerId:             playerId,
-        autoSort:             autoSort,
-        autoPlayAllTreasures: autoPlayAllTreasures,
-        shuffleBy:            permutation( 200 )
+        playerId:  playerId,
+        autoSort:  autoSort,
+        shuffleBy: permutation( 200 )
       };
     if ( clickedCardId !== undefined ) {
       this.data.clickedCardId = clickedCardId;

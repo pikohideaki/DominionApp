@@ -29,12 +29,16 @@
     </div>
   </div>
   <div class="new-message">
-    <mat-input-container class="new-message-input-box">
-      <input matInput
+    <mat-form-field class="new-message-input-box">
+      <textarea matInput placeholder="Autosize textarea"
+          matTextareaAutosize matAutosizeMinRows="2"
+          matAutosizeMaxRows="5"
           [value]="newMessage || ''"
           (input)="messageOnChange( $event.target.value )"
           placeholder="メッセージを入力">
-    </mat-input-container>
+      </textarea>
+    </mat-form-field>
+
     <button mat-raised-button class="send-button" color="primary"
         [disabled]="disableSubmitButton || !newMessage" (click)="submitMessage()" >
       <mat-icon>send</mat-icon>

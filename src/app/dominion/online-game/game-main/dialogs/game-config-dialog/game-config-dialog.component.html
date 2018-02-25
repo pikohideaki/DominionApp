@@ -1,10 +1,10 @@
 <ng-container *ngIf="{
       devMode:              devMode$              | async,
-      messageSpeed:         messageSpeed$         | async,
+      messageMillisec:      messageMillisec$      | async,
+      messageSecRounded:    messageSecRounded$    | async,
       cardSizeRatio:        cardSizeRatio$        | async,
       cardSizeAutoChange:   cardSizeAutoChange$   | async,
-      autoSort:             autoSort$             | async,
-      autoPlayAllTreasures: autoPlayAllTreasures$ | async
+      autoSort:             autoSort$             | async
     } as data">
 
 
@@ -28,7 +28,7 @@
         [max]="150"
         [min]="50"
         [value]="data.cardSizeRatio * 100"
-        (valueChange)="setCardSizeRatio( $event )" >
+        (valueChange)="cardSizeSliderOnInput( $event )" >
       <span>：{{data.cardSizeRatio}}倍</span>
     </app-card-image-size-slider>
 
@@ -41,16 +41,16 @@
     </div>
 
     <div class="box">
-      メッセージ表示速度
+      メッセージ表示時間
       <mat-slider
-          [min]="30"
-          [max]="300"
-          [value]="data.messageSpeed * 100"
-          [step]="10"
-          (input)="setMessageSpeed( $event.value )">
+          [min]="300"
+          [max]="3000"
+          [value]="data.messageMillisec"
+          [step]="100"
+          (input)="messageMillisecSliderOnInput( $event.value )">
       </mat-slider>
-      <span>：{{data.messageSpeed}}倍速</span>
-      <button mat-raised-button (click)="resetMessageSpeed()">reset</button>
+      <span>：{{data.messageSecRounded}}秒</span>
+      <button mat-raised-button (click)="resetMessageMillisec()">reset</button>
     </div>
 
     <div class="box">
@@ -62,17 +62,8 @@
     </div>
 
     <div class="box">
-      <mat-checkbox
-          [checked]="data.autoPlayAllTreasures"
-          (change)="setAutoPlayAllTreasures( $event.checked )"
-          [disabled]="true">
-        購入フェーズの初めに財宝カードを自動でプレイ
-      </mat-checkbox>
-    </div>
-
-    <div class="box">
       <p>ゲームを初期状態に戻すには、
-        下の数字を入力した後「ゲームをリセット」を押してください。
+        下の4桁の数字を入力した後「ゲームをリセット」を押してください。
       </p>
       <p>ゲームを強制終了して結果画面に移るには、
         下の数字を入力した後「ゲームを強制終了」を押してください。

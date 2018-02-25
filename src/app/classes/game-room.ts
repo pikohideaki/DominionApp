@@ -13,7 +13,7 @@ export class GameRoom {
 
   // set automatically
   playerShuffler: number[] = [];
-  private playersName:    string[] = [];
+  playersName:    string[] = [];
 
   databaseKey:             string        = '';
   gameRoomCommunicationId: string        = '';

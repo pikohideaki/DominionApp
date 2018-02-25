@@ -58,6 +58,7 @@ export class GameStateShortcutService {
   async playAllTreasures(
     gameState: GameState,
     playerId: number,
+    playersName: string,
     shuffleBy: number[],
     showMessage: boolean = true
   ) {
@@ -66,11 +67,13 @@ export class GameStateShortcutService {
           .filter( d => d.cardProperty.isBasicTreasure() );
 
     if ( showMessage ) {
+      const name
+        = basicTreasures.map( e => e.cardProperty.nameJp ).join('、')
       this.messageService.pushMessage(
-        `（${basicTreasures.map( e => e.cardProperty.nameJp ).join('、')}）をプレイしました。`);
+          `${playersName}が（${name}）をプレイしました。`);
     }
     for ( const d of basicTreasures ) {
-      await this.playCard( d, playerId, gameState, shuffleBy, false );
+      await this.playCard( d, playerId, playersName, gameState, shuffleBy, false );
     }
   }
 
@@ -171,14 +174,16 @@ export class GameStateShortcutService {
 
   async drawCards(
     n: number,
-    gameState: GameState,
     playerId: number,
+    playersName: string,
+    gameState: GameState,
     shuffleBy: number[],
     showMessage: boolean = true
   ) {
     if ( n <= 0 ) return;
     if ( showMessage ) {
-      this.messageService.pushMessage(`${n}枚カードを引きました。`);
+      this.messageService.pushMessage(
+          `${playersName}が${n}枚カードを引きました。`);
     }
     for ( let i = 0; i < n; ++i ) {
       await this.draw1Card( gameState, playerId, shuffleBy );
@@ -190,28 +195,37 @@ export class GameStateShortcutService {
   async playCard(
     dcard: DCard,
     playerId: number,
+    playersName: string,
     gameState: GameState,
     shuffleBy: number[],
     showMessage: boolean = true
   ) {
     if ( showMessage ) {
-      this.messageService.pushMessage(`${dcard.cardProperty.nameJp}をプレイしました。`);
+      this.messageService.pushMessage(
+          `${playersName}が${dcard.cardProperty.nameJp}をプレイしました。`);
     }
     gameState.removeDCards([dcard.id]);
     gameState.DCards.allPlayersCards[ playerId ].PlayArea.push( dcard );
     this.faceUp([dcard]);
     this.unbuttonize([dcard]);
-    await this.getCardEffect( dcard, playerId, gameState, shuffleBy );
+    await this.getCardEffect(
+                dcard,
+                playerId,
+                playersName,
+                gameState,
+                shuffleBy );
   }
 
   gainCard(
     dcard: DCard,
     playerId: number,
+    playersName: string,
     gameState: GameState,
     showMessage: boolean = true
   ) {
     if ( showMessage ) {
-      this.messageService.pushMessage(`${dcard.cardProperty.nameJp}を獲得しました。`);
+      this.messageService.pushMessage(
+          `${playersName}が${dcard.cardProperty.nameJp}を獲得しました。`);
     }
     gameState.removeDCards([dcard.id]);
     gameState.DCards.allPlayersCards[ playerId ].DiscardPile.push( dcard );
@@ -221,44 +235,57 @@ export class GameStateShortcutService {
   buyCard(
     dcard: DCard,
     playerId: number,
+    playersName: string,
     gameState: GameState,
     showMessage: boolean = true
   ) {
     if ( showMessage ) {
-      this.messageService.pushMessage(`${dcard.cardProperty.nameJp}を購入しました。`);
+      this.messageService.pushMessage(
+          `${playersName}が${dcard.cardProperty.nameJp}を購入しました。`);
     }
     gameState.turnInfo.buy  -= 1;
     gameState.turnInfo.coin -= dcard.cardProperty.cost.coin;
-    this.gainCard( dcard, playerId, gameState, false );
+    this.gainCard( dcard, playerId, playersName, gameState, false );
   }
 
   discard(
     dcards: DCard[],
     playerId: number,
+    playersName: string,
     gameState: GameState,
     showMessage: boolean = true
   ) {
     if ( showMessage ) {
-      this.messageService.pushMessage(`${dcards.length}枚捨て札にしました。`);
+      this.messageService.pushMessage(
+          `${playersName}が${dcards.length}枚捨て札にしました。`);
     }
     gameState.removeDCards( dcards.map( c => c.id ) );
     const playerCards = gameState.DCards.allPlayersCards[ playerId ];
     playerCards.DiscardPile.push( ...dcards );
   }
 
-  async cleanUp( gameState: GameState, playerId: number, shuffleBy: number[] ) {
+  async cleanUp(
+    gameState: GameState,
+    playerId: number,
+    playersName: string,
+    shuffleBy: number[],
+  ) {
     // 場と手札のカードを捨て札に
     await this.utils.sleep( 0.1 );
     const playerCards = gameState.DCards.allPlayersCards[ playerId ];
     this.discard(
       [].concat( playerCards.HandCards, playerCards.PlayArea ),
-      playerId, gameState, false );
+      playerId, playersName, gameState, false );
     // 手札に5枚カードを引く
-    await this.drawCards( 5, gameState, playerId, shuffleBy, false );
+    await this.drawCards( 5, playerId, playersName, gameState, shuffleBy, false );
   }
 
 
-  async onCardClick( gameState: GameState, userInput: UserInput ) {
+  async onCardClick(
+    gameState: GameState,
+    userInput: UserInput,
+    playersName: string,
+  ) {
     const playerId    = userInput.data.playerId;
     const shuffleBy   = userInput.data.shuffleBy;
     const clickedCard = gameState.getDCard( userInput.data.clickedCardId );
@@ -266,7 +293,12 @@ export class GameStateShortcutService {
 
     switch ( gameState.turnInfo.phase ) {
       case 'Action': // アクションカードの通常の使用
-        await this.playCard( clickedCard, playerId, gameState, userInput.data.shuffleBy );
+        await this.playCard(
+                clickedCard,
+                playerId,
+                playersName,
+                gameState,
+                userInput.data.shuffleBy );
         gameState.turnInfo.action -= 1;
         break;
 
@@ -277,12 +309,17 @@ export class GameStateShortcutService {
       case 'BuyPlay':
         if ( dir[0] === 'allPlayersCards' && dir[1] === playerId && dir[2] === 'HandCards' ) {
           // 財宝カードの通常の使用
-          await this.playCard( clickedCard, playerId, gameState, userInput.data.shuffleBy );
+          await this.playCard(
+                  clickedCard,
+                  playerId,
+                  playersName,
+                  gameState,
+                  userInput.data.shuffleBy );
         }
         if ( dir[0] === 'BasicCards' || dir[0] === 'KingdomCards' ) {
           // カードの購入
           gameState.turnInfo.phase = 'BuyCard';
-          this.buyCard( clickedCard, playerId, gameState );
+          this.buyCard( clickedCard, playerId, playersName, gameState );
         }
         break;
 
@@ -290,11 +327,16 @@ export class GameStateShortcutService {
         break;
 
       case 'BuyCard': // サプライなどからのカードの購入
-        this.buyCard( clickedCard, playerId, gameState );
+        this.buyCard( clickedCard, playerId, playersName, gameState );
         break;
 
       case 'Night': // Nightカードの使用
-        await this.playCard( clickedCard, playerId, gameState, userInput.data.shuffleBy );
+        await this.playCard(
+                clickedCard,
+                playerId,
+                playersName,
+                gameState,
+                userInput.data.shuffleBy );
         break;
 
       default:
@@ -307,6 +349,7 @@ export class GameStateShortcutService {
   private async getCardEffect(
     dcard: DCard,
     playerId: number,
+    playersName: string,
     gameState: GameState,
     shuffleBy: number[],
   ) {
@@ -314,7 +357,12 @@ export class GameStateShortcutService {
     gameState.turnInfo.action += cardProp.action;
     gameState.turnInfo.buy    += cardProp.buy;
     gameState.turnInfo.coin   += cardProp.coin;
-    await this.drawCards( cardProp.drawCard, gameState, playerId, shuffleBy );
+    await this.drawCards(
+                cardProp.drawCard,
+                playerId,
+                playersName,
+                gameState,
+                shuffleBy );
     // this.**service.getAdditionalEffect( dcard, snapshot, cardList )
   }
 

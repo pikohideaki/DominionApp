@@ -3,6 +3,11 @@
       currentMonth: currentMonth$ | async,
       weeks:        weeks$        | async
     } as data">
+
+<ng-container *ngIf="data.currentYear  !== undefined
+                  && data.currentMonth !== undefined
+                  && data.weeks        !== undefined
+                ">
   <div class="margined-element" [style.width.px]="width">
     <div class="picker-top-row">
       <button mat-button class="mini-button" (click)='goToPreviousMonth()' >
@@ -43,4 +48,5 @@
       <button mat-raised-button (click)="goToToday()"><mat-icon>undo</mat-icon>Today</button>
     </div>
   </div>
+</ng-container>
 </ng-container>

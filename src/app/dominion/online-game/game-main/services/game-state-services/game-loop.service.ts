@@ -25,17 +25,20 @@ export class GameLoopService {
 
 
 
-  async phaseAction( gameState: GameState, userInput: UserInput, Prosperity: boolean ) {
-    // console.log('phaseAction', gameState );
-
+  async phaseAction(
+    gameState: GameState,
+    userInput: UserInput,
+    Prosperity: boolean,
+    playersName: string,
+  ) {
     const shuffleBy = userInput.data.shuffleBy;
     const printPhase = (phase: Phase) => 0;
       // console.log(`it's ${gameState.turnPlayerIndex()}'s ${phase} phase` );
 
     while ( true ) {  // 自動フェーズ変更のため
-      const turnInfo = gameState.turnInfo;
+      const turnInfo        = gameState.turnInfo;
       const turnPlayerCards = gameState.turnPlayerCards();
-      const turnPlayerId = gameState.turnPlayerIndex();
+      const turnPlayerId    = gameState.turnPlayerIndex();
 
       this.shortcut.resetDCardsAttributes( gameState );
 
@@ -72,12 +75,6 @@ export class GameLoopService {
 
         case 'BuyPlay': {
           printPhase('BuyPlay');
-          // 自動で財宝カードをプレイ
-          // if ( userInput.data.autoPlayAllTreasures ) {
-          //   await this.shortcut.playAllTreasures(
-          //       gameState, userInput.data.playerId, userInput.data.shuffleBy );
-          // }
-
           const treasureCards = turnPlayerCards.HandCards.filter( c =>
               c.cardProperty.cardTypes.includes('Treasure') );
 
@@ -115,7 +112,11 @@ export class GameLoopService {
 
         case 'CleanUp': {
           printPhase('CleanUp');
-          await this.shortcut.cleanUp( gameState, turnPlayerId, shuffleBy );
+          await this.shortcut.cleanUp(
+                  gameState,
+                  turnPlayerId,
+                  playersName,
+                  shuffleBy );
           turnInfo.phase = 'EndOfTurn';
           break;
         }

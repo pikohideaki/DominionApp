@@ -9,24 +9,32 @@ import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.se
 @Injectable()
 export class GameMessageService {
 
-  messageSpeed$ = this.myUserInfo.onlineGame.messageSpeed$;
+  private messageMillisec$ = this.myUserInfo.onlineGame.messageMillisec$;
 
   private messageForMeSource = new BehaviorSubject<string>('');
-  messageForMe$: Observable<string>
-    = this.messageForMeSource.asObservable()
-        .withLatestFrom( this.messageSpeed$ )
-        .concatMap( ([x, messageSpeed]) =>
+  private messageForMe$ = this.messageForMeSource.asObservable();
+
+  private messageForMeList = [];
+  messageForMeList$
+    = this.messageForMe$.map( _ => this.messageForMeList );
+
+  messageForMeWithTime$: Observable<string>
+    = this.messageForMe$
+        .withLatestFrom( this.messageMillisec$ )
+        .concatMap( ([x, messageMillisec]) =>
             Observable.merge(
                 Observable.of(x),
-                Observable.of('').delay(1000 / messageSpeed) ) );
+                Observable.of('').delay(messageMillisec) ) );
 
 
   constructor(
     private myUserInfo: MyUserInfoService
-  ) { }
+  ) {
+  }
 
 
   pushMessage( message: string ) {
+    this.messageForMeList.push( message );
     this.messageForMeSource.next( message );
   }
 }
