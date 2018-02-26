@@ -72,7 +72,7 @@ export class CloudFirestoreMediatorService {
         chatOpened:           ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeAutoChange:   ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeRatio:        ( uid: string, value: number                 ) => Promise<void>,
-        messageMillisec:      ( uid: string, value: number                 ) => Promise<void>,
+        messageSec:           ( uid: string, value: number                 ) => Promise<void>,
         autoSort:             ( uid: string, value: boolean                ) => Promise<void>,
       }
     }
@@ -234,8 +234,8 @@ export class CloudFirestoreMediatorService {
           cardSizeRatio: ( uid: string, value: number ) =>
             userSetProperty( uid, 'onlineGame/cardSizeRatio', value ),
 
-          messageMillisec: ( uid: string, value: number ) =>
-            userSetProperty( uid, 'onlineGame/messageMillisec', value ),
+          messageSec: ( uid: string, value: number ) =>
+            userSetProperty( uid, 'onlineGame/messageSec', value ),
 
           autoSort: ( uid: string, value: boolean ) =>
             userSetProperty( uid, 'onlineGame/autoSort', value ),

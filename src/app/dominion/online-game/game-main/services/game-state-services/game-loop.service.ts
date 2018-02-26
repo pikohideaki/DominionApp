@@ -9,6 +9,7 @@ import { CloudFirestoreMediatorService } from '../../../../../firebase-mediator/
 import { GameStateService } from './game-state.service';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateShortcutService } from './game-state-shortcut.service';
+import { GameMessageService } from '../game-message.service';
 
 
 @Injectable()
@@ -19,7 +20,8 @@ export class GameLoopService {
     private utils: UtilitiesService,
     private gameRoomService: MyGameRoomService,
     private gameState: GameStateService,
-    private shortcut: GameStateShortcutService
+    private shortcut: GameStateShortcutService,
+    private messageService: GameMessageService,
   ) {
   }
 
@@ -129,6 +131,7 @@ export class GameLoopService {
             gameState.turnCounter++;
             turnInfo.phase = '';
           }
+          this.messageService.pushMessage(`---${playersName}のターン終了---`);
           break;
         }
 

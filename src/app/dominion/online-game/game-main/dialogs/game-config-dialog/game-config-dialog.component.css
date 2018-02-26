@@ -19,3 +19,7 @@
 .title-bar {
   display: flex;
 }
+
+#devModeButton {
+  float: right;
+}

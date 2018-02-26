@@ -29,7 +29,7 @@ export class MyUserInfoService {
     chatOpened$:           Observable<boolean>,
     cardSizeAutoChange$:   Observable<boolean>,
     cardSizeRatio$:        Observable<number>,
-    messageMillisec$:      Observable<number>,
+    messageSec$:           Observable<number>,
     autoSort$:             Observable<boolean>,
   };
 
@@ -90,8 +90,8 @@ export class MyUserInfoService {
       cardSizeRatio$ :
         this.myUserInfo$.map( e => e.onlineGame.cardSizeRatio )
           .distinctUntilChanged(),
-      messageMillisec$ :
-        this.myUserInfo$.map( e => e.onlineGame.messageMillisec )
+      messageSec$ :
+        this.myUserInfo$.map( e => e.onlineGame.messageSec )
           .distinctUntilChanged(),
       autoSort$ :
         this.myUserInfo$.map( e => e.onlineGame.autoSort )
@@ -147,9 +147,9 @@ export class MyUserInfoService {
     if ( !this.uid ) return Promise.resolve();
     return this.database.user.set.onlineGame.cardSizeRatio( this.uid, value );
   }
-  setOnlineGameMessageMillisec( millisec: number ) {
+  setOnlineGameMessageSec( sec: number ) {
     if ( !this.uid ) return Promise.resolve();
-    return this.database.user.set.onlineGame.messageMillisec( this.uid, millisec );
+    return this.database.user.set.onlineGame.messageSec( this.uid, sec );
   }
   setOnlineGameAutoSort( value: boolean ) {
     if ( !this.uid ) return Promise.resolve();

@@ -1,18 +1,19 @@
 <ng-container *ngIf="{
-      devMode:              devMode$              | async,
-      messageMillisec:      messageMillisec$      | async,
-      messageSecRounded:    messageSecRounded$    | async,
-      cardSizeRatio:        cardSizeRatio$        | async,
-      cardSizeAutoChange:   cardSizeAutoChange$   | async,
-      autoSort:             autoSort$             | async
+      devMode:            devMode$            | async,
+      messageSec:         messageSec$         | async,
+      cardSizeRatio:      cardSizeRatio$      | async,
+      cardSizeAutoChange: cardSizeAutoChange$ | async,
+      autoSort:           autoSort$           | async
     } as data">
 
 
   <div mat-dialog-title class="title-bar">
     <span>設定</span>
     <span class="spacer"></span>
-    <button mat-icon-button (click)="toggleDevMode( data.devMode )">
-      <mat-icon>developer_mode</mat-icon>
+    <button mat-icon-button (click)="smartphoneMode()"
+        matTooltip="Smart phone用表示"
+        matTooltipPosition="below" >
+      <mat-icon>smartphone</mat-icon>
     </button>
   </div>
 
@@ -23,14 +24,19 @@
       </mat-checkbox>
     </div> -->
 
-    <app-card-image-size-slider
-        [default]="100"
-        [max]="150"
-        [min]="50"
-        [value]="data.cardSizeRatio * 100"
-        (valueChange)="cardSizeSliderOnInput( $event )" >
-      <span>：{{data.cardSizeRatio}}倍</span>
-    </app-card-image-size-slider>
+    <div class="box">
+      カードサイズ（％）
+      <mat-slider
+          [min]="30"
+          [max]="200"
+          [step]="10"
+          [thumb-label]="true"
+          [tick-interval]="1"
+          [value]="data.cardSizeRatio * 100"
+          (change)="setCardSizeRatio( $event.value / 100 )">
+      </mat-slider>
+      <button mat-raised-button (click)="setCardSizeRatio( 1.0 )">reset</button>
+    </div>
 
     <div class="box">
       <mat-checkbox
@@ -41,16 +47,17 @@
     </div>
 
     <div class="box">
-      メッセージ表示時間
+      メッセージ表示時間（秒）
       <mat-slider
-          [min]="300"
-          [max]="3000"
-          [value]="data.messageMillisec"
-          [step]="100"
-          (input)="messageMillisecSliderOnInput( $event.value )">
+          [min]="0.5"
+          [max]="5"
+          [step]="0.1"
+          [thumb-label]="true"
+          [tick-interval]="1"
+          [value]="data.messageSec"
+          (change)="setMessageSec( round( $event.value ) )">
       </mat-slider>
-      <span>：{{data.messageSecRounded}}秒</span>
-      <button mat-raised-button (click)="resetMessageMillisec()">reset</button>
+      <button mat-raised-button (click)="setMessageSec( 2.0 )">reset</button>
     </div>
 
     <div class="box">
@@ -69,11 +76,11 @@
         下の数字を入力した後「ゲームを強制終了」を押してください。
       </p>
       <div class="center">
-        <span class="reset-game-password">{{resetGameKeyword}}</span>
+        <span class="reset-game-password">{{resetGameKeycode}}</span>
         <mat-input-container class="new-message-input-box">
           <input matInput
               type="number"
-              (input)="inputStringOnChange( $event.target.valueAsNumber )"
+              (input)="keycodeOnInput( $event.target.valueAsNumber )"
               placeholder="数字を入力">
         </mat-input-container>
       </div>
@@ -85,12 +92,17 @@
       OK
     </button>
     <button mat-raised-button mat-dialog-close="resetGame" color='warn'
-        [disabled]="resetGameKeyword !== input">
+        [disabled]="resetGameKeycode !== keycode">
       ゲームをリセット
     </button>
     <button mat-raised-button mat-dialog-close="terminateGame" color='warn'
-        [disabled]="resetGameKeyword !== input">
+        [disabled]="resetGameKeycode !== keycode">
       ゲームを強制終了
     </button>
   </div>
+
+  <button mat-icon-button id="devModeButton" (click)="toggleDevMode( data.devMode )">
+    <mat-icon>developer_mode</mat-icon>
+  </button>
+
 </ng-container>

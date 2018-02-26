@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { Observable } from 'rxjs/Observable';
 
 import { ConfirmDialogComponent } from '../../../../my-own-library/confirm-dialog.component';
 
@@ -13,15 +14,15 @@ import { GameRoomCommunicationService } from '../services/game-room-communicatio
 })
 export class MyAreaComponent implements OnInit {
 
-  @Input() isMyTurn$;
-  @Input() isBuyPlayPhase$;
-  @Input() messageForMe$;
-  @Input() messageForMeList$;
-  @Input() myIndex$;
-  @Input() autoSort$;
-  @Input() showCardProperty$;
-  @Input() gameIsOver$;
-  @Input() myThinkingState$;
+  @Input() isMyTurn$:         Observable<boolean>;
+  @Input() isBuyPlayPhase$:   Observable<boolean>;
+  @Input() messageForMe$:     Observable<string>;
+  @Input() messageForMeList$: Observable<string[]>;
+  @Input() myIndex$:          Observable<number>;
+  @Input() autoSort$:         Observable<boolean>;
+  @Input() showCardProperty$: Observable<boolean>;
+  @Input() gameIsOver$:       Observable<boolean>;
+  @Input() myThinkingState$:  Observable<boolean>;
 
   @Output() cardClicked = new EventEmitter<any>();
 

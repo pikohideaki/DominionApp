@@ -83,7 +83,7 @@ export class SignUpComponent implements OnInit {
               chatOpened:           true,
               cardSizeAutoChange:   true,
               cardSizeRatio:        1,
-              messageMillisec:      1,
+              messageSec:           1,
               autoSort:             true,
             }
           } ) );

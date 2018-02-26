@@ -67,8 +67,7 @@ export class GameStateShortcutService {
           .filter( d => d.cardProperty.isBasicTreasure() );
 
     if ( showMessage ) {
-      const name
-        = basicTreasures.map( e => e.cardProperty.nameJp ).join('、')
+      const name = basicTreasures.map( e => e.cardProperty.nameJp ).join('、');
       this.messageService.pushMessage(
           `${playersName}が（${name}）をプレイしました。`);
     }

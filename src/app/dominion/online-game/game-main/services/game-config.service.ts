@@ -7,10 +7,10 @@ import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.se
 @Injectable()
 export class GameConfigService {
 
-  cardSizeAutoChange$   = this.user.onlineGame.cardSizeAutoChange$;
-  cardSizeRatio$        = this.user.onlineGame.cardSizeRatio$;
-  messageMillisec$      = this.user.onlineGame.messageMillisec$;
-  autoSort$             = this.user.onlineGame.autoSort$;
+  cardSizeAutoChange$ = this.user.onlineGame.cardSizeAutoChange$;
+  cardSizeRatio$      = this.user.onlineGame.cardSizeRatio$;
+  messageSec$         = this.user.onlineGame.messageSec$;
+  autoSort$           = this.user.onlineGame.autoSort$;
 
   private devModeSource = new BehaviorSubject<boolean>(false);
   devMode$ = this.devModeSource.asObservable();
@@ -29,8 +29,8 @@ export class GameConfigService {
     this.user.setOnlineGameCardSizeRatio( value );
   }
 
-  setMessageMillisec( millisec: number ) {
-    this.user.setOnlineGameMessageMillisec( millisec );
+  setMessageSec( sec: number ) {
+    this.user.setOnlineGameMessageSec( sec );
   }
 
   setDevMode( value: boolean ) {

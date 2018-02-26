@@ -1,6 +1,5 @@
 <ng-container *ngIf="{
-    showCardProperty: showCardProperty$ | async,
-    turnPlayersName:  turnPlayersName$  | async
+    turnPlayersName: turnPlayersName$  | async
   } as data">
 
 
@@ -10,7 +9,7 @@
   <div class="PlayArea_Aside">
     <div class="CardArea box-shadow PlayArea">
       <app-cards-lined-up
-        [showCardProperty]="data.showCardProperty"
+        [showCardProperty]="false"
         [DCardArray$]="turnPlayerCards.PlayArea$"
         [myIndex$]="myIndex$"
         [width$]="width$"
@@ -19,7 +18,7 @@
     </div>
     <div class="CardArea box-shadow Aside">
       <app-cards-lined-up
-        [showCardProperty]="data.showCardProperty"
+        [showCardProperty]="false"
         [DCardArray$]="turnPlayerCards.Aside$"
         [myIndex$]="myIndex$"
         [width$]="width$"
@@ -32,7 +31,7 @@
     <div class="CardArea box-shadow Deck">
       <app-cards-pile
         [showArraySize]="true"
-        [showCardProperty]="data.showCardProperty"
+        [showCardProperty]="false"
         [DCardArray$]="turnPlayerCards.Deck$"
         [myIndex$]="myIndex$"
         [width$]="width$"
@@ -42,7 +41,7 @@
     <div class="CardArea box-shadow HandCards">
       <app-cards-lined-up
         [defaultArrayLength]="5"
-        [showCardProperty]="data.showCardProperty"
+        [showCardProperty]="false"
         [DCardArray$]="turnPlayerCards.HandCards$"
         [myIndex$]="myIndex$"
         [width$]="width$"
@@ -52,7 +51,7 @@
     <div class="CardArea box-shadow DiscardPile">
       <app-cards-pile
         [showArraySize]="true"
-        [showCardProperty]="data.showCardProperty"
+        [showCardProperty]="false"
         [DCardArray$]="turnPlayerCards.DiscardPileReveresed$"
         [myIndex$]="myIndex$"
         [width$]="width$"

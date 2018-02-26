@@ -13,7 +13,7 @@ export class User {
     chatOpened:           boolean,
     cardSizeAutoChange:   boolean,
     cardSizeRatio:        number,
-    messageMillisec:      number,
+    messageSec:           number,
     autoSort:             boolean,
   } = {
     isSelectedExpansions: [],
@@ -23,7 +23,7 @@ export class User {
     chatOpened:           true,
     cardSizeAutoChange:   true,
     cardSizeRatio:        1,
-    messageMillisec:      2000,
+    messageSec:           2000,
     autoSort:             true,
   };
 
@@ -39,7 +39,7 @@ export class User {
         chatOpened:           boolean,
         cardSizeAutoChange:   boolean,
         cardSizeRatio:        number,
-        messageMillisec:      number,
+        messageSec:           number,
         autoSort:             boolean,
       }
   }) {
@@ -57,7 +57,7 @@ export class User {
     this.onlineGame.chatOpened           = !!initObj.onlineGame.chatOpened;
     this.onlineGame.cardSizeAutoChange   = !!initObj.onlineGame.cardSizeAutoChange;
     this.onlineGame.cardSizeRatio        = ( initObj.onlineGame.cardSizeRatio        || 1  );
-    this.onlineGame.messageMillisec      = ( initObj.onlineGame.messageMillisec      || 2000 );
+    this.onlineGame.messageSec           = ( initObj.onlineGame.messageSec           || 2000 );
     this.onlineGame.autoSort             = !!initObj.onlineGame.autoSort;
   }
 }

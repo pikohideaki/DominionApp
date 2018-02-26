@@ -40,3 +40,14 @@
   display: flex;
   justify-content: center;
 }
+
+
+/***** lineUp *****/
+.card-images-lined-up {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.card-image-in-line {
+  padding-bottom: 4px;
+}
