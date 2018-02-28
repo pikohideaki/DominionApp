@@ -15,12 +15,13 @@ import { CardPropertyDialogComponent } from '../../../../../sub-components/card-
 export class CardsAreaComponent implements OnInit {
 
   @Input() displayStyle: 'lineUp'|'pile';
-  @Input() showCardProperty: boolean = false;
-  @Input() showArraySize: boolean = false;
+  @Input() showCardProperty:   boolean = false;
+  @Input() showArraySize:      boolean = false;
+  @Input() hideNonButtonCards: boolean = false;
 
-  @Input() myIndex$: Observable<number>;
+  @Input() myIndex$:    Observable<number>;
   @Input() DCardArray$: Observable<DCard[]>;
-  @Input() cardWidth$: Observable<number>;
+  @Input() cardWidth$:  Observable<number>;
 
   @Output() cardClicked = new EventEmitter<DCard>();
 
@@ -39,6 +40,7 @@ export class CardsAreaComponent implements OnInit {
     private dialog: MatDialog
   ) { }
 
+
   ngOnInit() {
     if ( this.displayStyle === 'lineUp' ) {
       this.DCardArrayForView$ = this.DCardArray$;
@@ -50,13 +52,11 @@ export class CardsAreaComponent implements OnInit {
       this.DCardArrayForView$ = this.DCardArray$.map( ar => ar.slice( 0, 1 ) );
       this.boxMinWidth$ = this.cardWidth$;
     }
-
   }
 
   onClicked( dcard: DCard ) {
     this.cardClicked.emit( dcard );
   }
-
 
 
   openCardPropertyDialog( dcard: DCard ) {

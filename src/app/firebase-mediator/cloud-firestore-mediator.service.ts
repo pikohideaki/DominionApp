@@ -1,7 +1,5 @@
 import { Injectable, isDevMode } from '@angular/core';
-
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/combineLatest';
 
 import { AngularFirestore    } from 'angularfire2/firestore';
 import { AngularFireDatabase } from 'angularfire2/database';
@@ -133,6 +131,7 @@ export class CloudFirestoreMediatorService {
     sendUserInput:           ( roomId: string, userInput: UserInput ) => firebase.database.ThenableReference,
     removeAllUserInput:      ( roomId: string ) => Promise<void>,
     setThinkingState:        ( roomId: string, playerId: number, state: boolean ) => Promise<void>,
+    setPresenceState:      ( roomId: string, playerId: number, state: boolean ) => Promise<void>,
     setTerminatedState:      ( roomId: string, state: boolean ) => Promise<void>,
     setResultSubmittedState: ( roomId: string, state: boolean ) => Promise<void>,
   };
@@ -253,7 +252,7 @@ export class CloudFirestoreMediatorService {
         delete copy.date;
         copy.timeStamp = gameResult.date.valueOf();
         copy.players.forEach( pl => {
-          delete pl.rank;
+          // delete pl.rank;
           delete pl.score;
         });
         return this.afdb.list( this.fdPath.gameResultList ).push( copy );
@@ -349,8 +348,10 @@ export class CloudFirestoreMediatorService {
           },
           lastTurnPlayerName: ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/lastTurnPlayerName`, value ),
+
           place: ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/place`, value ),
+
           memo:  ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/memo`, value ),
         },
@@ -411,20 +412,30 @@ export class CloudFirestoreMediatorService {
     this.onlineGameCommunication = {
       add:        ( newGameComm: GameCommunication ) =>
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).push( newGameComm ),
+
       remove:     ( roomId: string ) =>
         this.afdb.list( this.fdPath.onlineGameCommunicationList ).remove( roomId ),
+
       sendMessage: ( roomId: string, message: ChatMessage ) =>
-        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList`).push( message ),
+        this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/chatList`).push( message.asObj() ),
+
       sendUserInput:    ( roomId: string, userInput: UserInput ) =>
         this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/userInputList`).push( userInput ),
+
       removeAllUserInput: ( roomId: string ) =>
         this.afdb.list(`${this.fdPath.onlineGameCommunicationList}/${roomId}/userInputList`).remove()
         .then( () =>
           this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/resetGameClicked`).set( Date.now() ) ),
+
       setThinkingState: ( roomId: string, playerId: number, state: boolean ) =>
         this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/thinkingState/${playerId}`).set( state ),
+
+      setPresenceState: ( roomId: string, playerId: number, state: boolean ) =>
+        this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/presenceState/${playerId}`).set( state ),
+
       setTerminatedState: ( roomId: string, state: boolean ) =>
         this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/isTerminated`).set( state ),
+
       setResultSubmittedState: ( roomId: string, state: boolean ) =>
         this.afdb.object(`${this.fdPath.onlineGameCommunicationList}/${roomId}/resultIsSubmitted`).set( state ),
     };

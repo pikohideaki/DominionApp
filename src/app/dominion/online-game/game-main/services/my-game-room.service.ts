@@ -16,16 +16,16 @@ export class MyGameRoomService {
 
   myGameRoom$: Observable<GameRoom>
     = this.database.onlineGameRooms$.combineLatest(
-          this.myUserInfo.onlineGame.roomId$,
+          this.user.onlineGame.roomId$,
           (list, id) => (list.find( e => e.databaseKey === id ) || new GameRoom()) );
 
   initialState$: Observable<GameState>
-    = this.myGameRoom$.map( e => new GameState( e.initialState ) );
+    = this.myGameRoom$.map( e => e.initialState );
 
   myIndex$: Observable<number>
     = Observable.combineLatest(
           this.myGameRoom$.map( e => e.playersNameShuffled() ).distinctUntilChanged(),
-          this.myUserInfo.name$,
+          this.user.name$,
           (playersName, myName) => playersName.findIndex( e => e === myName ) )
         .first();
 
@@ -50,7 +50,7 @@ export class MyGameRoomService {
   constructor(
     private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
-    private myUserInfo: MyUserInfoService
+    private user: MyUserInfoService
   ) {
   }
 }

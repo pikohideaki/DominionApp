@@ -1,3 +1,5 @@
+import { CardProperty } from './card-property';
+
 export class NumberOfVictoryCards {
   VPtoken:          number = 0;
   others:           number = 0;
@@ -42,6 +44,7 @@ export class NumberOfVictoryCards {
   numberOfDifferentlyNamedCards: number = 0;  // for Fairgrounds
   numberOfSilvers:               number = 0;  // for Feodum
   Distant_Lands_on_TavernMat:    number = 0;  // for Distant_Lands
+
 
   constructor( initObj? ) {
     if ( !initObj ) return;
@@ -90,4 +93,141 @@ export class NumberOfVictoryCards {
       + this.Kings_Castle
       ;
   }
+
+
+
+  VPtotal(): number {
+    let VPtotal = 0;
+    Object.keys( this ).forEach( key =>
+      VPtotal += this.VPofCard( key ) );
+    return VPtotal;
+  }
+
+  VPofCard( name: string ): number {
+    return this[ name ] * this.VPperCard( name );
+  }
+
+
+  VPperCard( name: string ): number {
+    switch (name) {
+      case 'VPtoken'          : return  1;
+      case 'others'           : return  1;
+      case 'othersMinus'      : return -1;
+      case 'Curse'            : return -1;
+      case 'Estate'           : return  1;
+      case 'Duchy'            : return  3;
+      case 'Province'         : return  6;
+      case 'Colony'           : return 10;
+      case 'Great_Hall'       : return  1;
+      case 'Nobles'           : return  2;
+      case 'Harem'            : return  2;
+      case 'Farmland'         : return  2;
+      case 'Island'           : return  2;
+      case 'Tunnel'           : return  2;
+      case 'Dame_Josephine'   : return  2;
+      case 'Overgrown_Estate' : return  0;
+      case 'Mill'             : return  1;
+      case 'Cemetery'         : return  2;
+
+
+      // 庭園 : デッキ枚数 ÷ 10 点
+      case 'Gardens'     : return Math.floor( this.DeckSize / 10 );
+
+      // 公爵 : 公領1枚につき1点
+      case 'Duke'        : return this.Duchy;
+
+      // ブドウ園 : アクションカード3枚につき1点
+      case 'Vineyard'    : return Math.floor( this.numberOfActionCards / 3 );
+
+      // 品評会 : 異なる名前のカード5枚につき2勝利点
+      case 'Fairgrounds' : return 2 * Math.floor( this.numberOfDifferentlyNamedCards / 5 );
+
+      // シルクロード : 勝利点カード4枚につき1点
+      case 'Silk_Road'   : return Math.floor( this.countVictoryCards() / 4 );
+
+      // // 封土 : 銀貨3枚につき1点
+      case 'Feodum'      : return Math.floor( this.numberOfSilvers / 3 );
+
+      // 遠隔地 : 酒場マットの上にあれば4点，そうでなければ0点
+      case 'Distant_Lands' : return 0;
+      case 'Distant_Lands_on_TavernMat' : return 4;
+
+      // Castles
+      case 'Humble_Castle'    : return this.countCastles();
+      case 'Crumbling_Castle' : return 1;
+      case 'Small_Castle'     : return 2;
+      case 'Haunted_Castle'   : return 2;
+      case 'Opulent_Castle'   : return 3;
+      case 'Sprawling_Castle' : return 4;
+      case 'Grand_Castle'     : return 5;
+      case 'Kings_Castle'     : return 2 * this.countCastles();
+
+      // Pasture : 屋敷1枚につき1点
+      case 'Pasture'        : return this.Estate;
+
+      default : return 0;
+    }
+  }
+
+
+
+
+  toStr( cardPropertyList: CardProperty[] ): string {
+    const result = [];
+
+    if ( this.VPtoken !== 0 ) result.push(`VPトークン(${this.VPtoken})`);
+    if ( this.others - this.othersMinus !== 0 ) {
+      result.push(`その他(${this.others - this.othersMinus})`);
+    }
+
+    const toNameJp = (id =>
+      ( cardPropertyList.find( e => e.cardId === id ) || new CardProperty() ).nameJp );
+
+    [ 'Curse',
+      'Estate',
+      'Duchy',
+      'Province',
+      'Colony',
+      'Great_Hall',
+      'Nobles',
+      'Harem',
+      'Farmland',
+      'Island',
+      'Tunnel',
+      'Dame_Josephine',
+      'Mill',
+      'Cemetery',
+      'Gardens',
+      'Duke',
+      'Vineyard',
+      'Fairgrounds',
+      'Silk_Road',
+      'Feodum',
+      'Distant_Lands',
+      'Pasture',
+    ].forEach( id => {
+      if ( this[id] !== 0 ) {
+        result.push(`${toNameJp(id)}(${this.VPperCard(id)}x${this[id]})`);
+      }
+    });
+
+    const CastleVPtotal
+      = [ 'Humble_Castle',
+          'Crumbling_Castle',
+          'Small_Castle',
+          'Haunted_Castle',
+          'Opulent_Castle',
+          'Sprawling_Castle',
+          'Grand_Castle',
+          'Kings_Castle'
+        ].map( cardId => this.VPperCard(cardId) * this[cardId] )
+          .reduce( (prev, curr) => prev + curr );
+
+    if ( CastleVPtotal !== 0 ) {
+      result.push(`城(${CastleVPtotal})`);
+    }
+
+    return result.join('，');
+  }
+
 }

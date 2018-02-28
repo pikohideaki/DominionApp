@@ -11,6 +11,7 @@ import { DCard } from '../../../../../classes/game-state';
       displayStyle="pile"
       [showArraySize]="showArraySize"
       [showCardProperty]="showCardProperty"
+      [hideNonButtonCards]="hideNonButtonCards"
       [myIndex$]="myIndex$"
       [DCardArray$]="DCardArray$"
       [cardWidth$]="width$"
@@ -23,11 +24,13 @@ import { DCard } from '../../../../../classes/game-state';
 })
 export class CardsPileComponent implements OnInit {
 
-  @Input() showArraySize: boolean = true;
-  @Input() showCardProperty: boolean = false;
-  @Input() myIndex$: Observable<number>;
+  @Input() showArraySize:      boolean = true;
+  @Input() showCardProperty:   boolean = false;
+  @Input() hideNonButtonCards: boolean = false;
+
+  @Input() myIndex$:    Observable<number>;
   @Input() DCardArray$: Observable<DCard[]>;
-  @Input() width$: Observable<number>;
+  @Input() width$:      Observable<number>;
 
   @Output() cardClicked = new EventEmitter<DCard>();
 

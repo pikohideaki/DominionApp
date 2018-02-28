@@ -17,6 +17,12 @@
       部屋を作成
     </button>
   </span>
+  <span *ngIf="isdevmode" class="margined-element">
+    <mat-checkbox [checked]="addTestPlayer"
+        (change)="addTestPlayerChecked( $event.checked )">
+      テストプレイヤーを追加
+    </mat-checkbox>
+  </span>
   <span *ngIf="data.preparingDialog" class="margined-element">
     準備中…
   </span>

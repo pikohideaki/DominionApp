@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, isDevMode } from '@angular/core';
 
 import { GameConfigService   } from '../../services/game-config.service';
 import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
@@ -10,6 +10,8 @@ import { UtilitiesService } from '../../../../../my-own-library/utilities.servic
   styleUrls: ['./game-config-dialog.component.css'],
 })
 export class GameConfigDialogComponent implements OnInit {
+
+  isDevMode = isDevMode();
 
   cardSizeAutoChange$ = this.config.cardSizeAutoChange$;
   cardSizeRatio$      = this.config.cardSizeRatio$;

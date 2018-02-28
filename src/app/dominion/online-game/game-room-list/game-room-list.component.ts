@@ -12,6 +12,7 @@ import { UtilitiesService } from '../../../my-own-library/utilities.service';
 import { GameRoom } from '../../../classes/game-room';
 import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/sign-in-to-game-room-dialog.component';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -22,17 +23,19 @@ import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.servi
 })
 export class GameRoomListComponent implements OnInit {
 
-  myName$ = this.myUserInfo.name$;
+  myName$ = this.user.name$;
   gameRoomList$: Observable<GameRoom[]> = this.database.onlineGameRooms$;
   selectedRoomId = '';
+  inPlayGameId$: Observable<string> = this.user.onlineGame.roomId$;
 
 
   constructor(
+    private router: Router,
     public snackBar: MatSnackBar,
     public dialog: MatDialog,
     public utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
-    private myUserInfo: MyUserInfoService
+    private user: MyUserInfoService
   ) {
   }
 
@@ -76,6 +79,9 @@ export class GameRoomListComponent implements OnInit {
       .forEach( key => this.database.onlineGameRoom.remove(key) );
   }
 
+  returnToGame() {
+    this.router.navigate( ['/online-game-main'] );
+  }
 
   private openSnackBar( message: string ) {
     this.snackBar.open( message, undefined, { duration: 3000 } );

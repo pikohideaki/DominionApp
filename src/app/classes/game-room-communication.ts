@@ -9,6 +9,7 @@ export class GameCommunication {
   userInputList:     UserInput[]   = [];
   resetGameClicked:  number        = 0;
   thinkingState:     boolean[]     = [];
+  presenceState:     boolean[]     = [];
   isTerminated:      boolean       = false;
   resultIsSubmitted: boolean       = false;
 
@@ -18,6 +19,7 @@ export class GameCommunication {
       userInputList:     UserInput[],
       resetGameClicked:  number,
       thinkingState:     boolean[],
+      presenceState:     boolean[],
       isTerminated:      boolean,
       resultIsSubmitted: boolean,
     }
@@ -29,6 +31,7 @@ export class GameCommunication {
     this.userInputList     = ( dataObj.userInputList    || [] );
     this.resetGameClicked  = ( dataObj.resetGameClicked || 0  );
     this.thinkingState     = ( dataObj.thinkingState    || [] );
+    this.presenceState     = ( dataObj.presenceState    || [] );
     this.isTerminated      = !!dataObj.isTerminated;
     this.resultIsSubmitted = !!dataObj.resultIsSubmitted;
   }

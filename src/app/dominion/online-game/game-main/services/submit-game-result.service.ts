@@ -6,9 +6,9 @@ import { GameState            } from '../../../../classes/game-state';
 import { NumberOfVictoryCards } from '../../../../classes/number-of-victory-cards';
 
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
-import { VictoryPointsCalculatorService } from '../../../sub-components/victory-points-calculator/victory-points-calculator.service';
 import { GameStateService } from './game-state-services/game-state.service';
 import { MyGameRoomService } from './my-game-room.service';
+import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 
 
 @Injectable()
@@ -17,7 +17,7 @@ export class SubmitGameResultService {
   gameResult$: Observable<GameResult>
     = Observable.combineLatest(
       this.database.scoringTable$,
-      this.gameStateService.gameState$,
+      this.gameStateService.gameState$.filter( gs => gs.gameIsOver() ),
       this.myGameRoomService.myGameRoom$,
       this.database.expansionNameList$,
       this.database.cardPropertyList$,
@@ -45,15 +45,17 @@ export class SubmitGameResultService {
             BlackMarketPile : selectedCards.BlackMarketPile.map( indexToId ),
           },
           players : playersName.map( (name, i) => ({
-                    name      : name,
-                    VP        : this.vpTotal( i, gameState ),
-                    turnOrder : i,
-                    rank      : 1,
-                    score     : 0,
+                    name            : name,
+                    NofVictoryCards : this.countNumberOfVictoryCards( i, gameState ),
+                    VP              : 0,
+                    turnOrder       : i,
+                    rank            : 1,
+                    score           : 0,
                   }) ),
           lastTurnPlayerName: lastTurnPlayerName,
         });
 
+        gameResult.players.forEach( p => p.VP = p.NofVictoryCards.VPtotal() );
         gameResult.rankPlayers();
         gameResult.setScores( defaultScores );
         return gameResult;
@@ -62,7 +64,7 @@ export class SubmitGameResultService {
 
   constructor(
     private database: CloudFirestoreMediatorService,
-    private vpcalc: VictoryPointsCalculatorService,
+    private utils: UtilitiesService,
     private myGameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
   ) { }
@@ -73,19 +75,28 @@ export class SubmitGameResultService {
     return this.database.gameResult.add( gameResult );
   }
 
-  private vpTotal( playerIndex: number, gameState: GameState ) {
-    return this.vpcalc.total( this.countNumberOfVictoryCards( playerIndex, gameState ) );
-  }
-
   private countNumberOfVictoryCards( playerIndex: number, gameState: GameState ): NumberOfVictoryCards {
     const numberOfVictoryCards = new NumberOfVictoryCards();
     const playerCards = gameState.DCards.allPlayersCards[ playerIndex ];
-    playerCards.getDCards()
+    const allCards = playerCards.getDCards();
+    allCards
       .filter( dcard => dcard.cardProperty.cardTypes.includes('Victory') )
       .forEach( dcard => {
         numberOfVictoryCards[ dcard.cardProperty.cardId ]++;
       });
-    // 特殊勝利点を追加したらここに計算を追加
+    numberOfVictoryCards.DeckSize
+      = allCards.length;
+    numberOfVictoryCards.numberOfActionCards
+      = allCards.filter( e => e.cardProperty.cardTypes.includes('Action') )
+          .length;
+    numberOfVictoryCards.numberOfDifferentlyNamedCards
+      = this.utils.uniq( allCards.map( e => e.cardProperty.nameEng ) )
+          .length;
+    numberOfVictoryCards.numberOfSilvers
+      = allCards.filter( e => e.cardProperty.cardId === 'Silver' )
+          .length;
+    // TavernMatを追加したら編集
+    numberOfVictoryCards.Distant_Lands_on_TavernMat = 0;
     return numberOfVictoryCards;
   }
 }

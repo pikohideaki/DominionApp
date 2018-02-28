@@ -13,25 +13,21 @@ import { GameRoomCommunicationService } from '../services/game-room-communicatio
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit, AfterViewInit {
-  private alive: boolean = true;
 
   @Input() sidenav;
   @Input() autoScroll: boolean = true;
 
-  chatList$: Observable<ChatMessage[]>;
-  myName$: Observable<string>;
+  chatList$: Observable<ChatMessage[]> = this.gameCommunication.chatList$;
+  myName$: Observable<string> = this.user.name$;
 
   newMessage: string = '';
   disableSubmitButton = false;  // 連打防止
 
 
   constructor(
-    private myUserInfo: MyUserInfoService,
+    private user: MyUserInfoService,
     private gameCommunication: GameRoomCommunicationService,
   ) {
-    // observables
-    this.myName$ = this.myUserInfo.name$;
-    this.chatList$ = this.gameCommunication.chatList$;
   }
 
   ngOnInit() {
@@ -51,9 +47,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   async submitMessage() {
     if ( !this.newMessage ) return;
-    this.disableSubmitButton = true;
-    await this.gameCommunication.sendMessage( this.newMessage );
+    const msg = this.newMessage;
     this.newMessage = '';
+    this.disableSubmitButton = true;
+    await this.gameCommunication.sendMessage( msg );
     this.disableSubmitButton = false;
   }
 

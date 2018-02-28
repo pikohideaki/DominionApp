@@ -19,8 +19,10 @@ export class SharedAreaComponent implements OnInit {
   @Input() showCardProperty$: Observable<boolean>;
   @Output() cardClicked = new EventEmitter<DCard>();
 
-  cardSizeRatio$ = this.config.cardSizeRatio$;
-  width$ = this.cardSizeRatio$.map( ratio => ratio * 70 );
+  width$           = this.config.cardSizeRatio$.map( ratio => ratio *  70 );
+  trashPileWidth$  = this.config.cardSizeRatio$.map( ratio => ratio * 100 );
+  trashPileHeight$ = this.config.cardSizeRatio$.map( ratio => ratio * 160 );
+
   myIndex$ = this.gameRoomService.myIndex$;
 
   Prosperity$           = this.gameRoomService.Prosperity$;

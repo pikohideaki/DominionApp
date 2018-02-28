@@ -1,3 +1,8 @@
+<ng-container *ngIf="{
+      myIndex: myIndex$ | async
+   } as data">
+
+
 <div class="body">
   <button mat-button class="sidebar-button"
       matTooltip="ゲーム結果" matTooltipPosition="before"
@@ -12,7 +17,9 @@
   <span class="spacer"></span>
   <button mat-button class="sidebar-button"
       matTooltip="終了" matTooltipPosition="before"
-      (click)="exit()" >
+      (click)="exit( data.myIndex )" >
     <mat-icon>exit_to_app</mat-icon>
   </button>
 </div>
+
+</ng-container>

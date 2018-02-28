@@ -1,25 +1,32 @@
+import { NumberOfVictoryCards } from './number-of-victory-cards';
+
 class PlayerResultRanked {
-  name:      string  = '';
-  VP:        number  = 0;
-  turnOrder: number  = 0;
-  rank:      number  = 0;   // <- calculate locally
-  score:     number  = 0;   // <- calculate locally
+  name:      string = '';
+  turnOrder: number = 0;
+  rank:      number = 0;   // <- calculated locally
+  score:     number = 0;   // <- calculated locally
+  VP:        number = 0;   // <- calculated locally
+  NofVictoryCards: NumberOfVictoryCards = new NumberOfVictoryCards();
 
   constructor( initObj?: {
     name:      string,
-    VP:        number,
     turnOrder: number,
     rank:      number,
     score:     number,
+    VP:        number,
+    NofVictoryCards: NumberOfVictoryCards,
   }) {
     if ( !initObj ) return;
     this.name      = ( initObj.name      || '' );
-    this.VP        = ( initObj.VP        || 0 );
-    this.turnOrder = ( initObj.turnOrder || 0 );
-    this.rank      = ( initObj.rank      || 0 );
-    this.score     = ( initObj.score     || 0 );
+    this.turnOrder = ( initObj.turnOrder || 0  );
+    this.rank      = ( initObj.rank      || 0  );
+    this.score     = ( initObj.score     || 0  );
+    this.VP        = ( initObj.VP        || 0  );
+    this.NofVictoryCards = new NumberOfVictoryCards( initObj.NofVictoryCards );
   }
 }
+
+
 
 class SelectedCardsId {
   Prosperity:       boolean  = false;
@@ -66,6 +73,7 @@ export class GameResult {
   selectedExpansionNameList: string[] = [];
   selectedCardsId:           SelectedCardsId = new SelectedCardsId();
   lastTurnPlayerName:        string = '';
+
 
   constructor( databaseKey?: string, initObj?: {
     timeStamp:                 number,
@@ -141,4 +149,8 @@ export class GameResult {
     this.players.forEach( e => { e.score = scoringTemp[ e.rank ]; } );
   }
 
+
+  setVP() {
+
+  }
 }

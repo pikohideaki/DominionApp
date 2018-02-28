@@ -1,17 +1,14 @@
 import { Injectable } from '@angular/core';
 import { CardProperty } from '../../../classes/card-property';
-import { PlayerResult } from '../../../classes/player-result';
-import { VictoryPointsCalculatorService } from '../../sub-components/victory-points-calculator/victory-points-calculator.service';
+import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
+
 
 @Injectable()
 export class NumberOfVictoryCardsStringService {
 
-  constructor(
-    private vpcalc: VictoryPointsCalculatorService
-  ) { }
+  constructor() { }
 
-  toStr( playerResult: PlayerResult, cardPropertyList: CardProperty[] ): string {
-    const nvc = playerResult.numberOfVictoryCards;
+  toStr( nvc: NumberOfVictoryCards, cardPropertyList: CardProperty[] ): string {
     const result = [];
 
     if ( nvc.VPtoken !== 0 ) result.push(`VPトークン(${nvc.VPtoken})`);
@@ -46,7 +43,7 @@ export class NumberOfVictoryCardsStringService {
       'Pasture',
     ].forEach( id => {
       if ( nvc[id] !== 0 ) {
-        result.push(`${toNameJp(id)}(${this.vpcalc.VPperCard(id, nvc)}x${nvc[id]})`);
+        result.push(`${toNameJp(id)}(${nvc.VPperCard(id)}x${nvc[id]})`);
       }
     });
 
@@ -59,7 +56,7 @@ export class NumberOfVictoryCardsStringService {
           'Sprawling_Castle',
           'Grand_Castle',
           'Kings_Castle'
-        ].map( id => this.vpcalc.VPperCard(id, nvc) * nvc[id] )
+        ].map( cardId => nvc.VPperCard(cardId) * nvc[cardId] )
           .reduce( (prev, curr) => prev + curr );
 
     if ( CastleVPtotal !== 0 ) {

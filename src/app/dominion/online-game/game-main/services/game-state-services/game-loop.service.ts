@@ -30,7 +30,6 @@ export class GameLoopService {
   async phaseAction(
     gameState: GameState,
     userInput: UserInput,
-    Prosperity: boolean,
     playersName: string,
   ) {
     const shuffleBy = userInput.data.shuffleBy;
@@ -125,10 +124,10 @@ export class GameLoopService {
 
         case 'EndOfTurn': {
           printPhase('EndOfTurn');
-          if ( gameState.gameIsOverConditions( Prosperity ) ) {
+          if ( gameState.gameIsOverConditions() ) {
             turnInfo.phase = 'GameIsOver';
           } else {
-            gameState.turnCounter++;
+            gameState.incrementTurnCounter();
             turnInfo.phase = '';
           }
           this.messageService.pushMessage(`---${playersName}のターン終了---`);

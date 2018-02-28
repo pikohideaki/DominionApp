@@ -1,6 +1,7 @@
 <ng-container *ngIf="{
     showCardProperty: showCardProperty$ | async,
-    cardSizeRatio:    cardSizeRatio$    | async,
+    trashPileWidth:   trashPileWidth$   | async,
+    trashPileHeight:  trashPileHeight$  | async,
     Prosperity:       Prosperity$       | async,
     trashPile:        trashPile$        | async
   } as data">
@@ -8,42 +9,14 @@
 <div class="shared-area box-shadow">
   <div class="BasicCards_KingdomCards">
     <div class="BasicCards">
-      <div class="treasures">
+
+      <div class="Curse">
         <div class="card-pile">
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [DCardArray$]="BasicCards.Copper$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [DCardArray$]="BasicCards.Silver$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [DCardArray$]="BasicCards.Gold$"
-            [myIndex$]="myIndex$"
-            [width$]="width$"
-            (cardClicked)="onClick( $event )" >
-          </app-cards-pile>
-        </div>
-        <div class="card-pile" *ngIf="data.Prosperity">
-          <app-cards-pile
-            [showArraySize]="true"
-            [showCardProperty]="data.showCardProperty"
-            [DCardArray$]="BasicCards.Platinum$"
+            [hideNonButtonCards]="true"
+            [DCardArray$]="BasicCards.Curse$"
             [myIndex$]="myIndex$"
             [width$]="width$"
             (cardClicked)="onClick( $event )" >
@@ -56,6 +29,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
             [DCardArray$]="BasicCards.Estate$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -66,6 +40,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
             [DCardArray$]="BasicCards.Duchy$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -76,6 +51,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
             [DCardArray$]="BasicCards.Province$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -86,7 +62,22 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
             [DCardArray$]="BasicCards.Colony$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick( $event )" >
+          </app-cards-pile>
+        </div>
+      </div>
+
+      <div class="treasures">
+        <div class="card-pile">
+          <app-cards-pile
+            [showArraySize]="true"
+            [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
+            [DCardArray$]="BasicCards.Copper$"
             [myIndex$]="myIndex$"
             [width$]="width$"
             (cardClicked)="onClick( $event )" >
@@ -96,7 +87,30 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [DCardArray$]="BasicCards.Curse$"
+            [hideNonButtonCards]="true"
+            [DCardArray$]="BasicCards.Silver$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick( $event )" >
+          </app-cards-pile>
+        </div>
+        <div class="card-pile">
+          <app-cards-pile
+            [showArraySize]="true"
+            [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
+            [DCardArray$]="BasicCards.Gold$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick( $event )" >
+          </app-cards-pile>
+        </div>
+        <div class="card-pile" *ngIf="data.Prosperity">
+          <app-cards-pile
+            [showArraySize]="true"
+            [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="true"
+            [DCardArray$]="BasicCards.Platinum$"
             [myIndex$]="myIndex$"
             [width$]="width$"
             (cardClicked)="onClick( $event )" >
@@ -110,6 +124,7 @@
         <app-cards-pile
           [showArraySize]="true"
           [showCardProperty]="data.showCardProperty"
+          [hideNonButtonCards]="true"
           [DCardArray$]="idArray$"
           [myIndex$]="myIndex$"
           [width$]="width$"
@@ -121,18 +136,17 @@
 
   <div class="trashPile-area">
     <div class="trashPile"
-        [style.width.px]="100 * data.cardSizeRatio"
-        [style.height.px]="160 * data.cardSizeRatio" >
-      <div>
-        <app-cards-pile *ngIf="data.trashPile?.length > 0"
-          [showArraySize]="true"
-          [showCardProperty]="data.showCardProperty"
-          [DCardArray$]="trashPile$"
-          [myIndex$]="myIndex$"
-          [width$]="width$"
-          (cardClicked)="onClick( $event )" >
-        </app-cards-pile>
-      </div>
+        [style.width.px]="data.trashPileWidth"
+        [style.height.px]="data.trashPileHeight" >
+      <app-cards-pile *ngIf="data.trashPile?.length > 0"
+        [showArraySize]="true"
+        [showCardProperty]="data.showCardProperty"
+        [hideNonButtonCards]="true"
+        [DCardArray$]="trashPile$"
+        [myIndex$]="myIndex$"
+        [width$]="width$"
+        (cardClicked)="onClick( $event )" >
+      </app-cards-pile>
     </div>
   </div>
 </div>

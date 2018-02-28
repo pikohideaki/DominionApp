@@ -12,6 +12,7 @@ import { GameConfigService } from '../../services/game-config.service';
       displayStyle="lineUp"
       [showArraySize]="false"
       [showCardProperty]="showCardProperty"
+      [hideNonButtonCards]="hideNonButtonCards"
       [myIndex$]="myIndex$"
       [DCardArray$]="DCardArray$"
       [cardWidth$]="widthShrunk$"
@@ -24,8 +25,10 @@ import { GameConfigService } from '../../services/game-config.service';
 })
 export class CardsLinedUpComponent implements OnInit {
 
-  @Input() showCardProperty: boolean = false;
-  @Input() myIndex$: Observable<number>;
+  @Input() showCardProperty:   boolean = false;
+  @Input() hideNonButtonCards: boolean = false;
+
+  @Input() myIndex$:    Observable<number>;
   @Input() DCardArray$: Observable<DCard[]>;
 
   @Input() width$: Observable<number>;

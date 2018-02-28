@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { GameResult } from '../../../../../classes/game-result';
 
+
 @Component({
   selector: 'app-online-game-result-dialog',
   templateUrl: './online-game-result-dialog.component.html',
@@ -16,9 +17,7 @@ export class OnlineGameResultDialogComponent implements OnInit {
   gameResult$: Observable<GameResult>;  // input
 
 
-  constructor(
-  ) {}
+  constructor() {}
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 }

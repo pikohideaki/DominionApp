@@ -13,7 +13,6 @@ import {
     TurnInfo,
     Phase,
     DCardPath,
-    getDCardsByIdArray,
   } from '../../../../../classes/game-state';
 import { MyGameRoomService } from '../my-game-room.service';
 import { GameRoomCommunicationService } from '../game-room-communication.service';
@@ -32,14 +31,11 @@ export class GameStateService {
   phase$  = this.turnInfo$.map( e => e.phase  ).distinctUntilChanged();
 
   allPlayersData$  = this.gameState$.map( e => e.allPlayersData         );
-  turnCounter$     = this.gameState$.map( e => e.turnCounter            );
   allPlayersCards$ = this.gameState$.map( e => e.DCards.allPlayersCards );
   BasicCards$      = this.gameState$.map( e => e.DCards.BasicCards      );
   KingdomCards$    = this.gameState$.map( e => e.DCards.KingdomCards    );
   trashPile$       = this.gameState$.map( e => e.DCards.trashPile       );
   BlackMarketPile$ = this.gameState$.map( e => e.DCards.BlackMarketPile );
-
-  numberOfPlayers$ = this.gameState$.map( e => e.numberOfPlayers );
 
   turnPlayerIndex$: Observable<number>
     = this.gameState$.map( e => e.turnPlayerIndex() ).distinctUntilChanged();
@@ -75,10 +71,9 @@ export class GameStateService {
   gameIsOver$: Observable<boolean>
     = Observable.combineLatest(
           this.gameState$,
-          this.myGameRoomService.Prosperity$,
           this.gameRoomCommunication.isTerminated$,
-          (gameState, Prosperity, isTerminated) =>
-            gameState.gameIsOver( Prosperity ) || isTerminated )
+          (gameState, isTerminated) =>
+            gameState.gameIsOver() || isTerminated )
         .distinctUntilChanged();
 
 

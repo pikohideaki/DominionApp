@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/startWith';
 
-import { DCardPath        } from '../../../../classes/game-state';
-import { ChatMessage      } from '../../../../classes/chat-message';
+import { DCardPath   } from '../../../../classes/game-state';
+import { ChatMessage, ChatCommand } from '../../../../classes/chat-message';
 import { GameCommunication,
     UserInput,
     UserInputCommand } from '../../../../classes/game-room-communication';
@@ -29,6 +29,7 @@ export class GameRoomCommunicationService {
   userInputList$:     Observable<UserInput[]>;
   resetGameClicked$:  Observable<number>;
   thinkingState$:     Observable<boolean[]>;
+  presenceState$:     Observable<boolean[]>;
   isTerminated$:      Observable<boolean>;
   resultIsSubmitted$: Observable<boolean>;
 
@@ -79,6 +80,15 @@ export class GameRoomCommunicationService {
           .filter( list => list !== undefined && list.length > 0 )
           .distinctUntilChanged();
 
+    this.presenceState$
+      = this.myGameRoomService.gameRoomCommunicationId$
+          .switchMap( id =>
+            this.afdb.list<boolean>(
+              `${this.database.fdPath.onlineGameCommunicationList}/${id}/presenceState` )
+            .valueChanges() )
+          .filter( list => list !== undefined && list.length > 0 )
+          .distinctUntilChanged();
+
     this.isTerminated$
       = this.myGameRoomService.gameRoomCommunicationId$
           .switchMap( id =>
@@ -97,13 +107,14 @@ export class GameRoomCommunicationService {
   }
 
 
-  async sendMessage( messageString: string ) {
+  async sendMessage( messageString: string, command: ChatCommand = '' ) {
     const communicationId = await this.communicationId$.toPromise();
     const myName = await this.myName$.toPromise();
     const msg = new ChatMessage({
                   playerName: myName,
-                  content: messageString,
-                  timeStamp: Date.now()
+                  content:    messageString,
+                  command:    command,
+                  timeStamp:  Date.now()
                 });
     await this.database.onlineGameCommunication
             .sendMessage( communicationId, msg );
@@ -136,6 +147,12 @@ export class GameRoomCommunicationService {
     const communicationId = await this.communicationId$.toPromise();
     await this.database.onlineGameCommunication
             .setThinkingState( communicationId, playerId, state );
+  }
+
+  async setPresenceState( playerId: number, state: boolean ) {
+    const communicationId = await this.communicationId$.toPromise();
+    await this.database.onlineGameCommunication
+            .setPresenceState( communicationId, playerId, state );
   }
 
   async setTerminatedState( state: boolean ) {

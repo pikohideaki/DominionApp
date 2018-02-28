@@ -6,22 +6,33 @@
             chatList: chatList$ | async
           } as data">
       <ng-container *ngIf="data.myName && data.chatList">
-        <div class="balloon6 chat-list-element" *ngFor="let message of data.chatList">
+        <div *ngFor="let msg of data.chatList"
+            class="balloon6 chat-list-element">
 
-          <div *ngIf="message.playerName === data.myName; then me; else otherPlayer" ></div>
-          <ng-template #me>
-            <div class="mycomment">
-              <p>{{message.content}}</p>
+          <ng-container *ngIf="!!msg.command then command; else message"></ng-container>
+          <ng-template #command>
+            <div [ngSwitch]="msg.command" class="command">
+              <ng-container *ngSwitchCase="'leaveTheRoom'">
+                {{msg.playerName}}が退室しました。
+              </ng-container>
             </div>
           </ng-template>
-          <ng-template #otherPlayer>
-            <div class="player-name">{{message.playerName}}</div>
-            <div class="faceicon">
-              <mat-icon>account_circle</mat-icon>
-            </div>
-            <div class="chatting">
-              <div class="says"> <p>{{message.content}}</p> </div>
-            </div>
+          <ng-template #message>
+            <div *ngIf="msg.playerName === data.myName; then me; else otherPlayer" ></div>
+            <ng-template #me>
+              <div class="mycomment">
+                <p>{{msg.content}}</p>
+              </div>
+            </ng-template>
+            <ng-template #otherPlayer>
+              <div class="player-name">{{msg.playerName}}</div>
+              <div class="faceicon">
+                <mat-icon>account_circle</mat-icon>
+              </div>
+              <div class="chatting">
+                <div class="says"> <p>{{msg.content}}</p> </div>
+              </div>
+            </ng-template>
           </ng-template>
 
         </div>
@@ -40,7 +51,8 @@
     </mat-form-field>
 
     <button mat-raised-button class="send-button" color="primary"
-        [disabled]="disableSubmitButton || !newMessage" (click)="submitMessage()" >
+        [disabled]="disableSubmitButton || !newMessage"
+        (click)="submitMessage()" >
       <mat-icon>send</mat-icon>
     </button>
   </div>

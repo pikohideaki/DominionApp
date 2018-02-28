@@ -45,8 +45,7 @@ export class TransitStateService {
           this.transitStateResult$ )
         .withLatestFrom(
           this.myGameRoom.myIndex$,
-          this.myGameRoom.playersNameShuffled$,
-          this.myGameRoom.Prosperity$ );
+          this.myGameRoom.playersNameShuffled$ );
 
 
   constructor(
@@ -69,7 +68,6 @@ export class TransitStateService {
     currState:       GameState,
     myIndex:         number,
     playersNameList: string[],
-    Prosperity:      boolean,
   ): Promise<void> {
     // 現在のゲーム状態をコピー
     const nextState = new GameState( this.utils.copyObject( currState ) );
@@ -80,7 +78,7 @@ export class TransitStateService {
     // コマンドの処理
     switch ( userInput.command ) {
       case 'increment turnCounter':
-        nextState.turnCounter++;
+        nextState.incrementTurnCounter();
         nextState.turnInfo.phase = '';
         break;
 
@@ -90,16 +88,10 @@ export class TransitStateService {
         break;
 
       case 'clicked finishMyTurn':
-        await this.shortcut.cleanUp(
-                nextState,
-                pid,
-                playersName,
-                userInput.data.shuffleBy );
-        if ( nextState.gameIsOverConditions( Prosperity ) ) {
+        if ( nextState.gameIsOverConditions() ) {
           nextState.turnInfo.phase = 'GameIsOver';
         } else {
-          nextState.turnCounter++;
-          nextState.turnInfo.phase = '';
+          nextState.turnInfo.phase = 'CleanUp';
         }
         break;
 
@@ -128,7 +120,6 @@ export class TransitStateService {
     await this.gameloop.phaseAction(
             nextState,
             userInput,
-            Prosperity,
             playersName );
 
     // 自動で手札をソート
@@ -138,11 +129,7 @@ export class TransitStateService {
 
     this.gameState.setGameState( nextState );
     this.setNextGameState( nextState );
-
-    // console.log( 'transitState', userInput, currState, nextState );
   }
-
-
 
 
   setNextGameState( gameState: GameState ) {

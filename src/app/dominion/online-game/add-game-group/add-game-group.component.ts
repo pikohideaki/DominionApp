@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-// import { isDevMode } from '@angular/core';
+import { isDevMode } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -38,22 +38,25 @@ export class AddGameGroupComponent implements OnInit {
   private memoSource = new BehaviorSubject<string>('');
   memo$ = this.memoSource.asObservable();
 
-  numberOfPlayers$ = this.myUserInfo.onlineGame.numberOfPlayers$;
-  isSelectedExpansions$ = this.myUserInfo.onlineGame.isSelectedExpansions$;
+  numberOfPlayers$ = this.user.onlineGame.numberOfPlayers$;
+  isSelectedExpansions$ = this.user.onlineGame.isSelectedExpansions$;
 
   // app-randomizer
-  private selectedCardsSource = new BehaviorSubject<SelectedCards>( new SelectedCards() );
+  private selectedCardsSource
+    = new BehaviorSubject<SelectedCards>( new SelectedCards() );
   selectedCards$ = this.selectedCardsSource.asObservable();
 
-  private BlackMarketPileShuffledSource = new BehaviorSubject<BlackMarketPileCard[]>([]);
+  private BlackMarketPileShuffledSource
+    = new BehaviorSubject<BlackMarketPileCard[]>([]);
   BlackMarketPileShuffled$ = this.BlackMarketPileShuffledSource.asObservable();
 
-  private preparingDialogSource = new BehaviorSubject<boolean>(false);
+  private preparingDialogSource
+    = new BehaviorSubject<boolean>(false);
   preparingDialog$ = this.preparingDialogSource.asObservable();
 
   disableMakeRoomButton$: Observable<boolean>
     = Observable.combineLatest(
-        this.numberOfPlayers$.map( e => !this.utils.isInRange( e, 2, 7) ),
+        this.numberOfPlayers$.map( e => !this.utils.isInRange( e, 2, 7 ) ),
         this.isSelectedExpansions$.map( list => list.every( e => !e ) ),
         this.selectedCards$.map( e => e.isEmpty() ),
         this.preparingDialog$,
@@ -61,38 +64,45 @@ export class AddGameGroupComponent implements OnInit {
       .startWith( true )
       .distinctUntilChanged();
 
+  isdevmode: boolean = isDevMode();
+  addTestPlayer: boolean = false;
+
 
   constructor(
     public snackBar: MatSnackBar,
     public dialog: MatDialog,
     private utils: UtilitiesService,
     private database: CloudFirestoreMediatorService,
-    private myUserInfo: MyUserInfoService,
+    private user: MyUserInfoService,
     private addGameGroupService: AddGameGroupService
   ) {
-    // if ( isDevMode() ) {
-      // const selectedCards = this.selectedCardsSource.getValue();
-      // selectedCards.KingdomCards10 = this.utils.numberSequence(7, 10);
-      // this.selectedCardsSource.next( selectedCards );
-      // this.isSelectedExpansionsOnChange({ index: 1, checked: true });
-      // console.log('selected test 10 KingdomCards');
-    // }
   }
 
   ngOnInit() {
   }
 
 
+  selectedCardsOnChange( value: SelectedCards ) {
+    if ( this.isdevmode ) {
+      console.log('selected test KingdomCards', value.KingdomCards10);
+    }
+    this.selectedCardsSource.next( value );
+  }
+
+  BlackMarketPileShuffledOnChange( value: BlackMarketPileCard[] ) {
+    this.BlackMarketPileShuffledSource.next( value );
+  }
+
   increment( currentValue: number ) {
-    this.myUserInfo.setOnlineGameNumberOfPlayers( currentValue + 1 );
+    this.user.setOnlineGameNumberOfPlayers( currentValue + 1 );
   }
 
   decrement( currentValue: number ) {
-    this.myUserInfo.setOnlineGameNumberOfPlayers( currentValue - 1 );
+    this.user.setOnlineGameNumberOfPlayers( currentValue - 1 );
   }
 
   isSelectedExpansionsOnChange( value: { index: number, checked: boolean } ) {
-    this.myUserInfo.setOnlineGameIsSelectedExpansions( value.index, value.checked );
+    this.user.setOnlineGameIsSelectedExpansions( value.index, value.checked );
   }
 
   memoClicked() {
@@ -102,14 +112,6 @@ export class AddGameGroupComponent implements OnInit {
       if ( value === undefined ) return;
       this.memoSource.next( value );
     });
-  }
-
-  selectedCardsOnChange( value ) {
-    this.selectedCardsSource.next( value );
-  }
-
-  BlackMarketPileShuffledOnChange( value ) {
-    this.BlackMarketPileShuffledSource.next( value );
   }
 
 
@@ -138,9 +140,11 @@ export class AddGameGroupComponent implements OnInit {
     dialogRef.componentInstance.dialogRef = dialogRef;
     dialogRef.disableClose = true;
 
-    // await this.utils.sleep(2);
-    // await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
-    // console.log('added testPlayer');
+    if ( this.addTestPlayer ) {
+      await this.utils.sleep(2);
+      await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
+      console.log('added testPlayer');
+    }
 
     const result = await dialogRef.afterClosed().toPromise();
     if ( result === 'Cancel Clicked' ) {
@@ -153,5 +157,9 @@ export class AddGameGroupComponent implements OnInit {
 
   private openSnackBar( message: string ) {
     this.snackBar.open( message, undefined, { duration: 3000 } );
+  }
+
+  addTestPlayerChecked( value: boolean ) {
+    this.addTestPlayer = value;
   }
 }

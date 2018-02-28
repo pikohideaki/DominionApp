@@ -19,15 +19,12 @@ import { SetVpDialogComponent } from './set-vp-dialog.component';
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 import { SubmitGameResultDialogComponent } from '../../sub-components/submit-game-result-dialog/submit-game-result-dialog.component';
 import { NumberOfVictoryCardsStringService } from './number-of-victory-cards-string.service';
-import { VictoryPointsCalculatorService } from '../../sub-components/victory-points-calculator/victory-points-calculator.service';
+import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
 
 
 
 @Component({
-  providers: [
-    NumberOfVictoryCardsStringService,
-    VictoryPointsCalculatorService
-  ],
+  providers: [ NumberOfVictoryCardsStringService ],
   selector: 'app-add-game-result',
   templateUrl: './add-game-result.component.html',
   styleUrls: [
@@ -100,7 +97,7 @@ export class AddGameResultComponent implements OnInit {
         this.cardPropertyList$,
         (selectedPlayers, cardPropertyList) =>
           selectedPlayers.map( pl =>
-            this.numberOfVictoryCardsString.toStr( pl, cardPropertyList ) ) );
+            pl.numberOfVictoryCards.toStr( cardPropertyList ) ) );
 
 
 
@@ -243,6 +240,7 @@ export class AddGameResultComponent implements OnInit {
                 turnOrder : pl.turnOrder,
                 rank      : 1,
                 score     : 0,
+                NofVictoryCards: new NumberOfVictoryCards(),
               }) ),
       lastTurnPlayerName: lastTurnPlayerName,
     });

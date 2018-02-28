@@ -7,7 +7,6 @@ import 'rxjs/add/operator/takeWhile';
 
 
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { VictoryPointsCalculatorService } from './victory-points-calculator.service';
 
 import { CardProperty, toListIndex } from '../../../classes/card-property';
 import { SelectedCards        } from '../../../classes/selected-cards';
@@ -16,7 +15,6 @@ import { UtilitiesService } from '../../../my-own-library/utilities.service';
 
 
 @Component({
-  providers: [ VictoryPointsCalculatorService ],
   selector: 'app-victory-points-calculator',
   templateUrl: './victory-points-calculator.component.html',
   styleUrls: ['./victory-points-calculator.component.css']
@@ -99,13 +97,12 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
 
   constructor(
     private database: CloudFirestoreMediatorService,
-    private calc: VictoryPointsCalculatorService,
     private utils: UtilitiesService
   ) {
   }
 
   ngOnInit() {
-    this.VPtotal$ = this.numberOfVictoryCards$.map( e => this.calc.total(e) );
+    this.VPtotal$ = this.numberOfVictoryCards$.map( e => e.VPtotal() );
 
     this.VictoryCardsFiltered$ = this.selectedCards$.combineLatest(
         this.cardPropertyList$,
@@ -149,8 +146,7 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
 
 
   private updateVPtotal( numberOfVictoryCards: NumberOfVictoryCards ) {
-    const VPtotal = this.calc.total( numberOfVictoryCards );
-    this.VPtotalChange.emit( VPtotal );
+    this.VPtotalChange.emit( numberOfVictoryCards.VPtotal() );
     this.numberOfVictoryCardsChange.emit( numberOfVictoryCards );
   }
 
@@ -166,7 +162,7 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
     numberOfVictoryCards: NumberOfVictoryCards,
     cardId: string
   ) {
-    return this.calc.VPperCard( cardId, numberOfVictoryCards );
+    return numberOfVictoryCards.VPperCard( cardId );
   }
 
 

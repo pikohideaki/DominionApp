@@ -2,7 +2,7 @@ import { seq0, objectEntries, permutation, objectForEach, filterRemove } from '.
 import { CardProperty, CardType } from './card-property';
 
 
-export function getDCardsByIdArray( idArray: (number[]|void), dcards: DCard[] ): DCard[] {
+function getDCardsByIdArray( idArray: (number[]|void), dcards: DCard[] ): DCard[] {
   // cardIdArrayの順番で取得
   if ( !idArray ) return dcards;
   return idArray.map( id => dcards.find( c => c.id === id ) ).filter( e => e !== undefined );
@@ -13,6 +13,8 @@ export function getDCardsByIdArray( idArray: (number[]|void), dcards: DCard[] ):
 export class GameState {
   turnCounter:     number = 0;
   numberOfPlayers: number = 0;
+  Prosperity:      boolean = false;
+  Alchemy:         boolean = false;
 
   turnInfo:        TurnInfo     = new TurnInfo();
   allPlayersData:  PlayerData[] = [];
@@ -35,6 +37,8 @@ export class GameState {
   constructor( dataObj?: {
     turnCounter:     number,
     numberOfPlayers: number,
+    Prosperity:      boolean,
+    Alchemy:         boolean,
     turnInfo:        TurnInfo,
     allPlayersData:  PlayerData[],
     DCards: {
@@ -48,6 +52,8 @@ export class GameState {
     if ( !dataObj ) return;
     this.turnCounter     = ( dataObj.turnCounter     || 0 );
     this.numberOfPlayers = ( dataObj.numberOfPlayers || 0 );
+    this.Prosperity      = ( dataObj.Prosperity      || false );
+    this.Alchemy         = ( dataObj.Alchemy         || false );
 
     this.turnInfo = new TurnInfo( dataObj.turnInfo );
     this.allPlayersData = ( dataObj.allPlayersData || [] ).map( e => new PlayerData(e) );
@@ -57,6 +63,11 @@ export class GameState {
     this.DCards.KingdomCards    = new KingdomCards( dataObj.DCards.KingdomCards );
     this.DCards.trashPile       = ( dataObj.DCards.trashPile       || [] ).map( e => new DCard(e) );
     this.DCards.BlackMarketPile = ( dataObj.DCards.BlackMarketPile || [] ).map( e => new DCard(e) );
+  }
+
+
+  incrementTurnCounter() {
+    this.turnCounter++;
   }
 
   setNumberOfPlayers( numberOfPlayers: number ) {
@@ -152,27 +163,26 @@ export class GameState {
       = this.DCards.BlackMarketPile.filter( c => !cardIdArray.includes(c.id) );
   }
 
-  emptyPiles( Prosperity: boolean, Alchemy: boolean = false ): number {
+  emptyPiles(): number {
     const Supplies = [].concat(
         objectEntries( this.DCards.BasicCards ),
         this.DCards.KingdomCards );
     return Supplies.filter( e => e.length <= 0 ).length
-            - (Prosperity ? 0 : 2)
-            - (Alchemy ? 0 : 1);
+            - (this.Prosperity ? 0 : 2)
+            - (this.Alchemy ? 0 : 1);
   }
 
-  gameIsOverConditions( Prosperity: boolean ): boolean {
+  gameIsOverConditions(): boolean {
     // 使用しているサプライが3山なくなったら終了
     /* [ToDo] 闇市場，廃墟などもカウント */
     return ( this.DCards.BasicCards.Province.length <= 0
-        || (Prosperity && this.DCards.BasicCards.Colony.length <= 0)
-        || this.emptyPiles( Prosperity ) >= 3 );
+        || (this.Prosperity && this.DCards.BasicCards.Colony.length <= 0)
+        || this.emptyPiles() >= 3 );
   }
 
-  gameIsOver( Prosperity: boolean ): boolean {
+  gameIsOver(): boolean {
     if ( this.isEmpty() ) return false;
-    return this.turnInfo.phase === 'GameIsOver'
-            && this.gameIsOverConditions( Prosperity );
+    return this.turnInfo.phase === 'GameIsOver' && this.gameIsOverConditions();
   }
 
 

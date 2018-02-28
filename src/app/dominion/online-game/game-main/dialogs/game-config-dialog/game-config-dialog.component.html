@@ -101,7 +101,9 @@
     </button>
   </div>
 
-  <button mat-icon-button id="devModeButton" (click)="toggleDevMode( data.devMode )">
+  <button *ngIf="isDevMode"
+      mat-icon-button id="devModeButton"
+      (click)="toggleDevMode( data.devMode )">
     <mat-icon>developer_mode</mat-icon>
   </button>
 

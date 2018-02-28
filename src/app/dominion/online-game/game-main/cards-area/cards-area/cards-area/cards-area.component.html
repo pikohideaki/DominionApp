@@ -19,10 +19,12 @@
     </ng-template>
     <ng-template #CardImage>
       <div *ngFor="let dcard of data.DCardArrayForView"
-          class="card-image-in-line" [style.paddingRight.px]="padding">
+          class="card-image-in-line"
+          [style.paddingRight.px]="padding">
 
         <div class="card-image-wrapper">
           <app-dominion-card-image
+            [class.unavailable]="hideNonButtonCards && !dcard.isButton[ data.myIndex ]"
             [matTooltip]="dcard.cardProperty.nameJp" matTooltipPosition="below"
             [matTooltipDisabled]="!dcard.faceUp[ data.myIndex ]"
             [card]="dcard.cardProperty"
@@ -56,7 +58,6 @@
         </div>
 
       </div>
-
     </ng-template>
   </div>
 </ng-container>

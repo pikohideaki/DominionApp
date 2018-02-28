@@ -51,3 +51,7 @@
 .card-image-in-line {
   padding-bottom: 4px;
 }
+
+.unavailable {
+  opacity: 0.4;
+}

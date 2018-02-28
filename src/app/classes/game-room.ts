@@ -47,8 +47,9 @@ export class GameRoom {
     this.gameRoomCommunicationId = ( dataObj.gameRoomCommunicationId || '' );
     this.date                    = new Date( dataObj.timeStamp || Date.now() );
     this.selectedCards           = new SelectedCards( dataObj.selectedCards );
-    this.initialState            = ( dataObj.initialState || new GameState() );
+    this.initialState            = new GameState( dataObj.initialState );
   }
+
 
 
   playersNameShuffled() {
@@ -56,13 +57,16 @@ export class GameRoom {
   }
 
 
-  initCards( cardPropertyList: CardProperty[] ) {
+
+  initCards( cardList: CardProperty[] ) {
+    this.initialState.Prosperity = this.selectedCards.Prosperity;
+
     let serialNumber = 0;
 
     const addCard = ( cardListIndex: number, placePath: (string|number)[] ) => {
       const card = new DCard();
       card.id = serialNumber++;
-      card.cardProperty = cardPropertyList[ cardListIndex ];
+      card.cardProperty = cardList[ cardListIndex ];
       card.faceUp   = seq0( this.numberOfPlayers ).map( _ => true  );
       card.isButton = seq0( this.numberOfPlayers ).map( _ => false );
 
@@ -75,7 +79,7 @@ export class GameRoom {
 
     const addMultipleCards = ( placePath: (string|number)[], cardListIndex: number ) => {
         const N = numberToPrepare(
-                    cardPropertyList,
+                    cardList,
                     cardListIndex,
                     this.numberOfPlayers,
                     this.selectedCards.DarkAges );
@@ -86,7 +90,7 @@ export class GameRoom {
 
     const usePotion = () => false;
 
-    const toCardPropIndex = ( cardId: string ) => toListIndex( cardPropertyList, cardId );
+    const toCardPropIndex = ( cardId: string ) => toListIndex( cardList, cardId );
 
     // basic cards
     addMultipleCards( ['BasicCards', 'Curse'   ], toCardPropIndex('Curse'   ) );
@@ -105,10 +109,15 @@ export class GameRoom {
     }
 
     // KingdomCards
-    this.selectedCards.KingdomCards10.forEach( (cardPropIndex, index) => {
-      addMultipleCards( ['KingdomCards', index], cardPropIndex );
-    });
+
+    this.selectedCards.KingdomCards10.slice(0)
+      .sort( (i, j) => cardList[i].cost.coin - cardList[j].cost.coin )
+      .forEach( (cardPropIndex, index) => {
+        addMultipleCards( ['KingdomCards', index], cardPropIndex );
+      });
   }
+
+
 
   initDecks() {
     for ( let index = 0; index < this.numberOfPlayers; ++index ) {
@@ -136,11 +145,13 @@ export class GameRoom {
         c.isButton[index] = c.cardProperty.cardTypes.includes('Action');
       });
 
-      // this.sortHandCards( index, cardpropertyList );
+      playerCards.sortHandCards();
 
       this.initialState.DCards.allPlayersCards.push( playerCards );
     }
   }
+
+
 
   waitingForNewPlayers(): boolean {
     return ( this.playersName.length < this.numberOfPlayers );

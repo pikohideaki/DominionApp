@@ -11,6 +11,7 @@ import { OnlineGameResultDialogComponent } from '../../dialogs/online-game-resul
 import { OnlineGamePlayerCardsDialogComponent } from '../../dialogs/online-game-result-player-cards-dialog/online-game-result-player-cards-dialog.component';
 import { GameStateService } from '../../services/game-state-services/game-state.service';
 import { MyGameRoomService } from '../../services/my-game-room.service';
+import { GameRoomCommunicationService } from '../../services/game-room-communication.service';
 
 
 @Component({
@@ -21,13 +22,15 @@ import { MyGameRoomService } from '../../services/my-game-room.service';
 export class SideBarRightComponent implements OnInit {
 
   @Input() gameResult$: Observable<GameResult>;
+  myIndex$ = this.myGameRoomService.myIndex$;
 
 
   constructor(
+    private router: Router,
     private dialog: MatDialog,
     private gameStateService: GameStateService,
     private myGameRoomService: MyGameRoomService,
-    private router: Router
+    private gameCommunication: GameRoomCommunicationService,
   ) { }
 
   ngOnInit() {
@@ -45,12 +48,16 @@ export class SideBarRightComponent implements OnInit {
     dialogRef.componentInstance.playersName$ = this.myGameRoomService.playersNameShuffled$;
   }
 
-  exit() {
+  exit( myIndex: number ) {
     const dialogRef = this.dialog.open( ConfirmDialogComponent );
     dialogRef.componentInstance.message
       = '退室しますか？（退室しても新しいゲームを始めるまではこの画面に戻ることができます。）';
     dialogRef.afterClosed().subscribe( yn => {
-      if ( yn === 'yes' ) this.router.navigate( ['/online-game'] );
+      if ( yn === 'yes' ) {
+        this.router.navigate( ['/online-game'] );
+        this.gameCommunication.setPresenceState( myIndex, false );
+        this.gameCommunication.sendMessage( '', 'leaveTheRoom' );
+      }
     });
   }
 }

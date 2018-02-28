@@ -1,9 +1,17 @@
 <ng-container *ngIf="{
     gameRoomList: gameRoomList$ | async,
-    myName:       myName$       | async
+    myName:       myName$       | async,
+    inPlayGameId: inPlayGameId$ | async
   } as data">
 
 <div class="body-with-padding" (click)="backgroundClicked()">
+  <div *ngIf="!!data.inPlayGameId"
+      class="return-to-game-button">
+    <button mat-raised-button (click)="returnToGame()">
+      プレイ中のゲームに復帰
+    </button>
+  </div>
+
   <div *ngFor="let room of data.gameRoomList | reverse">
     <mat-card class="roomListItem"
         [class.notWaitingForPlayers]="!room.waitingForNewPlayers()"

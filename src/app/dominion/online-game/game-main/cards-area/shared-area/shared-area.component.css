@@ -23,10 +23,11 @@
   flex-flow: row wrap;
   justify-content: flex-start;
 }
-.treasures,.victories {
+.treasures,.victories,.Curse {
   display: flex;
   flex-flow: row wrap;
   justify-content: flex-start;
+  padding-right: 10px;
 }
 
 .KingdomCards {

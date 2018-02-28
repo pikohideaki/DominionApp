@@ -14,7 +14,6 @@ import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.servi
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyGameRoomService } from './services/my-game-room.service';
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
-import { VictoryPointsCalculatorService } from '../../sub-components/victory-points-calculator/victory-points-calculator.service';
 
 import { GameRoomCommunicationService } from './services/game-room-communication.service';
 import { GameMessageService           } from './services/game-message.service';
@@ -37,7 +36,6 @@ import { TransitStateService          } from './services/game-state-services/tra
     TransitStateService,
     GameLoopService,
     GameMessageService,
-    VictoryPointsCalculatorService,
     SubmitGameResultService,
   ],
   selector: 'app-game-main',
@@ -167,13 +165,12 @@ export class GameMainComponent implements OnInit, OnDestroy {
     this.userInputSubscription
       = this.transitStateService.gameData$
           .takeWhile( () => this.alive )
-          .subscribe( ([[userInput, currState], myIndex, playersNameList, Prosperity]) =>
+          .subscribe( ([[userInput, currState], myIndex, playersNameList]) =>
             this.transitStateService.transitState(
                 userInput,
                 currState,
                 myIndex,
-                playersNameList,
-                Prosperity ) );
+                playersNameList ) );
 
     const initialState = await this.myGameRoomService.initialState$.first().toPromise();
     this.gameStateService.setGameState( initialState );
