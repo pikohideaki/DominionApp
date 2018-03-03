@@ -11,7 +11,7 @@ import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
 import { CardProperty  } from '../../../classes/card-property';
 import { GameResult    } from '../../../classes/game-result';
-import { PlayerResult  } from '../../../classes/player-result';
+import { PlayerResult  } from '../../../classes/online-randomizer/player-result';
 import { SelectedCards } from '../../../classes/selected-cards';
 import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-values';
 

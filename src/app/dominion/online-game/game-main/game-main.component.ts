@@ -5,7 +5,6 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 
-import { DCard } from '../../../classes/game-state';
 
 import { MessageDialogComponent } from '../../../my-own-library/message-dialog.component';
 import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
@@ -23,6 +22,8 @@ import { GameStateShortcutService     } from './services/game-state-services/gam
 import { GameLoopService              } from './services/game-state-services/game-loop.service';
 import { TransitStateService          } from './services/game-state-services/transit-state.service';
 
+import { ValuesForViewService } from './services/values-for-view.service';
+import { DCard } from '../../../classes/online-game/dcard';
 
 
 
@@ -37,6 +38,7 @@ import { TransitStateService          } from './services/game-state-services/tra
     GameLoopService,
     GameMessageService,
     SubmitGameResultService,
+    ValuesForViewService,
   ],
   selector: 'app-game-main',
   templateUrl: './game-main.component.html',
@@ -59,17 +61,17 @@ export class GameMainComponent implements OnInit, OnDestroy {
   private userInputSubscription: Subscription;
 
   // view config
-  chatOpened$ = this.myUserInfo.onlineGame.chatOpened$;
-  autoSort$   = this.myUserInfo.onlineGame.autoSort$;
+  chatOpened$ = this.user.onlineGame.chatOpened$;
+  autoSort$   = this.user.onlineGame.autoSort$;
   private showCardPropertySource = new BehaviorSubject<boolean>(false);
   showCardProperty$ = this.showCardPropertySource.asObservable();
+  gainCardState$: Observable<boolean> = this.valuesForView.gainCardState$;
+
 
   // left sidebar
   private autoScrollSource = new BehaviorSubject<boolean>(true);
   autoScroll$ = this.autoScrollSource.asObservable();
-
   isBuyPlayPhase$ = this.gameStateService.phase$.map( e => e === 'BuyPlay' );
-
   myThinkingState$
     = Observable.combineLatest(
           this.gameRoomCommunication.thinkingState$,
@@ -78,17 +80,20 @@ export class GameMainComponent implements OnInit, OnDestroy {
 
   private logSnapshotSource = new BehaviorSubject<void>(null);  // debug
 
+  loading$ = this.transitStateService.loadingInitialUserInputList$;
+
 
   constructor(
     private dialog: MatDialog,
     private utils: UtilitiesService,
-    private myUserInfo: MyUserInfoService,
+    private user: MyUserInfoService,
     private myGameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
     private gameRoomCommunication: GameRoomCommunicationService,
     private gameMessage: GameMessageService,
     private transitStateService: TransitStateService,
     private submitGameResultService: SubmitGameResultService,
+    private valuesForView: ValuesForViewService,
   ) {
     this.startProcessing();
 
@@ -115,11 +120,12 @@ export class GameMainComponent implements OnInit, OnDestroy {
         this.myGameRoomService.myIndex$,
         this.gameStateService.gameState$,
         this.gameRoomCommunication.resultIsSubmitted$,
-        this.gameResult$ )
+        this.gameResult$,
+        this.loading$ )
       .takeWhile( () => this.alive )
-      .subscribe( ([[name, gameIsOver], myIndex, gameState, isSubmitted, gameResult]) => {
+      .subscribe( ([[name, gameIsOver], myIndex, gameState, isSubmitted, gameResult, loading]) => {
         if ( !gameIsOver ) {
-          this.showChangeTurnDialog( name );
+          if ( !loading ) this.showChangeTurnDialog( name );
         } else {
           // ゲーム終了処理
           gameState.disableAllButtons();
@@ -182,7 +188,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
 
  // left sidebar
   async toggleSideNav( sidenav ) {
-    this.myUserInfo.setOnlineGameChatOpened( (await sidenav.toggle()).type === 'open' );
+    this.user.setOnlineGameChatOpened( (await sidenav.toggle()).type === 'open' );
   }
 
   autoScrollChange( value: boolean ) {

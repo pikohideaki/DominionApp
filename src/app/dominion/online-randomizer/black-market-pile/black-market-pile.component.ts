@@ -11,7 +11,7 @@ import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
 import { CardProperty        } from '../../../classes/card-property';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
-import { BlackMarketPhase as BMPhase, BlackMarketPhase } from '../../../classes/black-market-phase.enum';
+import { BlackMarketPhase as BMPhase, BlackMarketPhase } from '../../../classes/online-randomizer/black-market-phase.enum';
 
 
 @Component({

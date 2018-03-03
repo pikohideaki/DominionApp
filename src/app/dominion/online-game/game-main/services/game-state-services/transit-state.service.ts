@@ -8,9 +8,7 @@ import 'rxjs/add/observable/from';
 import 'rxjs/add/operator/concatAll';
 import 'rxjs/add/operator/pairwise';
 
-import { GameRoom         } from '../../../../../classes/game-room';
-import { UserInput        } from '../../../../../classes/game-room-communication';
-import { GameState, Phase } from '../../../../../classes/game-state';
+import { GameRoom         } from '../../../../../classes/online-game/game-room';
 import { CardProperty     } from '../../../../../classes/card-property';
 
 import { CloudFirestoreMediatorService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -20,6 +18,8 @@ import { GameLoopService } from './game-loop.service';
 import { GameRoomCommunicationService } from '../game-room-communication.service';
 import { MyGameRoomService } from '../my-game-room.service';
 import { GameStateService } from './game-state.service';
+import { GameState } from '../../../../../classes/online-game/game-state';
+import { UserInput } from '../../../../../classes/online-game/user-input';
 
 
 @Injectable()
@@ -46,6 +46,22 @@ export class TransitStateService {
         .withLatestFrom(
           this.myGameRoom.myIndex$,
           this.myGameRoom.playersNameShuffled$ );
+
+
+  loadingInitialUserInputList$: Observable<boolean>
+    = Observable.combineLatest(
+        Observable.zip(
+            this.userInput$.map( e => e.index ).startWith(-1),
+            this.transitStateResult$,
+            (index, _) => index )
+          .startWith(-1),
+        this.gameCommunication.userInputList$
+          .map( list => list.length )
+          .filter( e => e > 0 )
+          .first(),
+        (doneIndex, initialListLength) => doneIndex < initialListLength - 1 )
+      .startWith( true )
+      .debounceTime( 500 );
 
 
   constructor(

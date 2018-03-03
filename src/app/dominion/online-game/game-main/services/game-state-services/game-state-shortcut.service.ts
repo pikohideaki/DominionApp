@@ -1,24 +1,18 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs/Subject';
 
-import {
-    GameState,
-    DCard,
-    BasicCards,
-    KingdomCards,
-    PlayerData,
-    PlayerCards,
-    TurnInfo,
-    Phase,
-  } from '../../../../../classes/game-state';
 import { CardProperty, CardType } from '../../../../../classes/card-property';
-import { UserInput } from '../../../../../classes/game-room-communication';
 
 import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
 import { CloudFirestoreMediatorService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameStateService } from './game-state.service';
 import { MyGameRoomService } from '../my-game-room.service';
 import { GameMessageService } from '../game-message.service';
+import { ValuesForViewService } from '../values-for-view.service';
+import { GameState } from '../../../../../classes/online-game/game-state';
+import { DCard } from '../../../../../classes/online-game/dcard';
+import { UserInput } from '../../../../../classes/online-game/user-input';
+import { Phase } from '../../../../../classes/online-game/phase';
 
 
 @Injectable()
@@ -27,7 +21,8 @@ export class GameStateShortcutService {
   constructor(
     private utils: UtilitiesService,
     private gameStateService: GameStateService,
-    private messageService: GameMessageService
+    private messageService: GameMessageService,
+    private valuesForView: ValuesForViewService,
   ) {
   }
 
@@ -117,9 +112,12 @@ export class GameStateShortcutService {
           )
           .filter( c => c !== undefined );
     this.buttonizeIf( topCards, playerId, condition );
+    this.valuesForView.setGainCardState( true );
   }
 
   resetDCardsAttributes( gameState: GameState ) {
+    this.valuesForView.setGainCardState( false );
+
     // ボタン化解除
     gameState.getAllDCards().forEach( c =>
         c.isButton.forEach( (_, i) => c.isButton[i] = false ) );
@@ -166,8 +164,8 @@ export class GameStateShortcutService {
       await this.utils.sleep( 0.1 );
       this.gameStateService.setGameState( gameState );
     }
-    playerCards.HandCards.push( playerCards.Deck.pop() );
     await this.utils.sleep( 0.1 );
+    playerCards.HandCards.push( playerCards.Deck.pop() );
     this.gameStateService.setGameState( gameState );
   }
 
@@ -187,6 +185,7 @@ export class GameStateShortcutService {
     for ( let i = 0; i < n; ++i ) {
       await this.draw1Card( gameState, playerId, shuffleBy );
     }
+    await this.utils.sleep( 0.1 );
     this.faceUp( gameState.DCards.allPlayersCards[ playerId ].HandCards );
   }
 
@@ -207,6 +206,7 @@ export class GameStateShortcutService {
     gameState.DCards.allPlayersCards[ playerId ].PlayArea.push( dcard );
     this.faceUp([dcard]);
     this.unbuttonize([dcard]);
+    this.gameStateService.setGameState( gameState );
     await this.getCardEffect(
                 dcard,
                 playerId,
@@ -229,6 +229,7 @@ export class GameStateShortcutService {
     gameState.removeDCards([dcard.id]);
     gameState.DCards.allPlayersCards[ playerId ].DiscardPile.push( dcard );
     this.unbuttonize([dcard]);
+    this.gameStateService.setGameState( gameState );
   }
 
   buyCard(
@@ -261,6 +262,7 @@ export class GameStateShortcutService {
     gameState.removeDCards( dcards.map( c => c.id ) );
     const playerCards = gameState.DCards.allPlayersCards[ playerId ];
     playerCards.DiscardPile.push( ...dcards );
+    this.gameStateService.setGameState( gameState );
   }
 
   async cleanUp(

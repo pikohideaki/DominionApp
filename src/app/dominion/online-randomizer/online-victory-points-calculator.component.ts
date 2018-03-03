@@ -8,7 +8,7 @@ import { MyUserInfoService             } from '../../firebase-mediator/my-user-i
 
 import { SelectedCards } from '../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
-import { PlayerResult } from '../../classes/player-result';
+import { PlayerResult } from '../../classes/online-randomizer/player-result';
 
 
 @Component({

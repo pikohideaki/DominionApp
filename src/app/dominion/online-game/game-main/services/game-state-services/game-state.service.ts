@@ -3,19 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import {
-    GameState,
-    DCard,
-    BasicCards,
-    KingdomCards,
-    PlayerData,
-    PlayerCards,
-    TurnInfo,
-    Phase,
-    DCardPath,
-  } from '../../../../../classes/game-state';
 import { MyGameRoomService } from '../my-game-room.service';
 import { GameRoomCommunicationService } from '../game-room-communication.service';
+import { PlayerCards } from '../../../../../classes/online-game/player-cards';
+import { GameState } from '../../../../../classes/online-game/game-state';
+import { TurnInfo } from '../../../../../classes/online-game/turn-info';
 
 
 @Injectable()
@@ -24,7 +16,7 @@ export class GameStateService {
   private gameStateSource = new BehaviorSubject<GameState>( new GameState() );
   gameState$: Observable<GameState> = this.gameStateSource.asObservable();
 
-  turnInfo$: Observable<TurnInfo> = this.gameState$.map( e => e.turnInfo );
+  private turnInfo$: Observable<TurnInfo> = this.gameState$.map( e => e.turnInfo );
   action$ = this.turnInfo$.map( e => e.action ).distinctUntilChanged();
   buy$    = this.turnInfo$.map( e => e.buy    ).distinctUntilChanged();
   coin$   = this.turnInfo$.map( e => e.coin   ).distinctUntilChanged();

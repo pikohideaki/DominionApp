@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { PlayerCards, DCard } from '../../../../../classes/game-state';
 import { MyUserInfoService } from '../../../../../firebase-mediator/my-user-info.service';
+import { PlayerCards } from '../../../../../classes/online-game/player-cards';
+import { DCard } from '../../../../../classes/online-game/dcard';
 
 
 @Component({

@@ -1,11 +1,12 @@
 <ng-container *ngIf="{
-      chatOpened:           chatOpened$           | async,
-      autoScroll:           autoScroll$           | async,
-      initialStateIsReady:  initialStateIsReady$  | async,
-      autoSort:             autoSort$             | async,
-      myIndex:              myIndex$              | async,
-      isMyTurn:             isMyTurn$             | async,
-      gameIsOver:           gameIsOver$           | async
+      chatOpened:          chatOpened$          | async,
+      autoScroll:          autoScroll$          | async,
+      loading:             loading$             | async,
+      initialStateIsReady: initialStateIsReady$ | async,
+      autoSort:            autoSort$            | async,
+      myIndex:             myIndex$             | async,
+      isMyTurn:            isMyTurn$            | async,
+      gameIsOver:          gameIsOver$          | async
     } as data">
 
   <div class="body">
@@ -29,11 +30,16 @@
         <app-chat [autoScroll]="data.autoScroll" [sidenav]="sidenav"> </app-chat>
       </mat-sidenav>
 
-      <div *ngIf="!data.initialStateIsReady" class="black-cover"></div>
+      <div *ngIf="!data.initialStateIsReady || data.loading"
+        class="black-cover">
+        <div class="modal-message">準備中です…</div>
+      </div>
+
       <div class="main">
         <div class="upper-part">
           <div class="shared-area_other-players-area">
             <app-shared-area class="shared-area"
+              [gainCardState$]="gainCardState$"
               [showCardProperty$]="showCardProperty$"
               (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-shared-area>

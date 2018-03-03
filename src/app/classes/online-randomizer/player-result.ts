@@ -1,4 +1,4 @@
-import { NumberOfVictoryCards } from './number-of-victory-cards';
+import { NumberOfVictoryCards } from '../number-of-victory-cards';
 
 export class PlayerResult {
   uid:       string  = '';  // databaseKey of users

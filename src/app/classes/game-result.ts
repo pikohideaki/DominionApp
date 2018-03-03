@@ -1,67 +1,5 @@
 import { NumberOfVictoryCards } from './number-of-victory-cards';
 
-class PlayerResultRanked {
-  name:      string = '';
-  turnOrder: number = 0;
-  rank:      number = 0;   // <- calculated locally
-  score:     number = 0;   // <- calculated locally
-  VP:        number = 0;   // <- calculated locally
-  NofVictoryCards: NumberOfVictoryCards = new NumberOfVictoryCards();
-
-  constructor( initObj?: {
-    name:      string,
-    turnOrder: number,
-    rank:      number,
-    score:     number,
-    VP:        number,
-    NofVictoryCards: NumberOfVictoryCards,
-  }) {
-    if ( !initObj ) return;
-    this.name      = ( initObj.name      || '' );
-    this.turnOrder = ( initObj.turnOrder || 0  );
-    this.rank      = ( initObj.rank      || 0  );
-    this.score     = ( initObj.score     || 0  );
-    this.VP        = ( initObj.VP        || 0  );
-    this.NofVictoryCards = new NumberOfVictoryCards( initObj.NofVictoryCards );
-  }
-}
-
-
-
-class SelectedCardsId {
-  Prosperity:       boolean  = false;
-  DarkAges:         boolean  = false;
-  KingdomCards10:   string[] = [];
-  BaneCard:         string[] = [];
-  EventCards:       string[] = [];
-  Obelisk:          string[] = [];
-  LandmarkCards:    string[] = [];
-  BlackMarketPile:  string[] = [];
-
-  constructor( initObj?: {
-    Prosperity:       boolean,
-    DarkAges:         boolean,
-    KingdomCards10:   string[],
-    BaneCard:         string[],
-    EventCards:       string[],
-    Obelisk:          string[],
-    LandmarkCards:    string[],
-    BlackMarketPile:  string[],
-  }) {
-    if ( !initObj ) return;
-    this.Prosperity       = !!initObj.Prosperity;
-    this.DarkAges         = !!initObj.DarkAges;
-    this.KingdomCards10   = ( initObj.KingdomCards10  || [] );
-    this.BaneCard         = ( initObj.BaneCard        || [] );
-    this.EventCards       = ( initObj.EventCards      || [] );
-    this.Obelisk          = ( initObj.Obelisk         || [] );
-    this.LandmarkCards    = ( initObj.LandmarkCards   || [] );
-    this.BlackMarketPile  = ( initObj.BlackMarketPile || [] );
-  }
-}
-
-
-
 
 export class GameResult {
   databaseKey:               string = '';  // key of this game-result in fire-database
@@ -148,9 +86,66 @@ export class GameResult {
     // write back
     this.players.forEach( e => { e.score = scoringTemp[ e.rank ]; } );
   }
+}
 
 
-  setVP() {
 
+class PlayerResultRanked {
+  name:      string = '';
+  turnOrder: number = 0;
+  rank:      number = 0;   // <- calculated locally
+  score:     number = 0;   // <- calculated locally
+  VP:        number = 0;   // <- calculated locally
+  NofVictoryCards: NumberOfVictoryCards = new NumberOfVictoryCards();
+
+  constructor( initObj?: {
+    name:      string,
+    turnOrder: number,
+    rank:      number,
+    score:     number,
+    VP:        number,
+    NofVictoryCards: NumberOfVictoryCards,
+  }) {
+    if ( !initObj ) return;
+    this.name      = ( initObj.name      || '' );
+    this.turnOrder = ( initObj.turnOrder || 0  );
+    this.rank      = ( initObj.rank      || 0  );
+    this.score     = ( initObj.score     || 0  );
+    this.VP        = ( initObj.VP        || 0  );
+    this.NofVictoryCards = new NumberOfVictoryCards( initObj.NofVictoryCards );
+  }
+}
+
+
+
+class SelectedCardsId {
+  Prosperity:       boolean  = false;
+  DarkAges:         boolean  = false;
+  KingdomCards10:   string[] = [];
+  BaneCard:         string[] = [];
+  EventCards:       string[] = [];
+  Obelisk:          string[] = [];
+  LandmarkCards:    string[] = [];
+  BlackMarketPile:  string[] = [];
+
+  constructor( initObj?: {
+    Prosperity:       boolean,
+    DarkAges:         boolean,
+    KingdomCards10:   string[],
+    BaneCard:         string[],
+    EventCards:       string[],
+    Obelisk:          string[],
+    LandmarkCards:    string[],
+    BlackMarketPile:  string[],
+  }) {
+    if ( !initObj ) return;
+    this.Prosperity       = !!initObj.Prosperity;
+    this.DarkAges         = !!initObj.DarkAges;
+    this.KingdomCards10   = ( initObj.KingdomCards10  || [] );
+    this.BaneCard         = ( initObj.BaneCard        || [] );
+    this.EventCards       = ( initObj.EventCards      || [] );
+    this.Obelisk          = ( initObj.Obelisk         || [] );
+    this.LandmarkCards    = ( initObj.LandmarkCards   || [] );
+    this.BlackMarketPile  = ( initObj.BlackMarketPile || [] );
   }
 }

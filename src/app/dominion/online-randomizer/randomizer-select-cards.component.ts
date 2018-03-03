@@ -7,7 +7,7 @@ import { MyRandomizerGroupService } from './my-randomizer-group.service';
 
 import { SelectedCards       } from '../../classes/selected-cards';
 import { BlackMarketPileCard } from '../../classes/black-market-pile-card';
-import { BlackMarketPhase    } from '../../classes/black-market-phase.enum';
+import { BlackMarketPhase    } from '../../classes/online-randomizer/black-market-phase.enum';
 
 
 @Component({

@@ -12,7 +12,7 @@ export class GameConfigService {
   messageSec$         = this.user.onlineGame.messageSec$;
   autoSort$           = this.user.onlineGame.autoSort$;
 
-  private devModeSource = new BehaviorSubject<boolean>(false);
+  private devModeSource = new BehaviorSubject<boolean>(true);
   devMode$ = this.devModeSource.asObservable();
 
 

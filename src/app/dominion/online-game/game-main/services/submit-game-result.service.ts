@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { GameResult           } from '../../../../classes/game-result';
-import { GameState            } from '../../../../classes/game-state';
 import { NumberOfVictoryCards } from '../../../../classes/number-of-victory-cards';
 
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameStateService } from './game-state-services/game-state.service';
 import { MyGameRoomService } from './my-game-room.service';
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
+import { GameState } from '../../../../classes/online-game/game-state';
 
 
 @Injectable()
@@ -16,50 +16,50 @@ export class SubmitGameResultService {
 
   gameResult$: Observable<GameResult>
     = Observable.combineLatest(
-      this.database.scoringTable$,
-      this.gameStateService.gameState$.filter( gs => gs.gameIsOver() ),
-      this.myGameRoomService.myGameRoom$,
-      this.database.expansionNameList$,
-      this.database.cardPropertyList$,
-      (defaultScores, gameState, gameRoom, expansionNameList, cardPropertyList) => {
-        const selectedExpansionNameList
-          = expansionNameList.filter( (name, i) => gameRoom.isSelectedExpansions[i] );
-        const selectedCards = gameRoom.selectedCards;
-        const indexToId = cardIndex => cardPropertyList[cardIndex].cardId;
-        const playersName = gameRoom.playersNameShuffled();
-        const lastTurnPlayerName = playersName[ gameState.turnPlayerIndex() ];
+        this.database.scoringTable$,
+        this.gameStateService.gameState$,
+        this.myGameRoomService.myGameRoom$,
+        this.database.expansionNameList$,
+        this.database.cardPropertyList$,
+        (defaultScores, gameState, gameRoom, expansionNameList, cardPropertyList) => {
+          const selectedExpansionNameList
+            = expansionNameList.filter( (name, i) => gameRoom.isSelectedExpansions[i] );
+          const selectedCards = gameRoom.selectedCards;
+          const indexToId = cardIndex => cardPropertyList[cardIndex].cardId;
+          const playersName = gameRoom.playersNameShuffled();
+          const lastTurnPlayerName = playersName[ gameState.turnPlayerIndex() ];
 
-        const gameResult = new GameResult( null, {
-          timeStamp  : Date.now(),
-          place      : 'Online',
-          memo       : '',
-          selectedExpansionNameList : selectedExpansionNameList,
-          selectedCardsId : {
-            Prosperity      : selectedCards.Prosperity,
-            DarkAges        : selectedCards.DarkAges,
-            KingdomCards10  : selectedCards.KingdomCards10 .map( indexToId ),
-            BaneCard        : selectedCards.BaneCard       .map( indexToId ),
-            EventCards      : selectedCards.EventCards     .map( indexToId ),
-            Obelisk         : selectedCards.Obelisk        .map( indexToId ),
-            LandmarkCards   : selectedCards.LandmarkCards  .map( indexToId ),
-            BlackMarketPile : selectedCards.BlackMarketPile.map( indexToId ),
-          },
-          players : playersName.map( (name, i) => ({
-                    name            : name,
-                    NofVictoryCards : this.countNumberOfVictoryCards( i, gameState ),
-                    VP              : 0,
-                    turnOrder       : i,
-                    rank            : 1,
-                    score           : 0,
-                  }) ),
-          lastTurnPlayerName: lastTurnPlayerName,
+          const gameResult = new GameResult( null, {
+            timeStamp  : Date.now(),
+            place      : 'Online',
+            memo       : '',
+            selectedExpansionNameList : selectedExpansionNameList,
+            selectedCardsId : {
+              Prosperity      : selectedCards.Prosperity,
+              DarkAges        : selectedCards.DarkAges,
+              KingdomCards10  : selectedCards.KingdomCards10 .map( indexToId ),
+              BaneCard        : selectedCards.BaneCard       .map( indexToId ),
+              EventCards      : selectedCards.EventCards     .map( indexToId ),
+              Obelisk         : selectedCards.Obelisk        .map( indexToId ),
+              LandmarkCards   : selectedCards.LandmarkCards  .map( indexToId ),
+              BlackMarketPile : selectedCards.BlackMarketPile.map( indexToId ),
+            },
+            players : playersName.map( (name, i) => ({
+                      name            : name,
+                      NofVictoryCards : this.countNumberOfVictoryCards( i, gameState ),
+                      VP              : 0,
+                      turnOrder       : i,
+                      rank            : 1,
+                      score           : 0,
+                    }) ),
+            lastTurnPlayerName: lastTurnPlayerName,
+          });
+
+          gameResult.players.forEach( p => p.VP = p.NofVictoryCards.VPtotal() );
+          gameResult.rankPlayers();
+          gameResult.setScores( defaultScores );
+          return gameResult;
         });
-
-        gameResult.players.forEach( p => p.VP = p.NofVictoryCards.VPtotal() );
-        gameResult.rankPlayers();
-        gameResult.setScores( defaultScores );
-        return gameResult;
-      });
 
 
   constructor(

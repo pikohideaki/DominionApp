@@ -1,8 +1,8 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { DCard } from '../../../../../classes/game-state';
 import { GameConfigService } from '../../services/game-config.service';
+import { DCard } from '../../../../../classes/online-game/dcard';
 
 
 @Component({

@@ -10,16 +10,16 @@ import { UtilitiesService   } from '../my-own-library/utilities.service';
 import { User                  } from '../classes/user';
 import { CardProperty          } from '../classes/card-property';
 import { GameResult            } from '../classes/game-result';
-import { RandomizerGroup       } from '../classes/randomizer-group';
-import { GameRoom              } from '../classes/game-room';
 import { SelectedCards         } from '../classes/selected-cards';
 import { SelectedCardsCheckbox } from '../classes/selected-cards-checkbox-values';
-import { GameState             } from '../classes/game-state';
 import { BlackMarketPileCard   } from '../classes/black-market-pile-card';
-import { ChatMessage           } from '../classes/chat-message';
-import { PlayerResult          } from '../classes/player-result';
-import { GameCommunication, UserInput } from '../classes/game-room-communication';
-import { NumberOfVictoryCards } from '../classes/number-of-victory-cards';
+import { NumberOfVictoryCards  } from '../classes/number-of-victory-cards';
+import { RandomizerGroup       } from '../classes/online-randomizer/randomizer-group';
+import { PlayerResult          } from '../classes/online-randomizer/player-result';
+import { GameRoom              } from '../classes/online-game/game-room';
+import { ChatMessage           } from '../classes/online-game/chat-message';
+import { GameCommunication     } from '../classes/online-game/game-room-communication';
+import { UserInput             } from '../classes/online-game/user-input';
 
 
 @Injectable()

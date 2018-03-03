@@ -1,16 +1,16 @@
-import { SelectedCards } from './selected-cards';
-import { SelectedCardsCheckbox } from './selected-cards-checkbox-values';
-import { PlayerResult } from './player-result';
-import { BlackMarketPileCard } from './black-market-pile-card';
-import { BlackMarketPhase    } from '../classes/black-market-phase.enum';
+import { SelectedCards         } from '../selected-cards';
+import { SelectedCardsCheckbox } from '../selected-cards-checkbox-values';
+import { PlayerResult          } from '../online-randomizer/player-result';
+import { BlackMarketPileCard   } from '../black-market-pile-card';
+import { BlackMarketPhase      } from '../online-randomizer/black-market-phase.enum';
 
 
 export class RandomizerGroup {
   databaseKey: string;             // set only when newly created
 
-  name:        string = '';        // set only when newly created
-  password:    string = '';        // set only when newly created
-  date:        Date = new Date();  // set only when newly created
+  name:     string = '';        // set only when newly created
+  password: string = '';        // set only when newly created
+  date:     Date = new Date();  // set only when newly created
 
   isSelectedExpansions:    boolean[] = [];
   selectedCardsCheckbox:   SelectedCardsCheckbox = new SelectedCardsCheckbox();
@@ -91,10 +91,4 @@ export class RandomizerGroup {
 function entries( obj: any ): { key: string, value: any }[] {
   if ( !obj ) return [];
   return Object.keys(obj).map( key => ({ key: key, value: obj[key] }) );
-}
-
-function compareString( a: string, b: string ): number {
-  if ( a < b ) return -1;
-  if ( a > b ) return 1;
-  return 0;
 }

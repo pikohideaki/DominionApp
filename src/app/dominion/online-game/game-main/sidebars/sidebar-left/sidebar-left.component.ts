@@ -9,6 +9,7 @@ import { GameStateService             } from '../../services/game-state-services
 import { MyGameRoomService            } from '../../services/my-game-room.service';
 import { GameConfigService            } from '../../services/game-config.service';
 import { GameRoomCommunicationService } from '../../services/game-room-communication.service';
+import { HelpDialogComponent } from '../../dialogs/help-dialog/help-dialog.component';
 
 
 
@@ -54,6 +55,9 @@ export class SideBarLeftComponent implements OnInit {
   }
 
 
+  showHelpDialog() {
+    this.dialog.open( HelpDialogComponent );
+  }
 
   toggleSideNavClicked() {
     this.toggleSideNav.emit();

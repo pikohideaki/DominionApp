@@ -7,12 +7,12 @@ import { switchMap, switchMapTo } from 'rxjs/operators';
 import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
 
-import { RandomizerGroup       } from '../../classes/randomizer-group';
+import { RandomizerGroup       } from '../../classes/online-randomizer/randomizer-group';
 import { SelectedCards         } from '../../classes/selected-cards';
 import { SelectedCardsCheckbox } from '../../classes/selected-cards-checkbox-values';
 import { BlackMarketPileCard   } from '../../classes/black-market-pile-card';
-import { BlackMarketPhase      } from '../../classes/black-market-phase.enum';
-import { PlayerResult          } from '../../classes/player-result';
+import { BlackMarketPhase      } from '../../classes/online-randomizer/black-market-phase.enum';
+import { PlayerResult          } from '../../classes/online-randomizer/player-result';
 import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
 
 

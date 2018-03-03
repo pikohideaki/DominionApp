@@ -9,7 +9,7 @@ import { ReversePipe } from 'ngx-pipes';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { UtilitiesService } from '../../../my-own-library/utilities.service';
 
-import { GameRoom } from '../../../classes/game-room';
+import { GameRoom } from '../../../classes/online-game/game-room';
 import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/sign-in-to-game-room-dialog.component';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 import { Router } from '@angular/router';

@@ -8,6 +8,13 @@
 
 <div class="body">
 
+  <button mat-button class="sidebar-button"
+      matTooltip="ヘルプ" matTooltipPosition="after"
+      (click)="showHelpDialog()" >
+    <mat-icon >help</mat-icon>
+  </button>
+
+
   <span class="spacer"></span>
 
   <app-turn-info></app-turn-info>
@@ -33,7 +40,7 @@
       [class.alert-icon]="data.newChatMessageAlert"
       matTooltip="チャットを表示／非表示" matTooltipPosition="after"
       (click)="toggleSideNavClicked()" >
-    <mat-icon >textsms</mat-icon>
+    <mat-icon>textsms</mat-icon>
   </button>
 
   <button mat-button class="sidebar-button"

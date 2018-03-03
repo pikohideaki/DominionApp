@@ -11,10 +11,10 @@ import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.servi
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
 import { SelectedCards         } from '../../../classes/selected-cards';
-import { RandomizerGroup       } from '../../../classes/randomizer-group';
+import { RandomizerGroup       } from '../../../classes/online-randomizer/randomizer-group';
 import { User                  } from '../../../classes/user';
 import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-values';
-import { BlackMarketPhase      } from '../../../classes/black-market-phase.enum';
+import { BlackMarketPhase      } from '../../../classes/online-randomizer/black-market-phase.enum';
 
 
 @Component({

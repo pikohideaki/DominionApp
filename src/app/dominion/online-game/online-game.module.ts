@@ -35,6 +35,7 @@ import { OnlineGamePlayerCardsDialogComponent, EachPlayerCardsComponent } from '
 import { MessageForMeListDialogComponent } from './game-main/dialogs/message-for-me-dialog-list.component';
 
 import { GameConfigService } from './game-main/services/game-config.service';
+import { HelpDialogComponent } from './game-main/dialogs/help-dialog/help-dialog.component';
 
 
 @NgModule({
@@ -86,6 +87,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     SideBarRightComponent,
     MyAreaComponent,
     CardsAreaComponent,
+    HelpDialogComponent,
   ],
   entryComponents: [
     SignInToGameRoomDialogComponent,
@@ -94,6 +96,7 @@ import { GameConfigService } from './game-main/services/game-config.service';
     OnlineGameResultDialogComponent,
     OnlineGamePlayerCardsDialogComponent,
     MessageForMeListDialogComponent,
+    HelpDialogComponent,
   ],
   providers: [
     GameConfigService,

@@ -3,9 +3,9 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/combineLatest';
 
-import { GameRoom } from '../../../../classes/game-room';
+import { GameRoom } from '../../../../classes/online-game/game-room';
 import { UtilitiesService } from '../../../../my-own-library/utilities.service';
-import { GameState } from '../../../../classes/game-state';
+import { GameState } from '../../../../classes/online-game/game-state';
 
 import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -20,7 +20,8 @@ export class MyGameRoomService {
           (list, id) => (list.find( e => e.databaseKey === id ) || new GameRoom()) );
 
   initialState$: Observable<GameState>
-    = this.myGameRoom$.map( e => e.initialState );
+    = this.myGameRoom$.map( e => e.initialState )
+                      .filter( e => !e.isEmpty() );
 
   myIndex$: Observable<number>
     = Observable.combineLatest(

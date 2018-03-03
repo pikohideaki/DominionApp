@@ -5,11 +5,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/first';
 import 'rxjs/add/operator/startWith';
 
-import { DCardPath   } from '../../../../classes/game-state';
-import { ChatMessage, ChatCommand } from '../../../../classes/chat-message';
-import { GameCommunication,
-    UserInput,
-    UserInputCommand } from '../../../../classes/game-room-communication';
+import { ChatMessage, ChatCommand } from '../../../../classes/online-game/chat-message';
+import { GameCommunication        } from '../../../../classes/online-game/game-room-communication';
+import { UserInput                } from '../../../../classes/online-game/user-input';
+import { UserInputCommand         } from '../../../../classes/online-game/user-input-command';
 
 import { MyUserInfoService             } from '../../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
@@ -32,6 +31,8 @@ export class GameRoomCommunicationService {
   presenceState$:     Observable<boolean[]>;
   isTerminated$:      Observable<boolean>;
   resultIsSubmitted$: Observable<boolean>;
+
+  private shuffleByLength;
 
 
   constructor(
@@ -60,7 +61,9 @@ export class GameRoomCommunicationService {
           .switchMap( id =>
             this.afdb.list<UserInput>(
               `${this.database.fdPath.onlineGameCommunicationList}/${id}/userInputList` )
-            .valueChanges(['child_added']) )
+            .valueChanges(['child_added'])
+            .map( list => list.map( (e, i) => new UserInput(e, i)))
+             )
           .distinctUntilChanged( (a, b) => a === b, x => x.length );
 
     this.resetGameClicked$
@@ -104,6 +107,10 @@ export class GameRoomCommunicationService {
               `${this.database.fdPath.onlineGameCommunicationList}/${id}/resultIsSubmitted` )
             .valueChanges() )
           .distinctUntilChanged();
+
+    this.myGameRoomService.initialState$.first()
+      .subscribe( initialState =>
+        this.shuffleByLength = initialState.getAllDCards().length );
   }
 
 
@@ -127,11 +134,16 @@ export class GameRoomCommunicationService {
     clickedCardId?: number
  ) {
     const communicationId = await this.communicationId$.toPromise();
-    const userInput = new UserInput(
-                            userInputCommand,
-                            playerId,
-                            autoSort,
-                            clickedCardId );
+    const userInput
+      = new UserInput({
+              command:  userInputCommand,
+              data: {
+                playerId:      playerId,
+                autoSort:      autoSort,
+                clickedCardId: clickedCardId,
+                shuffleBy:     this.utils.permutation( this.shuffleByLength ),
+              },
+            }, null );
     await this.database.onlineGameCommunication
             .sendUserInput( communicationId, userInput );
   }

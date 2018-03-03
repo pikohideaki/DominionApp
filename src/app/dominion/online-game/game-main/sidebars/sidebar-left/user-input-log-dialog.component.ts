@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
+import { UserInput } from '../../../../../classes/online-game/user-input';
+import { GameState } from '../../../../../classes/online-game/game-state';
 
-import { UserInput } from '../../../../../classes/game-room-communication';
-import { GameState } from '../../../../../classes/game-state';
 
 
 

@@ -1,5 +1,6 @@
 <ng-container *ngIf="{
     showCardProperty: showCardProperty$ | async,
+    gainCardState:    gainCardState$    | async,
     trashPileWidth:   trashPileWidth$   | async,
     trashPileHeight:  trashPileHeight$  | async,
     Prosperity:       Prosperity$       | async,
@@ -15,7 +16,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Curse$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -29,7 +30,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Estate$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -40,7 +41,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Duchy$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -51,7 +52,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Province$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -62,7 +63,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Colony$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -76,7 +77,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Copper$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -87,7 +88,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Silver$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -98,7 +99,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Gold$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -109,7 +110,7 @@
           <app-cards-pile
             [showArraySize]="true"
             [showCardProperty]="data.showCardProperty"
-            [hideNonButtonCards]="true"
+            [hideNonButtonCards]="data.gainCardState"
             [DCardArray$]="BasicCards.Platinum$"
             [myIndex$]="myIndex$"
             [width$]="width$"
@@ -124,7 +125,7 @@
         <app-cards-pile
           [showArraySize]="true"
           [showCardProperty]="data.showCardProperty"
-          [hideNonButtonCards]="true"
+          [hideNonButtonCards]="data.gainCardState"
           [DCardArray$]="idArray$"
           [myIndex$]="myIndex$"
           [width$]="width$"
@@ -141,7 +142,7 @@
       <app-cards-pile *ngIf="data.trashPile?.length > 0"
         [showArraySize]="true"
         [showCardProperty]="data.showCardProperty"
-        [hideNonButtonCards]="true"
+        [hideNonButtonCards]="data.gainCardState"
         [DCardArray$]="trashPile$"
         [myIndex$]="myIndex$"
         [width$]="width$"

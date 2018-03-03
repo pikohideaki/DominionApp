@@ -1,8 +1,10 @@
-import { shuffle, objectEntries, seq0, objectForEach } from '../my-own-library/utilities';
+import { shuffle, objectEntries, seq0, objectForEach } from '../../my-own-library/utilities';
+import { SelectedCards } from '../selected-cards';
+import { GameState } from './game-state';
+import { CardProperty, numberToPrepare, toListIndex } from '../card-property';
+import { DCard } from './dcard';
+import { PlayerCards } from './player-cards';
 
-import { SelectedCards } from './selected-cards';
-import { CardProperty, numberToPrepare, toListIndex } from './card-property';
-import { GameState, DCard, PlayerCards } from './game-state';
 
 
 export class GameRoom {

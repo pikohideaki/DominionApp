@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { TurnInfo } from '../../../../../../classes/game-state';
 import { GameStateService } from '../../../services/game-state-services/game-state.service';
 
 
@@ -22,11 +21,12 @@ export class TurnInfoComponent implements OnInit {
             case ''            : return '';
             case 'StartOfTurn' : return '';
             case 'Action'      : return 'A';
-            case 'Action*'     : return 'A*';
+            case 'Action*'     : return '〈A〉';
             case 'BuyPlay'     : return 'B';
-            case 'BuyPlay*'    : return 'B*';
-            case 'BuyCard'     : return `B'`;
+            case 'BuyPlay*'    : return '〈B〉';
+            case 'BuyCard'     : return 'B*';
             case 'Night'       : return 'N';
+            case 'Night*'      : return '〈N〉';
             case 'CleanUp'     : return 'C';
             case 'EndOfTurn'   : return '';
             case 'GameIsOver'  : return '';

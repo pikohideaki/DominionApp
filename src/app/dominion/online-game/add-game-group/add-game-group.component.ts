@@ -141,9 +141,11 @@ export class AddGameGroupComponent implements OnInit {
     dialogRef.disableClose = true;
 
     if ( this.addTestPlayer ) {
-      await this.utils.sleep(2);
-      await this.database.onlineGameRoom.addMember( newRoom.databaseKey, 'testPlayer' );
-      console.log('added testPlayer');
+      for ( let i = 1; i < numberOfPlayers; ++i ) {
+        await this.utils.sleep(1);
+        await this.database.onlineGameRoom.addMember( newRoom.databaseKey, `testPlayer${i}` );
+        console.log('added testPlayer');
+      }
     }
 
     const result = await dialogRef.afterClosed().toPromise();

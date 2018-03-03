@@ -5,12 +5,13 @@ import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.servi
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';
-import { SelectedCards } from '../../../classes/selected-cards';
-import { GameRoom } from '../../../classes/game-room';
-import { GameCommunication, UserInput } from '../../../classes/game-room-communication';
+import { SelectedCards       } from '../../../classes/selected-cards';
+import { GameRoom            } from '../../../classes/online-game/game-room';
+import { GameCommunication   } from '../../../classes/online-game/game-room-communication';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
-import { ChatMessage } from '../../../classes/chat-message';
-import { TurnInfo } from '../../../classes/game-state';
+import { ChatMessage         } from '../../../classes/online-game/chat-message';
+import { UserInput           } from '../../../classes/online-game/user-input';
+import { TurnInfo            } from '../../../classes/online-game/turn-info';
 
 
 
@@ -60,7 +61,14 @@ export class AddGameGroupService {
       const newComm = new GameCommunication();
       newComm.thinkingState = this.utils.seq0( numberOfPlayers ).map( _ => false );
       // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
-      newComm.userInputList.push( new UserInput( 'clicked goToNextPhase', 0, true ) );
+      newComm.userInputList.push( new UserInput( {
+                                    command: 'clicked goToNextPhase',
+                                    data: {
+                                      playerId: 0,
+                                      autoSort: true,
+                                      shuffleBy: this.utils.permutation(10),
+                                    }
+                                  }, null ) );
       const result = await this.database.onlineGameCommunication.add( newComm );
       newRoom.gameRoomCommunicationId = result.key;
     }

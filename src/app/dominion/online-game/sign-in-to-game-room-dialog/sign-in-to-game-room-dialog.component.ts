@@ -8,7 +8,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { MyUserInfoService             } from '../../../firebase-mediator/my-user-info.service';
 import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { GameRoom } from '../../../classes/game-room';
+import { GameRoom } from '../../../classes/online-game/game-room';
 import { SelectedCards } from '../../../classes/selected-cards';
 
 

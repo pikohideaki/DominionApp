@@ -2,7 +2,6 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
-import { PlayerCards } from '../../../../../classes/game-state';
 import { MyGameRoomService  } from '../../services/my-game-room.service';
 import { GameStateService } from '../../services/game-state-services/game-state.service';
 import { UtilitiesService } from '../../../../../my-own-library/utilities.service';

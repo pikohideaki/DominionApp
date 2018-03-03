@@ -1,15 +1,14 @@
 import { Injectable } from '@angular/core';
 
-import { DCard, GameState, PlayerCards, Phase } from '../../../../../classes/game-state';
 import { CardProperty } from '../../../../../classes/card-property';
-import { UserInput    } from '../../../../../classes/game-room-communication';
 
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameStateService } from './game-state.service';
-import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateShortcutService } from './game-state-shortcut.service';
 import { GameMessageService } from '../game-message.service';
+import { UserInput } from '../../../../../classes/online-game/user-input';
+import { Phase } from '../../../../../classes/online-game/phase';
+import { DCard } from '../../../../../classes/online-game/dcard';
+import { GameState } from '../../../../../classes/online-game/game-state';
 
 
 @Injectable()
@@ -17,8 +16,6 @@ export class GameLoopService {
 
 
   constructor(
-    private utils: UtilitiesService,
-    private gameRoomService: MyGameRoomService,
     private gameState: GameStateService,
     private shortcut: GameStateShortcutService,
     private messageService: GameMessageService,
@@ -98,8 +95,7 @@ export class GameLoopService {
             turnInfo.phase = 'Night';
           } else {
             this.shortcut.buttonizeSupplyIf( gameState, turnPlayerId,
-                (c: DCard) =>
-                  c.cardProperty.cost.coin <= turnInfo.coin );
+                (c: DCard) => c.cardProperty.cost.coin <= turnInfo.coin );
           }
           break;
         }

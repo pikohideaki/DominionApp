@@ -1,12 +1,11 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { DCard, BasicCards, KingdomCards } from '../../../../../classes/game-state';
-
 import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateService  } from '../../services/game-state-services/game-state.service';
 import { GameConfigService } from '../../services/game-config.service';
+import { DCard } from '../../../../../classes/online-game/dcard';
 
 
 @Component({
@@ -17,6 +16,7 @@ import { GameConfigService } from '../../services/game-config.service';
 export class SharedAreaComponent implements OnInit {
 
   @Input() showCardProperty$: Observable<boolean>;
+  @Input() gainCardState$: Observable<boolean>;
   @Output() cardClicked = new EventEmitter<DCard>();
 
   width$           = this.config.cardSizeRatio$.map( ratio => ratio *  70 );

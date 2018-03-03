@@ -2,9 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 
-import { DCard } from '../../../../../../classes/game-state';
 import { GameConfigService } from '../../../services/game-config.service';
 import { CardPropertyDialogComponent } from '../../../../../sub-components/card-property-dialog/card-property-dialog.component';
+import { DCard } from '../../../../../../classes/online-game/dcard';
 
 
 @Component({

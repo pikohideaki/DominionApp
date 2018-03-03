@@ -1,0 +1,40 @@
+import { UserInputCommand } from './user-input-command';
+import { permutation } from '../../my-own-library/utilities';
+
+
+export class UserInput {
+  command: UserInputCommand = '';
+  data: {
+    playerId:       number,
+    shuffleBy:      number[],
+    autoSort:       boolean,
+    clickedCardId?: number,
+  } = {
+    playerId:      0,
+    shuffleBy:     [],
+    autoSort:      true,
+    clickedCardId: 0,
+  };
+  index: number = 0;
+
+  constructor( initObj: {
+    command:        UserInputCommand,
+    data: {
+      playerId:       number,
+      autoSort:       boolean,
+      clickedCardId?: number,
+      shuffleBy:      number[],
+    }
+  }, index?: number ) {
+    this.command = (initObj.command || '');
+    this.data = {
+        playerId:  initObj.data.playerId,
+        autoSort:  initObj.data.autoSort,
+        shuffleBy: ( initObj.data.shuffleBy || permutation( 200 ) ),
+      };
+    if ( initObj.data.clickedCardId !== undefined ) {
+      this.data.clickedCardId = initObj.data.clickedCardId;
+    }
+    this.index = index;
+  }
+}
