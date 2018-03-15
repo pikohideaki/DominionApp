@@ -20,21 +20,20 @@
       {{data.messageForMe || '　'}}
     </div>
 
-    <div class="buttons-area">
+    <div class="buttons-area" *ngIf="!data.gameIsOver">
       <button mat-icon-button class="sidebar-button"
           matTooltipPosition="above" matTooltip="考慮中"
           (click)="toggleMyThinkingState( data.myThinkingState, data.myIndex )" >
         <mat-icon>hourglass_full</mat-icon>
       </button>
 
-      <button *ngIf="!data.gameIsOver"
-          mat-icon-button class="sidebar-button"
+      <button mat-icon-button class="sidebar-button"
           matTooltipPosition="above" matTooltip="手札をソート"
           (click)="sortMyHandCards( data.myIndex )">
         <mat-icon>sort</mat-icon>
       </button>
 
-      <ng-container *ngIf="data.isMyTurn && !data.gameIsOver">
+      <ng-container *ngIf="data.isMyTurn">
         <button *ngIf="data.isBuyPlayPhase"
             mat-icon-button class="sidebar-button"
             matTooltipPosition="above" matTooltip="基本財宝カードをすべてプレイ"
@@ -58,7 +57,10 @@
   <div class="my-card-area">
     <app-my-card-area
       [showCardProperty$]="showCardProperty$"
-      (cardClicked)="onCardClick( $event )">
+      [buttonizeVCoins]="data.isBuyPlayPhase && data.isMyTurn"
+      (cardClicked)="onCardClick( $event )"
+      (vcoinClicked)="vcoinClick()"
+      (debtClicked)="debtClick()" >
     </app-my-card-area>
   </div>
 

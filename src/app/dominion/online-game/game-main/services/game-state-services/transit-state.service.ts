@@ -11,8 +11,8 @@ import 'rxjs/add/operator/pairwise';
 import { GameRoom         } from '../../../../../classes/online-game/game-room';
 import { CardProperty     } from '../../../../../classes/card-property';
 
-import { CloudFirestoreMediatorService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
+import { FireDatabaseService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../../../my-own-library/utilities';
 import { GameStateShortcutService } from './game-state-shortcut.service';
 import { GameLoopService } from './game-loop.service';
 import { GameRoomCommunicationService } from '../game-room-communication.service';
@@ -20,6 +20,7 @@ import { MyGameRoomService } from '../my-game-room.service';
 import { GameStateService } from './game-state.service';
 import { GameState } from '../../../../../classes/online-game/game-state';
 import { UserInput } from '../../../../../classes/online-game/user-input';
+import { nextPhase, sortHandCards } from './shortcut';
 
 
 @Injectable()
@@ -66,12 +67,11 @@ export class TransitStateService {
 
   constructor(
     private dialog: MatDialog,
-    private utils: UtilitiesService,
     private myGameRoom: MyGameRoomService,
     private gameState: GameStateService,
     private shortcut: GameStateShortcutService,
     private gameloop: GameLoopService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private gameCommunication: GameRoomCommunicationService,
   ) {
     // this.userInput$.subscribe( val => console.log( 'userInput$', val ) );
@@ -86,10 +86,9 @@ export class TransitStateService {
     playersNameList: string[],
   ): Promise<void> {
     // 現在のゲーム状態をコピー
-    const nextState = new GameState( this.utils.copyObject( currState ) );
+    const nextState = new GameState( utils.object.copy( currState ) );
     // console.log('transitState', nextState);
     const pid = userInput.data.playerId;
-    const playersName = playersNameList[ pid ];
 
     // コマンドの処理
     switch ( userInput.command ) {
@@ -99,8 +98,7 @@ export class TransitStateService {
         break;
 
       case 'clicked goToNextPhase':
-        nextState.turnInfo.phase
-          = this.shortcut.nextPhase( nextState.turnInfo.phase );
+        nextState.turnInfo.phase = nextPhase( nextState.turnInfo.phase );
         break;
 
       case 'clicked finishMyTurn':
@@ -112,19 +110,27 @@ export class TransitStateService {
         break;
 
       case 'clicked sortHandcards':
-        this.shortcut.sortHandCards( nextState, pid );
+        sortHandCards( nextState, pid );
         break;
 
       case 'play all treasures':
         await this.shortcut.playAllTreasures(
                 nextState,
                 pid,
-                playersName,
+                playersNameList,
                 userInput.data.shuffleBy );
         break;
 
       case 'clicked card':
-        await this.shortcut.onCardClick( nextState, userInput, playersName );
+        await this.shortcut.onCardClick( nextState, userInput, playersNameList );
+        break;
+
+      case 'clicked vcoin':
+        await this.shortcut.onVcoinClick( nextState, userInput );
+        break;
+
+      case 'clicked debt':
+        await this.shortcut.onDebtClick( nextState, userInput );
         break;
 
       default:
@@ -136,12 +142,10 @@ export class TransitStateService {
     await this.gameloop.phaseAction(
             nextState,
             userInput,
-            playersName );
+            playersNameList );
 
     // 自動で手札をソート
-    if ( userInput.data.autoSort ) {
-      this.shortcut.sortHandCards( nextState, pid );
-    }
+    if ( userInput.data.autoSort ) sortHandCards( nextState, pid );
 
     this.gameState.setGameState( nextState );
     this.setNextGameState( nextState );

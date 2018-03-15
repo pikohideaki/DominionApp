@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
+import { utils } from '../../../../../my-own-library/utilities';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateService  } from '../../services/game-state-services/game-state.service';
 import { GameConfigService } from '../../services/game-config.service';
@@ -26,11 +26,13 @@ export class SharedAreaComponent implements OnInit {
   myIndex$ = this.gameRoomService.myIndex$;
 
   Prosperity$           = this.gameRoomService.Prosperity$;
+  usePotion$            = this.gameRoomService.usePotion$;
   private BasicCards$   = this.gameStateService.BasicCards$;
   private KingdomCards$ = this.gameStateService.KingdomCards$;
   trashPile$            = this.gameStateService.trashPile$;
 
   BasicCards = {
+    Potion$   : this.BasicCards$.map( e => e.Potion   ),
     Copper$   : this.BasicCards$.map( e => e.Copper   ),
     Silver$   : this.BasicCards$.map( e => e.Silver   ),
     Gold$     : this.BasicCards$.map( e => e.Gold     ),
@@ -42,11 +44,10 @@ export class SharedAreaComponent implements OnInit {
     Curse$    : this.BasicCards$.map( e => e.Curse    ),
   };
 
-  KingdomCards = this.utils.seq0(10).map( i => this.KingdomCards$.map( e => e[i] ) );
+  KingdomCards = utils.number.seq0(10).map( i => this.KingdomCards$.map( e => e[i] ) );
 
 
   constructor(
-    private utils: UtilitiesService,
     private gameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
     private config: GameConfigService,

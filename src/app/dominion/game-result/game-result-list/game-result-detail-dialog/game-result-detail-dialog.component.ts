@@ -8,7 +8,7 @@ import { GameResult    } from '../../../../classes/game-result';
 import { SelectedCards } from '../../../../classes/selected-cards';
 import { CardProperty  } from '../../../../classes/card-property';
 
-import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { ConfirmDialogComponent } from '../../../../my-own-library/confirm-dialog.component';
 
 import { CardPropertyDialogComponent } from '../../../sub-components/card-property-dialog/card-property-dialog.component';
@@ -35,7 +35,7 @@ export class GameResultDetailDialogComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    private database: CloudFirestoreMediatorService
+    private database: FireDatabaseService
   ) {
   }
 

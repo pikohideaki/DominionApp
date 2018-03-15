@@ -1,5 +1,6 @@
 <ng-container *ngIf="{
-      gameResult: gameResult$ | async
+      gameResult:       gameResult$       | async,
+      cardPropertyList: cardPropertyList$ | async
     } as data">
 
 <ng-container *ngIf="!data.gameResult; then loading; else main"></ng-container>
@@ -42,7 +43,7 @@
                 <ng-template #normal>{{player.turnOrder}}</ng-template>
               </td>
               <td>
-                {{player.NofVictoryCards.toStr()}}
+                {{player.NofVictoryCards.toStr( data.cardPropertyList )}}
               </td>
             </tr>
             </ng-container>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameResult } from '../../../classes/game-result';
 
 
@@ -17,7 +17,7 @@ export class SubmitGameResultDialogComponent implements OnInit {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
   ) {
   }
 

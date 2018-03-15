@@ -12,6 +12,7 @@ import { OnlineGamePlayerCardsDialogComponent } from '../../dialogs/online-game-
 import { GameStateService } from '../../services/game-state-services/game-state.service';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameRoomCommunicationService } from '../../services/game-room-communication.service';
+import { FireDatabaseService } from '../../../../../firebase-mediator/cloud-firestore-mediator.service';
 
 
 @Component({
@@ -28,6 +29,7 @@ export class SideBarRightComponent implements OnInit {
   constructor(
     private router: Router,
     private dialog: MatDialog,
+    private database: FireDatabaseService,
     private gameStateService: GameStateService,
     private myGameRoomService: MyGameRoomService,
     private gameCommunication: GameRoomCommunicationService,
@@ -40,12 +42,13 @@ export class SideBarRightComponent implements OnInit {
   showGameResultDialog() {
     const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
     dialogRef.componentInstance.gameResult$ = this.gameResult$;
+    dialogRef.componentInstance.cardPropertyList$ = this.database.cardPropertyList$;
   }
 
   showPlayerCards() {
     const dialogRef = this.dialog.open( OnlineGamePlayerCardsDialogComponent );
     dialogRef.componentInstance.allPlayersCards$ = this.gameStateService.allPlayersCards$;
-    dialogRef.componentInstance.playersName$ = this.myGameRoomService.playersNameShuffled$;
+    dialogRef.componentInstance.playersNameList$ = this.myGameRoomService.playersNameShuffled$;
   }
 
   exit( myIndex: number ) {

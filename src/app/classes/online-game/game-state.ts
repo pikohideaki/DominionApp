@@ -1,4 +1,4 @@
-import { seq0, objectEntries, permutation, objectForEach, filterRemove } from '../../my-own-library/utilities';
+import { utils } from '../../my-own-library/utilities';
 import { CardProperty, CardType } from '../card-property';
 import { PlayerCardDirectory } from './player-card-directory';
 
@@ -19,7 +19,7 @@ export class GameState {
   turnCounter:     number = 0;
   numberOfPlayers: number = 0;
   Prosperity:      boolean = false;
-  Alchemy:         boolean = false;
+  usePotion:       boolean = false;
 
   turnInfo:        TurnInfo     = new TurnInfo();
   allPlayersData:  PlayerData[] = [];
@@ -43,7 +43,7 @@ export class GameState {
     turnCounter:     number,
     numberOfPlayers: number,
     Prosperity:      boolean,
-    Alchemy:         boolean,
+    usePotion:       boolean,
     turnInfo:        TurnInfo,
     allPlayersData:  PlayerData[],
     DCards: {
@@ -58,7 +58,7 @@ export class GameState {
     this.turnCounter     = ( dataObj.turnCounter     || 0 );
     this.numberOfPlayers = ( dataObj.numberOfPlayers || 0 );
     this.Prosperity      = ( dataObj.Prosperity      || false );
-    this.Alchemy         = ( dataObj.Alchemy         || false );
+    this.usePotion       = ( dataObj.usePotion       || false );
 
     this.turnInfo = new TurnInfo( dataObj.turnInfo );
     this.allPlayersData = ( dataObj.allPlayersData || [] ).map( e => new PlayerData(e) );
@@ -78,10 +78,10 @@ export class GameState {
   setNumberOfPlayers( numberOfPlayers: number ) {
     this.numberOfPlayers = numberOfPlayers;
     if ( this.allPlayersData.length === 0 ) {
-      this.allPlayersData = seq0( numberOfPlayers ).map( _ => new PlayerData() );
+      this.allPlayersData = utils.number.seq0( numberOfPlayers ).map( _ => new PlayerData() );
     }
     if ( this.DCards.allPlayersCards.length === 0 ) {
-      this.DCards.allPlayersCards = seq0( numberOfPlayers ).map( _ => new PlayerCards() );
+      this.DCards.allPlayersCards = utils.number.seq0( numberOfPlayers ).map( _ => new PlayerCards() );
     }
   }
 
@@ -97,17 +97,21 @@ export class GameState {
     return this.DCards.allPlayersCards[ this.turnPlayerIndex() ];
   }
 
+  turnPlayerData() {
+    return this.allPlayersData[ this.turnPlayerIndex() ];
+  }
+
 
   getDirectory( cardId: number ): DCardPath[] {
     let result: DCardPath[];
     this.DCards.allPlayersCards.forEach( (playerCards, playerIndex) =>
-      objectForEach( playerCards, (pile, key: PlayerCardDirectory ) => {
+      utils.object.forEach( playerCards, (pile, key: PlayerCardDirectory ) => {
         if ( pile.map( c => c.id ).includes( cardId ) ) {
           result = ['allPlayersCards', playerIndex, key];
         }
       }) );
 
-    objectForEach( this.DCards.BasicCards, (pile, key: BasicCardsDirectory) => {
+    utils.object.forEach( this.DCards.BasicCards, (pile, key: BasicCardsDirectory) => {
       if ( pile.map( c => c.id ).includes( cardId ) ) {
         result = ['BasicCards', key];
       }
@@ -170,11 +174,11 @@ export class GameState {
 
   emptyPiles(): number {
     const Supplies = [].concat(
-        objectEntries( this.DCards.BasicCards ),
+        utils.object.entries( this.DCards.BasicCards ),
         this.DCards.KingdomCards );
     return Supplies.filter( e => e.length <= 0 ).length
             - (this.Prosperity ? 0 : 2)
-            - (this.Alchemy ? 0 : 1);
+            - (this.usePotion ? 0 : 1);
   }
 
   gameIsOverConditions(): boolean {

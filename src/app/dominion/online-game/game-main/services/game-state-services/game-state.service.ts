@@ -8,6 +8,7 @@ import { GameRoomCommunicationService } from '../game-room-communication.service
 import { PlayerCards } from '../../../../../classes/online-game/player-cards';
 import { GameState } from '../../../../../classes/online-game/game-state';
 import { TurnInfo } from '../../../../../classes/online-game/turn-info';
+import { PlayerData } from '../../../../../classes/online-game/players-data';
 
 
 @Injectable()
@@ -20,6 +21,7 @@ export class GameStateService {
   action$ = this.turnInfo$.map( e => e.action ).distinctUntilChanged();
   buy$    = this.turnInfo$.map( e => e.buy    ).distinctUntilChanged();
   coin$   = this.turnInfo$.map( e => e.coin   ).distinctUntilChanged();
+  potion$ = this.turnInfo$.map( e => e.potion ).distinctUntilChanged();
   phase$  = this.turnInfo$.map( e => e.phase  ).distinctUntilChanged();
 
   allPlayersData$  = this.gameState$.map( e => e.allPlayersData         );
@@ -45,6 +47,12 @@ export class GameStateService {
         this.allPlayersCards$, this.turnPlayerIndex$,
         (allPlayersCards, turnPlayerIndex) =>
           allPlayersCards[ turnPlayerIndex ] || new PlayerCards() );
+
+  myData$: Observable<PlayerData>
+    = Observable.combineLatest(
+        this.allPlayersData$, this.myGameRoomService.myIndex$,
+        (allPlayersData, myIndex) =>
+          allPlayersData[ myIndex ] || new PlayerData() );
 
   myCards$: Observable<PlayerCards>
     = Observable.combineLatest(

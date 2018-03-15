@@ -24,7 +24,7 @@
       </app-sidebar-left>
     </div>
 
-    <mat-sidenav-container class="sidenavContainer">
+    <mat-sidenav-container class="sidenav-container">
       <mat-sidenav #sidenav mode="side" disableClose="true"
             [opened]="data.chatOpened" >
         <app-chat [autoScroll]="data.autoScroll" [sidenav]="sidenav"> </app-chat>
@@ -48,11 +48,11 @@
               (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-other-players-area>
           </div>
-          <div *ngIf="!data.isMyTurn">
+          <!-- <div *ngIf="!data.isMyTurn">
             <app-turn-player-area
               (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
             </app-turn-player-area>
-          </div>
+          </div> -->
         </div>
         <div class="spacer"></div>
         <div class="my-area">
@@ -66,7 +66,9 @@
             [isBuyPlayPhase$]="isBuyPlayPhase$"
             [gameIsOver$]="gameIsOver$"
             [myThinkingState$]="myThinkingState$"
-            (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )">
+            (cardClicked)="onCardClick( data.myIndex, $event, data.autoSort )"
+            (vcoinClicked)="onVcoinClick( data.myIndex, data.autoSort )"
+            (debtClicked)="onDebtClick( data.myIndex, data.autoSort )" >
           </app-my-area>
         </div>
       </div>

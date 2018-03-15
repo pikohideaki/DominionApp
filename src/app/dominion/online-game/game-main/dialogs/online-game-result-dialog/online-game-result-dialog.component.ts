@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { GameResult } from '../../../../../classes/game-result';
+import { CardProperty } from '../../../../../classes/card-property';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { GameResult } from '../../../../../classes/game-result';
 export class OnlineGameResultDialogComponent implements OnInit {
 
   gameResult$: Observable<GameResult>;  // input
+  cardPropertyList$: Observable<CardProperty[]>;
 
 
   constructor() {}

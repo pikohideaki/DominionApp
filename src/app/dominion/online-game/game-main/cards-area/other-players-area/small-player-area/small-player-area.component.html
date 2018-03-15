@@ -2,20 +2,35 @@
     PlayArea:        playerCards.PlayArea$ | async,
     Aside:           playerCards.Aside$    | async,
     turnPlayerIndex: turnPlayerIndex$      | async,
-    myIndex:         myIndex$              | async
+    myIndex:         myIndex$              | async,
+    VPtoken:         VPtoken$              | async,
+    vcoin:           vcoin$                | async,
+    debt:            debt$                 | async
   } as data">
 
 
 <div class="player-area"
-    [class.isTurnPlayer]="playerIndex === data.turnPlayerIndex">
+    [class.is-turn-player]="playerIndex === data.turnPlayerIndex">
   <div class="players-name">
     <span> {{playerName}} </span>
     <span class="spacer"></span>
     <mat-icon *ngIf="thinkingState">hourglass_full</mat-icon>
   </div>
 
-  <ng-container *ngIf="playerIndex !== data.turnPlayerIndex
-                      && playerIndex !== data.myIndex">
+  <div class="tokens">
+    <div *ngIf="data.vcoin + data.debt > 0"
+        class="vcoins-debts box-shadow">
+      <app-vcoins diameter="20" [number$]="vcoin$"></app-vcoins>
+      <app-debts  diameter="20" [number$]="debt$" ></app-debts>
+    </div>
+    <div class="spacer"></div>
+    <app-vp-tokens *ngIf="data.VPtoken > 0"
+        [diameter]="20" [VPtoken]="data.VPtoken"></app-vp-tokens>
+  </div>
+
+  <ng-container *ngIf="playerIndex !== data.myIndex">
+  <!-- <ng-container *ngIf="playerIndex !== data.turnPlayerIndex
+                      && playerIndex !== data.myIndex"> -->
     <div class="PlayArea_Aside">
       <div *ngIf="data.PlayArea?.length > 0"
           class="CardArea box-shadow PlayArea">

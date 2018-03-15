@@ -3,7 +3,7 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
 
-import { toYMD, isToday } from '../my-own-library/utilities';
+import { utils } from '../my-own-library/utilities';
 
 
 @Injectable()
@@ -26,7 +26,7 @@ export class AutoBackupOnFirebaseService {
 
   async checkAndExecuteBackup() {
     const latestBackupDate = await this.getLatestBackupDate();
-    if ( !isToday( latestBackupDate ) ) {
+    if ( !utils.date.isToday( latestBackupDate ) ) {
       this.createBackup();
     }
   }
@@ -40,7 +40,7 @@ export class AutoBackupOnFirebaseService {
     console.log('created backup');
     this.updateLatestBackupDate();
 
-    const dateString = toYMD( new Date(), '' );
+    const dateString = utils.date.toYMD( new Date(), '' );
 
     Object.keys( this.fdPath ).forEach( key => {
       const sourcePath = this.fdPath[key];

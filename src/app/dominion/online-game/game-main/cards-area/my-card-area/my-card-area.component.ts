@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
+import { utils } from '../../../../../my-own-library/utilities';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateService } from '../../services/game-state-services/game-state.service';
 import { GameConfigService } from '../../services/game-config.service';
@@ -18,11 +18,18 @@ import { PlayerCards } from '../../../../../classes/online-game/player-cards';
 export class MyCardAreaComponent implements OnInit {
 
   @Input() showCardProperty$: Observable<boolean>;
+  @Input() buttonizeVCoins: boolean = false;
+  @Input() buttonizeDebts:  boolean = false;
   @Output() cardClicked = new EventEmitter<DCard>();
+  @Output() vcoinClicked = new EventEmitter<void>();
+  @Output() debtClicked = new EventEmitter<void>();
 
-  width$ = this.config.cardSizeRatio$.map( ratio => ratio * 70 );
-  myIndex$ = this.gameRoomService.myIndex$;
+  width$    = this.config.cardSizeRatio$.map( ratio => ratio * 70 );
+  myIndex$  = this.gameRoomService.myIndex$;
   isMyTurn$ = this.gameStateService.isMyTurn$;
+  VPtoken$  = this.gameStateService.myData$.map( e => e.VPtoken ).distinctUntilChanged();
+  vcoin$    = this.gameStateService.myData$.map( e => e.vcoin   ).distinctUntilChanged();
+  debt$     = this.gameStateService.myData$.map( e => e.debt    ).distinctUntilChanged();
 
   private myCards$: Observable<PlayerCards>
     = this.gameStateService.myCards$;
@@ -33,13 +40,12 @@ export class MyCardAreaComponent implements OnInit {
     HandCards$ : this.myCards$.map( e => e.HandCards ),
     Open$      : this.myCards$.map( e => e.Open      ),
     PlayArea$  : this.myCards$.map( e => e.PlayArea  ),
-    DiscardPileReveresed$ : this.myCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
+    DiscardPileReveresed$ : this.myCards$.map( e => utils.array.getReversed( e.DiscardPile ) ),
   };
 
 
 
   constructor(
-    private utils: UtilitiesService,
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
     private config: GameConfigService,
@@ -51,5 +57,13 @@ export class MyCardAreaComponent implements OnInit {
 
   onClick( dcard: DCard ) {
     this.cardClicked.emit( dcard );
+  }
+
+  vcoinClick() {
+    this.vcoinClicked.emit();
+  }
+
+  debtClick() {
+    this.debtClicked.emit();
   }
 }

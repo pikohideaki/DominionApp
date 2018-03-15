@@ -1,6 +1,6 @@
-<ng-container *ngIf="{ playersName: playersName$ | async } as data">
+<ng-container *ngIf="{ playersNameList: playersNameList$ | async } as data">
 
-<ng-container *ngIf="!data.playersName; then loading; else main"></ng-container>
+<ng-container *ngIf="!data.playersNameList; then loading; else main"></ng-container>
 <ng-template #loading>Loading...</ng-template>
 <ng-template #main>
   <div class="body-with-padding" >
@@ -8,7 +8,7 @@
     <h1 mat-dialog-title>プレイヤーの山札一覧</h1>
 
     <div mat-dialog-content class="content">
-      <ng-container *ngFor="let name of data.playersName; let idx = index">
+      <ng-container *ngFor="let name of data.playersNameList; let idx = index">
         <app-each-player-cards
           [name]="name"
           [playerIndex]="idx"

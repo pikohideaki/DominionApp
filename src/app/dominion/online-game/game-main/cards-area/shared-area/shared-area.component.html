@@ -4,6 +4,7 @@
     trashPileWidth:   trashPileWidth$   | async,
     trashPileHeight:  trashPileHeight$  | async,
     Prosperity:       Prosperity$       | async,
+    usePotion:        usePotion$        | async,
     trashPile:        trashPile$        | async
   } as data">
 
@@ -73,6 +74,18 @@
       </div>
 
       <div class="treasures">
+        <div class="card-pile" *ngIf="data.usePotion">
+          <app-cards-pile
+            [showArraySize]="true"
+            [showCardProperty]="data.showCardProperty"
+            [hideNonButtonCards]="data.gainCardState"
+            [DCardArray$]="BasicCards.Potion$"
+            [myIndex$]="myIndex$"
+            [width$]="width$"
+            (cardClicked)="onClick( $event )" >
+          </app-cards-pile>
+        </div>
+
         <div class="card-pile">
           <app-cards-pile
             [showArraySize]="true"

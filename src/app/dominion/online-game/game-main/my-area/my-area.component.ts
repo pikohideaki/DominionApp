@@ -6,6 +6,7 @@ import { ConfirmDialogComponent } from '../../../../my-own-library/confirm-dialo
 
 import { MessageForMeListDialogComponent } from '../dialogs/message-for-me-dialog-list.component';
 import { GameRoomCommunicationService } from '../services/game-room-communication.service';
+import { DCard } from '../../../../classes/online-game/dcard';
 
 @Component({
   selector: 'app-my-area',
@@ -24,7 +25,9 @@ export class MyAreaComponent implements OnInit {
   @Input() gameIsOver$:       Observable<boolean>;
   @Input() myThinkingState$:  Observable<boolean>;
 
-  @Output() cardClicked = new EventEmitter<any>();
+  @Output() cardClicked  = new EventEmitter<DCard>();
+  @Output() vcoinClicked = new EventEmitter<void>();
+  @Output() debtClicked  = new EventEmitter<void>();
 
   constructor(
     private dialog: MatDialog,
@@ -40,9 +43,9 @@ export class MyAreaComponent implements OnInit {
     dialogRef.componentInstance.messageForMeList = messageForMeList;
   }
 
-  onCardClick( value ) {
-    this.cardClicked.emit( value );
-  }
+  onCardClick( value: DCard ) { this.cardClicked.emit( value ); }
+  vcoinClick() { this.vcoinClicked.emit(); }
+  debtClick() { this.debtClicked.emit(); }
 
 
   toggleMyThinkingState( currentState: boolean, myIndex: number ) {

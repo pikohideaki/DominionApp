@@ -14,6 +14,7 @@ export class TurnInfoComponent implements OnInit {
   action$: Observable<number> = this.gameStateService.action$;
   buy$:    Observable<number> = this.gameStateService.buy$;
   coin$:   Observable<number> = this.gameStateService.coin$;
+  potion$: Observable<number> = this.gameStateService.potion$;
 
   phaseCharacter$:  Observable<string>
     = this.gameStateService.phase$.map( phase => {
@@ -35,6 +36,7 @@ export class TurnInfoComponent implements OnInit {
           }
       });
 
+  potionRepeater$ = this.potion$.map( potion => Array.from( new Array(potion) ) );
 
 
   constructor(

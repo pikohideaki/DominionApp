@@ -5,7 +5,7 @@ import { AngularFirestore    } from 'angularfire2/firestore';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
 
-import { UtilitiesService   } from '../my-own-library/utilities.service';
+import { utils } from '../my-own-library/utilities';
 
 import { User                  } from '../classes/user';
 import { CardProperty          } from '../classes/card-property';
@@ -23,7 +23,7 @@ import { UserInput             } from '../classes/online-game/user-input';
 
 
 @Injectable()
-export class CloudFirestoreMediatorService {
+export class FireDatabaseService {
   fdPath = ( isDevMode() ? {
     expansionNameList           : '/dev/data/expansionNameList',
     cardPropertyList            : '/dev/data/cardPropertyList',
@@ -141,7 +141,6 @@ export class CloudFirestoreMediatorService {
   constructor(
     private afs: AngularFirestore,
     private afdb: AngularFireDatabase,
-    private utils: UtilitiesService,
   ) {
     this.expansionNameList$
       = afdb.list<string>( this.fdPath.expansionNameList ).valueChanges()
@@ -196,7 +195,7 @@ export class CloudFirestoreMediatorService {
     };
     this.user = {
       setUser: ( uid: string, newUser: User ) => {
-        const newUserObj = this.utils.copyObject( newUser );
+        const newUserObj = utils.object.copy( newUser );
         delete newUserObj.databaseKey;
         return this.afdb.object(`${this.fdPath.users}/${uid}`).set( newUserObj );
       },
@@ -247,7 +246,7 @@ export class CloudFirestoreMediatorService {
 
     this.gameResult = {
       add: ( gameResult: GameResult ) => {
-        const copy = this.utils.copyObject( gameResult );
+        const copy = utils.object.copy( gameResult );
         delete copy.no;
         delete copy.date;
         copy.timeStamp = gameResult.date.valueOf();
@@ -286,13 +285,13 @@ export class CloudFirestoreMediatorService {
 
     this.randomizerGroup = {
       addGroup: ( newGroup: RandomizerGroup ) => {
-        const newGroupObj = this.utils.copyObject( newGroup );  // deep copy
+        const newGroupObj = utils.object.copy( newGroup );  // deep copy
         newGroupObj.timeStamp = newGroup.date.valueOf();
         delete newGroupObj.date;
         delete newGroupObj.databaseKey;
         newGroupObj.newGameResult.players = {};
         newGroup.newGameResult.players.forEach( e => {
-          const playerResultObj = this.utils.copyObject(e);
+          const playerResultObj = utils.object.copy(e);
           delete playerResultObj.uid;
           newGroupObj.newGameResult.players[e.uid] = playerResultObj;
         } );
@@ -344,7 +343,7 @@ export class CloudFirestoreMediatorService {
               randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/VP`, value ),
 
             numberOfVictoryCards: ( groupId: string, uid: string, value: NumberOfVictoryCards ) =>
-              randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/numberOfVictoryCards`, value ),
+              randomizerGroupSetValue( groupId, `newGameResult/players/${uid}/NofVictoryCards`, value ),
           },
           lastTurnPlayerName: ( groupId: string, value: string ) =>
             randomizerGroupSetValue( groupId, `newGameResult/lastTurnPlayerName`, value ),
@@ -363,13 +362,13 @@ export class CloudFirestoreMediatorService {
 
       add: {
         member: ( groupId: string, uid: string, value: PlayerResult ) => {
-          const obj = this.utils.copyObject( value );
+          const obj = utils.object.copy( value );
           delete obj.uid;
           return randomizerGroupSetValue( groupId, `newGameResult/players/${uid}`, obj );
         },
 
         selectedCardsHistory: ( groupId: string, value: SelectedCards ) => {
-          const obj = this.utils.copyObject( value );
+          const obj = utils.object.copy( value );
           delete obj.date;
           obj.timeStamp = value.date.valueOf();
           return randomizerGroupPushValue( groupId, 'selectedCardsHistory', obj );
@@ -391,7 +390,7 @@ export class CloudFirestoreMediatorService {
 
     this.onlineGameRoom = {
       add: ( newGameRoom: GameRoom ) => {
-        const newGameRoomObj = this.utils.copyObject( newGameRoom );  // deep copy
+        const newGameRoomObj = utils.object.copy( newGameRoom );  // deep copy
         newGameRoomObj.timeStamp = newGameRoomObj.date.valueOf();
         delete newGameRoomObj.date;
         delete newGameRoomObj.databaseKey;
@@ -402,10 +401,10 @@ export class CloudFirestoreMediatorService {
         this.afdb.list( this.fdPath.onlineGameRoomsList ).remove( roomId ),
 
       addMember: ( roomId: string, playerName: string ) =>
-        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersName` ).push( playerName ),
+        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersNameList` ).push( playerName ),
 
       removeMember: ( roomId: string, uid: string ) =>
-        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersName` ).remove( uid ),
+        this.afdb.list( `${this.fdPath.onlineGameRoomsList}/${roomId}/playersNameList` ).remove( uid ),
     };
 
 

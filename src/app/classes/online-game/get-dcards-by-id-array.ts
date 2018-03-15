@@ -1,4 +1,4 @@
-import { DCard } from "./dcard";
+import { DCard } from './dcard';
 
 export function getDCardsByIdArray(
   idArray: (number[]|void),

@@ -3,8 +3,8 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../my-own-library/utilities';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
@@ -18,13 +18,11 @@ import { SelectedCardsCheckbox } from '../../../classes/selected-cards-checkbox-
 import { SetVpDialogComponent } from './set-vp-dialog.component';
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 import { SubmitGameResultDialogComponent } from '../../sub-components/submit-game-result-dialog/submit-game-result-dialog.component';
-import { NumberOfVictoryCardsStringService } from './number-of-victory-cards-string.service';
 import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
 
 
 
 @Component({
-  providers: [ NumberOfVictoryCardsStringService ],
   selector: 'app-add-game-result',
   templateUrl: './add-game-result.component.html',
   styleUrls: [
@@ -47,7 +45,7 @@ export class AddGameResultComponent implements OnInit {
 
   places$: Observable<string[]>
     = this.database.gameResultList$.map( gameResultList =>
-          this.utils.uniq(
+          utils.array.uniq(
               gameResultList
                 .map( e => e.place )
                 .filter( e => e !== '' ) ) )
@@ -102,13 +100,11 @@ export class AddGameResultComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService,
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
     private myUserInfo: MyUserInfoService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService,
-    private numberOfVictoryCardsString: NumberOfVictoryCardsStringService
   ) {
   }
 
@@ -157,13 +153,13 @@ export class AddGameResultComponent implements OnInit {
   async shuffleTurnOrders( selectedPlayers: PlayerResult[] ) {
     if ( selectedPlayers.length < 2 ) return;
     const shuffledArray
-      = this.utils.getShuffled( this.utils.numSeq( 1, selectedPlayers.length ) );
+      = utils.number.random.getShuffled( utils.number.numSeq( 1, selectedPlayers.length ) );
     selectedPlayers.forEach( (e, i) => e.turnOrder = shuffledArray[i] );
     await this.submitTurnOrders( selectedPlayers );
   }
 
   async rotateAtRandom( selectedPlayers: PlayerResult[] ) {
-    const rand = this.utils.randomNumber( 0, selectedPlayers.length -  1 );
+    const rand = utils.number.random.genIntegerIn( 0, selectedPlayers.length -  1 );
     this.rotateTurnOrders( selectedPlayers, rand );
   }
 

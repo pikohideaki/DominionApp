@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { Subject } from 'rxjs/Subject';
 import { switchMap, switchMapTo } from 'rxjs/operators';
 
-import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
 
 import { RandomizerGroup       } from '../../classes/online-randomizer/randomizer-group';
@@ -105,7 +105,7 @@ export class MyRandomizerGroupService {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myUserInfo: MyUserInfoService
   ) {
     // this.myGrp$.subscribe( val => console.log('myGrp$', val ) );

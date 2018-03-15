@@ -1,7 +1,7 @@
 import { Component, OnInit, isDevMode } from '@angular/core';
 
 import { GameConfigService   } from '../../services/game-config.service';
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
+import { utils } from '../../../../../my-own-library/utilities';
 
 
 @Component({
@@ -19,14 +19,13 @@ export class GameConfigDialogComponent implements OnInit {
   devMode$            = this.config.devMode$;
   autoSort$           = this.config.autoSort$;
 
-  resetGameKeycode: number = this.utils.randInt( 1000, 9999 );
+  resetGameKeycode: number = utils.number.random.genIntegerIn( 1000, 9999 );
   keycode: number = 0;
 
   round = ((num: number) => Math.round( num * 10 ) / 10 );
 
 
   constructor(
-    private utils: UtilitiesService,
     private config: GameConfigService
   ) {
   }

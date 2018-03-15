@@ -1,6 +1,3 @@
-import { submatch } from '../my-own-library/utilities';
-
-
 export type CardType = (
        'Curse'
       |'Action'
@@ -144,6 +141,7 @@ export class CardProperty {
           || this.cardId === 'Silver'
           || this.cardId === 'Gold'
           || this.cardId === 'Platinum'
+          || this.cardId === 'Potion'
           || this.cardId === 'Harem'
           || this.cardId === 'Stash'
           || this.cardId === 'Humble_Castle'

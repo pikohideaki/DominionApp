@@ -10,7 +10,6 @@ import { AlertDialogComponent    } from './alert-dialog.component';
 import { ConfirmDialogComponent  } from './confirm-dialog.component';
 import { WaitingSpinnerComponent } from './waiting-spinner.component';
 import { AppListComponent        } from './app-list/app-list.component';
-import { UtilitiesService        } from './utilities.service';
 
 // data table
 import { ItemsPerPageComponent } from './data-table/items-per-page.component';
@@ -46,9 +45,6 @@ import { MultipleDatePickerComponent } from './multiple-date-picker/multiple-dat
     ItemsPerPageComponent,
     PagenationComponent,
     MultipleDatePickerComponent,
-  ],
-  providers: [
-    UtilitiesService,
   ],
   entryComponents: [
     MessageDialogComponent,

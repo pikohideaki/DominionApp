@@ -1,18 +1,16 @@
 export class PlayerData {
-  VPtoken:    number = 0;
-  // VPtotal:    number = 0;
-  // turnCount:  number = 0;
-  // debt
-  // vcoin
+  VPtoken: number = 0;
+  vcoin:   number = 0;
+  debt:    number = 0;
 
   constructor( dataObj?: {
-    VPtoken:   number,
-    // VPtotal:   number,
-    // turnCount: number,
+    VPtoken: number,
+    vcoin:   number,
+    debt:    number,
   } ) {
     if ( !dataObj ) return;
-    this.VPtoken   = ( dataObj.VPtoken   || 0 );
-    // this.VPtotal   = ( dataObj.VPtotal   || 0 );
-    // this.turnCount = ( dataObj.turnCount || 0 );
+    this.VPtoken = ( dataObj.VPtoken || 0 );
+    this.vcoin   = ( dataObj.vcoin   || 0 );
+    this.debt    = ( dataObj.debt    || 0 );
   }
 }

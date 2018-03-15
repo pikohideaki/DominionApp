@@ -6,13 +6,13 @@ import 'rxjs/add/operator/takeWhile';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { ReversePipe } from 'ngx-pipes';
 
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { GameRoom } from '../../../classes/online-game/game-room';
 import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/sign-in-to-game-room-dialog.component';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 import { Router } from '@angular/router';
+import { utils } from '../../../my-own-library/utilities';
 
 
 @Component({
@@ -33,8 +33,7 @@ export class GameRoomListComponent implements OnInit {
     private router: Router,
     public snackBar: MatSnackBar,
     public dialog: MatDialog,
-    public utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private user: MyUserInfoService
   ) {
   }
@@ -42,6 +41,7 @@ export class GameRoomListComponent implements OnInit {
   ngOnInit() {
   }
 
+  toYMDHMS = ( dat: Date ) => utils.date.toYMDHMS( dat );
 
   roomClicked( clickedRoomId: string ) {
     if ( this.selectedRoomId === clickedRoomId ) this.selectedRoomId = '';  // toggle

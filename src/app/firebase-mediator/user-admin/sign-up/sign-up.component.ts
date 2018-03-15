@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 
-import { CloudFirestoreMediatorService } from '../../cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../cloud-firestore-mediator.service';
 
 import { User } from '../../../classes/user';
 
@@ -31,7 +31,7 @@ export class SignUpComponent implements OnInit {
     public snackBar: MatSnackBar,
     public afAuth: AngularFireAuth,
     private location: Location,
-    private database: CloudFirestoreMediatorService
+    private database: FireDatabaseService
   ) {
   }
 

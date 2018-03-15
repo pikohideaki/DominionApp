@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { MatDialog } from '@angular/material';
+import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
@@ -10,9 +10,8 @@ import { MessageDialogComponent } from '../../../my-own-library/message-dialog.c
 import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
 
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyGameRoomService } from './services/my-game-room.service';
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
 
 import { GameRoomCommunicationService } from './services/game-room-communication.service';
 import { GameMessageService           } from './services/game-message.service';
@@ -85,8 +84,9 @@ export class GameMainComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private utils: UtilitiesService,
+    private snackBar: MatSnackBar,
     private user: MyUserInfoService,
+    private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
     private gameRoomCommunication: GameRoomCommunicationService,
@@ -125,7 +125,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
       .takeWhile( () => this.alive )
       .subscribe( ([[name, gameIsOver], myIndex, gameState, isSubmitted, gameResult, loading]) => {
         if ( !gameIsOver ) {
-          if ( !loading ) this.showChangeTurnDialog( name );
+          if ( !loading ) this.showChangeTurnMessage( name );
         } else {
           // ゲーム終了処理
           gameState.disableAllButtons();
@@ -219,15 +219,32 @@ export class GameMainComponent implements OnInit, OnDestroy {
         'clicked card', myIndex, autoSort, dcard.id );
   }
 
-  private async showChangeTurnDialog( name: string ) {
-    const dialogRef = this.dialog.open( MessageDialogComponent );
-    dialogRef.componentInstance.message = `${name}のターン`;
-    await this.utils.sleep(1);
-    dialogRef.close();
+  onVcoinClick( myIndex: number, autoSort: boolean ) {
+    this.gameRoomCommunication.sendUserInput(
+        'clicked vcoin', myIndex, autoSort );
+  }
+
+  onDebtClick( myIndex: number, autoSort: boolean ) {
+    this.gameRoomCommunication.sendUserInput(
+        'clicked debt', myIndex, autoSort );
+  }
+
+  private async showChangeTurnMessage( name: string ) {
+    // const dialogRef = this.dialog.open( MessageDialogComponent );
+    // dialogRef.componentInstance.message = `${name}のターン`;
+    // await this.utils.sleep(1);
+    // dialogRef.close();
+    this.openSnackBar(`${name}のターン`);
   }
 
   showGameResultDialog() {
     const dialogRef = this.dialog.open( OnlineGameResultDialogComponent );
     dialogRef.componentInstance.gameResult$ = this.gameResult$;
+    dialogRef.componentInstance.cardPropertyList$ = this.database.cardPropertyList$;
   }
+
+  private openSnackBar( message: string ) {
+    this.snackBar.open( message, undefined, { duration: 3000 } );
+  }
+
 }

@@ -4,8 +4,8 @@ import { MatSnackBar } from '@angular/material';
 
 import { Observable } from 'rxjs/Observable';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../my-own-library/utilities';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
 
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
@@ -50,9 +50,8 @@ export class RandomizerGroupListComponent implements OnInit {
 
   constructor(
     public snackBar: MatSnackBar,
-    private utils: UtilitiesService,
     private myUserInfo: MyUserInfoService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService
   ) {
   }
@@ -134,7 +133,7 @@ export class RandomizerGroupListComponent implements OnInit {
   }
 
   toYMDHMS( date: Date ) {
-    return this.utils.toYMDHMS( date );
+    return utils.date.toYMDHMS( date );
   }
 
   signInPasswordOnChange( value ) {

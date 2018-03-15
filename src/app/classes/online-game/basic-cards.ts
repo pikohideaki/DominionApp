@@ -1,6 +1,6 @@
-import { DCard } from "./dcard";
-import { objectForEach, objectEntries } from "../../my-own-library/utilities";
-import { getDCardsByIdArray } from "./get-dcards-by-id-array";
+import { DCard } from './dcard';
+import { utils } from '../../my-own-library/utilities';
+import { getDCardsByIdArray } from './get-dcards-by-id-array';
 
 
 export class BasicCards {
@@ -28,18 +28,18 @@ export class BasicCards {
     Potion:   DCard[],
   } ) {
     if ( !dataObj ) return;
-    objectForEach( dataObj, (_, key) => {
+    utils.object.forEach( dataObj, (_, key) => {
       this[key] = ( dataObj[key] || [] ).map( e => new DCard(e) );
     });
   }
 
   getDCards( cardIdArray?: number[] ): DCard[] {
-    const allDCards: DCard[] = [].concat( ...objectEntries( this ) );
+    const allDCards: DCard[] = [].concat( ...utils.object.entries( this ) );
     return getDCardsByIdArray( cardIdArray, allDCards );
   }
 
   removeDCards( cardIdArray: number[] ) {
-    objectForEach( this, (pile, key, obj) =>
+    utils.object.forEach( this, (pile, key, obj) =>
       obj[key] = pile.filter( c => !cardIdArray.includes(c.id) ) );
   }
 

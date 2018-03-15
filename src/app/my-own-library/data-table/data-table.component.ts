@@ -6,7 +6,7 @@ import 'rxjs/add/operator/debounceTime';
 import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/takeWhile';
 
-import { UtilitiesService } from '../utilities.service';
+import { utils } from '../utilities';
 
 import { ItemsPerPageComponent } from './items-per-page.component';
 import { PagenationComponent, getDataAtPage } from './pagenation/pagenation.component';
@@ -74,10 +74,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
 
 
-  constructor(
-    private utils: UtilitiesService,
-  ) {
-  }
+  constructor( ) { }
 
   ngOnInit() {
     this.columnSettingsSource.next( this.columnSettings );  // initialize
@@ -145,7 +142,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
           const dataOfColumnFiltered = filteredData.map( line => line[ column.name ] );
           switch ( column.manip ) {
             case 'select' : {
-              const options = this.utils.uniq( dataOfColumn ).sort();
+              const options = utils.array.uniq( dataOfColumn ).sort();
               column.selectOptions
                 = options.map( e => ({
                       value: e,
@@ -155,7 +152,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
             } break;
             case 'multiSelect-or' :
             case 'multiSelect-and' : {
-              const options = this.utils.uniq( [].concat( ...dataOfColumn ) ).sort();
+              const options = utils.array.uniq( [].concat( ...dataOfColumn ) ).sort();
               column.selectOptions
                 = options.map( e => ({
                       value: e,
@@ -227,7 +224,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
       /* no mismatches => return true; 1 or more mismatches => return false */
       switch ( column.manip ) {
         case 'input' :
-          if ( !this.utils.submatch( lineOfData[ column.name ], column.manipState, true ) ) return false;
+          if ( !utils.string.submatch( lineOfData[ column.name ], column.manipState, true ) ) return false;
           break;
 
         case 'select' :
@@ -237,7 +234,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         case 'multiSelect-and' :
           if ( !!column.manipState && column.manipState.length > 0 ) {
             const cellValue = lineOfData[ column.name ];
-            if ( !this.utils.isSubset( column.manipState, cellValue ) ) return false;
+            if ( !utils.array.isSubset( column.manipState, cellValue ) ) return false;
             /* for any e \in column.manipState, e \in cellValue */
           }
           break;
@@ -247,7 +244,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
              column.manipStateの全選択初期化は不要になっている */
           if ( !!column.manipState && column.manipState.length > 0 ) {
             const cellValue = lineOfData[ column.name ];
-            if ( this.utils.setIntersection( column.manipState, cellValue ).length === 0 ) return false;
+            if ( utils.array.setIntersection( column.manipState, cellValue ).length === 0 ) return false;
             /* for some e \in column.manipState, e \in cellValue */
           }
           break;

@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { MatDialog } from '@angular/material';
 
 import { getDataAtPage } from '../../../my-own-library/data-table/pagenation/pagenation.component';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.component';
 import { GameResultDetailDialogComponent    } from './game-result-detail-dialog/game-result-detail-dialog.component';
 import { GameResult } from '../../../classes/game-result';
@@ -35,7 +35,7 @@ export class GameResultListComponent implements OnInit, OnDestroy {
 
   constructor(
     public dialog: MatDialog,
-    private database: CloudFirestoreMediatorService
+    private database: FireDatabaseService
   ) {
   }
 

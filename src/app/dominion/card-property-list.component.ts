@@ -4,10 +4,9 @@ import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { UtilitiesService } from '../my-own-library/utilities.service';
 import { ColumnSetting } from '../my-own-library/data-table/data-table.component';
 
-import { CloudFirestoreMediatorService } from '../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, transform } from '../classes/card-property';
 import { CardPropertyDialogComponent } from './sub-components/card-property-dialog/card-property-dialog.component';
@@ -58,9 +57,8 @@ export class CardPropertyListComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService,
     public dialog: MatDialog,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
   ) {
   }
 

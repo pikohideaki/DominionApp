@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
+import { utils } from '../../../../../my-own-library/utilities';
 import { MyGameRoomService } from '../../services/my-game-room.service';
 import { GameStateService } from '../../services/game-state-services/game-state.service';
 import { GameConfigService } from '../../services/game-config.service';
@@ -31,14 +31,13 @@ export class TurnPlayerAreaComponent implements OnInit {
     HandCards$ : this.turnPlayerCards$.map( e => e.HandCards ),
     Open$      : this.turnPlayerCards$.map( e => e.Open      ),
     PlayArea$  : this.turnPlayerCards$.map( e => e.PlayArea  ),
-    DiscardPileReveresed$ : this.turnPlayerCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
+    DiscardPileReveresed$ : this.turnPlayerCards$.map( e => utils.array.getReversed( e.DiscardPile ) ),
   };
 
   turnPlayersName$ = this.gameStateService.turnPlayersName$;
 
 
   constructor(
-    private utils: UtilitiesService,
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
     private config: GameConfigService,
@@ -47,6 +46,7 @@ export class TurnPlayerAreaComponent implements OnInit {
 
   ngOnInit() {
   }
+
 
   onClick( dcard: DCard ) {
     this.cardClicked.emit( dcard );

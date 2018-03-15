@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { AngularFireAuth } from 'angularfire2/auth';
 
 import { User } from '../classes/user';
-import { CloudFirestoreMediatorService } from './cloud-firestore-mediator.service';
+import { FireDatabaseService } from './cloud-firestore-mediator.service';
 
 
 @Injectable()
@@ -39,7 +39,7 @@ export class MyUserInfoService {
 
   constructor(
     private afAuth: AngularFireAuth,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
   ) {
     this.signedIn$
       = this.afAuth.authState.map( user => !!user );

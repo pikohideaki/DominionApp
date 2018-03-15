@@ -9,6 +9,8 @@ import { UserInput } from '../../../../../classes/online-game/user-input';
 import { Phase } from '../../../../../classes/online-game/phase';
 import { DCard } from '../../../../../classes/online-game/dcard';
 import { GameState } from '../../../../../classes/online-game/game-state';
+import { buttonizeForTurnPlayer, buttonizeSupplyIf, resetDCardsAttributes, cleanUp } from './shortcut';
+import { ValuesForViewService } from '../values-for-view.service';
 
 
 @Injectable()
@@ -19,6 +21,7 @@ export class GameLoopService {
     private gameState: GameStateService,
     private shortcut: GameStateShortcutService,
     private messageService: GameMessageService,
+    private valuesForView: ValuesForViewService,
   ) {
   }
 
@@ -27,7 +30,7 @@ export class GameLoopService {
   async phaseAction(
     gameState: GameState,
     userInput: UserInput,
-    playersName: string,
+    playersNameList: string[],
   ) {
     const shuffleBy = userInput.data.shuffleBy;
     const printPhase = (phase: Phase) => 0;
@@ -36,9 +39,11 @@ export class GameLoopService {
     while ( true ) {  // 自動フェーズ変更のため
       const turnInfo        = gameState.turnInfo;
       const turnPlayerCards = gameState.turnPlayerCards();
+      const turnPlayerData  = gameState.turnPlayerData();
       const turnPlayerId    = gameState.turnPlayerIndex();
 
-      this.shortcut.resetDCardsAttributes( gameState );
+      resetDCardsAttributes( gameState,
+          (b: boolean) => this.valuesForView.setGainCardState( true ) );
 
       const phaseBefore = turnInfo.phase;
 
@@ -48,6 +53,7 @@ export class GameLoopService {
           turnInfo.action = 1;
           turnInfo.buy    = 1;
           turnInfo.coin   = 0;
+          turnInfo.potion = 0;
           turnInfo.phase  = 'StartOfTurn';
           break;
         }
@@ -66,7 +72,7 @@ export class GameLoopService {
             // 法貨を実装したらここの条件を変える必要あり
             turnInfo.phase = 'BuyPlay';
           } else {
-            this.shortcut.buttonizeForTurnPlayer( actionCards, gameState );
+            buttonizeForTurnPlayer( actionCards, gameState );
           }
           break;
         }
@@ -76,15 +82,17 @@ export class GameLoopService {
           const treasureCards = turnPlayerCards.HandCards.filter( c =>
               c.cardProperty.cardTypes.includes('Treasure') );
 
-          if ( treasureCards.length <= 0 ) {
+          if ( treasureCards.length + turnPlayerData.vcoin <= 0 ) {
             turnInfo.phase = 'BuyCard';
           } else {
-            this.shortcut.buttonizeForTurnPlayer( treasureCards, gameState );
+            buttonizeForTurnPlayer( treasureCards, gameState );
           }
           /* Pouchなどでbuyが増やせるのでBuyPlayフェーズではbuy <= 0 で自動遷移はできない */
           if ( turnInfo.buy > 0 ) {
-            this.shortcut.buttonizeSupplyIf( gameState, turnPlayerId,
-                (c: DCard) => c.cardProperty.cost.coin <= turnInfo.coin );
+            buttonizeSupplyIf( gameState, turnPlayerId,
+                (c: DCard) => c.cardProperty.cost.coin   <= turnInfo.coin
+                           && c.cardProperty.cost.potion <= turnInfo.potion,
+                (b: boolean) => this.valuesForView.setGainCardState( true ) );
           }
           break;
         }
@@ -94,8 +102,10 @@ export class GameLoopService {
           if ( turnInfo.buy <= 0 ) {
             turnInfo.phase = 'Night';
           } else {
-            this.shortcut.buttonizeSupplyIf( gameState, turnPlayerId,
-                (c: DCard) => c.cardProperty.cost.coin <= turnInfo.coin );
+            buttonizeSupplyIf( gameState, turnPlayerId,
+                (c: DCard) => c.cardProperty.cost.coin   <= turnInfo.coin
+                           && c.cardProperty.cost.potion <= turnInfo.potion,
+                (b: boolean) => this.valuesForView.setGainCardState( true ) );
           }
           break;
         }
@@ -109,11 +119,13 @@ export class GameLoopService {
 
         case 'CleanUp': {
           printPhase('CleanUp');
-          await this.shortcut.cleanUp(
-                  gameState,
-                  turnPlayerId,
-                  playersName,
-                  shuffleBy );
+          await cleanUp( turnPlayerId, {
+              shuffleBy       : userInput.data.shuffleBy,
+              gameState       : gameState,
+              gameStateSetter : (gst: GameState) => this.gameState.setGameState( gameState ),
+              playersNameList : playersNameList,
+              messager        : (msg: string) => this.messageService.pushMessage(msg),
+            });
           turnInfo.phase = 'EndOfTurn';
           break;
         }
@@ -126,7 +138,7 @@ export class GameLoopService {
             gameState.incrementTurnCounter();
             turnInfo.phase = '';
           }
-          this.messageService.pushMessage(`---${playersName}のターン終了---`);
+          this.messageService.pushMessage(`---${playersNameList[ turnPlayerId ]}のターン終了---`);
           break;
         }
 

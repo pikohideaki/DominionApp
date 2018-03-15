@@ -36,6 +36,12 @@ import { MessageForMeListDialogComponent } from './game-main/dialogs/message-for
 
 import { GameConfigService } from './game-main/services/game-config.service';
 import { HelpDialogComponent } from './game-main/dialogs/help-dialog/help-dialog.component';
+import { VcoinComponent } from './game-main/token/vcoin.component';
+import { DebtComponent } from './game-main/token/debt.component';
+import { VpTokenComponent } from './game-main/token/vp-token.component';
+import { VcoinsComponent } from './game-main/token/vcoins.component';
+import { VpTokensComponent } from './game-main/token/vp-tokens.component';
+import { DebtsComponent } from './game-main/token/debts.component';
 
 
 @NgModule({
@@ -88,6 +94,12 @@ import { HelpDialogComponent } from './game-main/dialogs/help-dialog/help-dialog
     MyAreaComponent,
     CardsAreaComponent,
     HelpDialogComponent,
+    VcoinComponent,
+    DebtComponent,
+    VpTokenComponent,
+    VcoinsComponent,
+    VpTokensComponent,
+    DebtsComponent,
   ],
   entryComponents: [
     SignInToGameRoomDialogComponent,

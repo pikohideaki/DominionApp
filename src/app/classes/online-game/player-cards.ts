@@ -1,7 +1,7 @@
-import { DCard } from "./dcard";
-import { CardType } from "../card-property";
-import { filterRemove, objectEntries, objectForEach } from "../../my-own-library/utilities";
-import { getDCardsByIdArray } from "./get-dcards-by-id-array";
+import { DCard } from './dcard';
+import { CardType } from '../card-property';
+import { utils } from '../../my-own-library/utilities';
+import { getDCardsByIdArray } from './get-dcards-by-id-array';
 
 
 export class PlayerCards {
@@ -21,7 +21,7 @@ export class PlayerCards {
     Open:        DCard[],
   } ) {
     if ( !dataObj ) return;
-    objectForEach( dataObj, (_, key) => {
+    utils.object.forEach( dataObj, (_, key) => {
       this[key] = ( dataObj[key] || [] ).map( e => new DCard(e) );
     });
   }
@@ -31,9 +31,9 @@ export class PlayerCards {
     let sorted = dcards.sort( (a, b) => a.cardProperty.no - b.cardProperty.no );
     let Actions, Treasures, Victories;
     const f = (type: CardType) => ((d: DCard) => d.cardProperty.cardTypes.includes(type));
-    [Actions,   sorted] = filterRemove( sorted, f('Action')   );
-    [Treasures, sorted] = filterRemove( sorted, f('Treasure') );
-    [Victories, sorted] = filterRemove( sorted, f('Victory')  );
+    [Actions,   sorted] = utils.array.filterRemove( sorted, f('Action')   );
+    [Treasures, sorted] = utils.array.filterRemove( sorted, f('Treasure') );
+    [Victories, sorted] = utils.array.filterRemove( sorted, f('Victory')  );
     return [].concat( Actions, Treasures, Victories, sorted );
   }
 
@@ -43,13 +43,13 @@ export class PlayerCards {
 
 
   getDCards( cardIdArray?: number[], sort: boolean = false ): DCard[] {
-    const allDCards: DCard[] = [].concat( ...objectEntries( this ) );
+    const allDCards: DCard[] = [].concat( ...utils.object.entries( this ) );
     const dcards = getDCardsByIdArray( cardIdArray, allDCards );
     return ( sort ? this.sortByCardType( dcards ) : dcards );
   }
 
   removeDCards( cardIdArray: number[] ) {
-    objectForEach( this, (pile, key, obj) =>
+    utils.object.forEach( this, (pile, key, obj) =>
       obj[key] = pile.filter( c => !cardIdArray.includes(c.id) ) );
   }
 

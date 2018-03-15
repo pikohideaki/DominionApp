@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/observable/combineLatest';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { utils } from '../../../my-own-library/utilities';
 
 import { GameResult } from '../../../classes/game-result';
 
@@ -26,11 +26,7 @@ export class GameResultOfPlayerComponent implements OnInit {
   headerSettings$;
 
 
-  constructor(
-    private utils: UtilitiesService
-  ) {
-  }
-
+  constructor( ) { }
 
   ngOnInit() {
     this.gameResultOfEachPlayerForView$
@@ -45,8 +41,8 @@ export class GameResultOfPlayerComponent implements OnInit {
       = this.gameResultListFiltered$
           .map( list => {
             const maxNumberOfPlayers
-              = this.utils.maxOfArray( list.map( e => e.players.length ) );
-            return this.utils.seq0(7).map( (_, i) => i < maxNumberOfPlayers + 1 );
+              = utils.array.maxValue( list.map( e => e.players.length ) );
+            return utils.number.seq0(7).map( (_, i) => i < maxNumberOfPlayers + 1 );
           })
           .startWith( [true, true, true, true, true, false, false] );
 
@@ -95,7 +91,7 @@ export class GameResultOfPlayerComponent implements OnInit {
     }));
 
     // calculate countRank and score average
-    this.utils.objectForEach( gameResultOfEachPlayer, playerResult => {
+    utils.object.forEach( gameResultOfEachPlayer, playerResult => {
       playerResult.countRank.forEach( e => playerResult.count += e );  // sum of countRank
       playerResult.scoreAverage = playerResult.scoreSum / playerResult.count;
     });
@@ -108,11 +104,11 @@ export class GameResultOfPlayerComponent implements OnInit {
   toGameResultOfEachPlayerForView( gameResultOfEachPlayer, sortKey ) {
     // round and sort
     const gameResultOfEachPlayerForView = [];  // reset
-    this.utils.objectForEach( gameResultOfEachPlayer, (playerResult, playerName) => {
+    utils.object.forEach( gameResultOfEachPlayer, (playerResult, playerName) => {
       gameResultOfEachPlayerForView.push( {
         name         : playerName,
-        scoreAverage : this.utils.roundAt( playerResult.scoreAverage, 3 ),
-        scoreSum     : this.utils.roundAt( playerResult.scoreSum, 3 ),
+        scoreAverage : utils.number.roundAt( playerResult.scoreAverage, 3 ),
+        scoreSum     : utils.number.roundAt( playerResult.scoreSum, 3 ),
         count        : playerResult.count,
         countRank    : playerResult.countRank
       });

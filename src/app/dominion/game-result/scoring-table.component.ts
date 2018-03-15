@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { ColumnSetting } from '../../my-own-library/data-table/data-table.component';
 
 
@@ -43,7 +43,7 @@ export class ScoringTableComponent implements OnInit {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService
+    private database: FireDatabaseService
   ) {
     this.scoringTableForView$
       = this.database.scoringTable$

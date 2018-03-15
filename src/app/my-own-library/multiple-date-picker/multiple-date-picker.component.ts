@@ -6,7 +6,7 @@ import 'rxjs/add/observable/combineLatest';
 import 'rxjs/add/operator/takeWhile';
 import 'rxjs/add/operator/startWith';
 
-import { UtilitiesService } from '../utilities.service';
+import { utils } from '../utilities';
 
 
 @Component({
@@ -37,7 +37,6 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private utils: UtilitiesService
   ) {
     this.weeks$ = Observable.combineLatest(
         this.currentYear$,
@@ -45,8 +44,8 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
         this.selectedDateValues$,
         (year, month, selectedDates) => {
           const weeks: { date: Date, selected: boolean }[][] = [];
-          this.utils.getAllDatesIn( year, month ).forEach( date => {
-            const weekNumber = this.utils.weekNumber( date );
+          utils.date.getAllDatesIn( year, month ).forEach( date => {
+            const weekNumber = utils.date.weekNumber( date );
             if ( weeks.length < weekNumber + 1 ) {
               weeks.push( Array(7).fill({ date: undefined, selected: false }) );
             }
@@ -60,7 +59,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
 
     this.selectedDateValues$
       .map( list => list.map( e => new Date(e) )
-                        .sort( (a, b) => this.utils.compareDates(a, b) ) )
+                        .sort( (a, b) => utils.date.compare(a, b) ) )
       .takeWhile( () => this.alive )
       .subscribe( val => this.selectedDatesChange.emit( val ) );
   }
@@ -79,9 +78,9 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
     if ( !!this.initialDateList$ ) {
       this.initialDateList$.first().subscribe( initialDateList => {
         const initialDateValuesUniq
-          = this.utils.uniq(
+          = utils.array.uniq(
               initialDateList
-                .map( e => this.utils.getMidnightOfDate(e) )
+                .map( e => utils.date.toMidnight(e) )
                 .map( e => e.valueOf() ) );
         this.selectedDateValuesSource.next( initialDateValuesUniq );
       });
@@ -118,7 +117,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
 
   isToday( date: Date ) {
     if ( !date ) return false;
-    return this.utils.isToday( date );
+    return utils.date.isToday( date );
   }
 
 
@@ -131,7 +130,7 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
     if ( !this.filterFunction( date ) ) return;
     const current = this.selectedDateValuesSource.getValue();
     if ( current.includes( date.valueOf() ) ) {
-      this.utils.removeValue( current, date.valueOf() );
+      utils.array.removeValue( current, date.valueOf() );
     } else {
       current.push( date.valueOf() );
     }
@@ -144,13 +143,13 @@ export class MultipleDatePickerComponent implements OnInit, OnDestroy {
     const year  = this.currentYearSource.getValue();
 
     const datesOfDayColumn
-      = this.utils.getAllDatesIn( year, month )
+      = utils.date.getAllDatesIn( year, month )
             .filter( date => date.getDay() === dayIndex )
             .filter( this.filterFunction );
     const datesInColumnAllSelected
       = datesOfDayColumn.every( e => current.includes( e.valueOf() ) );
 
-    datesOfDayColumn.forEach( date => this.utils.remove( current, date.valueOf() ) );
+    datesOfDayColumn.forEach( date => utils.array.remove( current, date.valueOf() ) );
     if ( !datesInColumnAllSelected ) {
       datesOfDayColumn.forEach( date => current.push( date.valueOf() ) );
     }

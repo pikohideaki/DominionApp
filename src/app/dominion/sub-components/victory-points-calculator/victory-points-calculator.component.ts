@@ -6,12 +6,12 @@ import 'rxjs/add/operator/skip';
 import 'rxjs/add/operator/takeWhile';
 
 
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, toListIndex } from '../../../classes/card-property';
 import { SelectedCards        } from '../../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../../classes/number-of-victory-cards';
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { utils } from '../../../my-own-library/utilities';
 
 
 @Component({
@@ -96,8 +96,7 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService,
-    private utils: UtilitiesService
+    private database: FireDatabaseService,
   ) {
   }
 
@@ -219,7 +218,7 @@ export class VictoryPointsCalculatorComponent implements OnInit, OnDestroy {
   }
 
   resetNumbers( numberOfVictoryCards: NumberOfVictoryCards ) {
-    this.utils.objectForEach(
+    utils.object.forEach(
         numberOfVictoryCards,
         (_, key) => numberOfVictoryCards[key] = 0 );
     this.updateVPtotal( numberOfVictoryCards );

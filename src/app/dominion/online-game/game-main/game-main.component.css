@@ -35,7 +35,7 @@
 }
 
 /********* side navi ***************/
-.sidenavContainer {
+.sidenav-container {
   background-color: #F3EBAA;
   flex-basis: 800px;
   flex-grow: 1;
@@ -47,6 +47,7 @@
 /*****************************************************/
 
 .main {
+  /* position: relative; */
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -82,4 +83,8 @@
 .main .my-area {
   flex-grow: 0;
   flex-shrink: 0;
+  /* position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0; */
 }

@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
-import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 
 
 @Component({
@@ -28,7 +28,7 @@ export class ExpansionsToggleComponent implements OnInit {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
   ) {
   }
 

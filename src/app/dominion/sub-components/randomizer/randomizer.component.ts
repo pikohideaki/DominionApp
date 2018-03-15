@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { MatDialog } from '@angular/material';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { utils } from '../../../my-own-library/utilities';
 import { RandomizerService } from './randomizer.service';
 
 import { AlertDialogComponent   } from '../../../my-own-library/alert-dialog.component';
@@ -80,7 +80,6 @@ export class RandomizerComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService,
     public dialog: MatDialog,
     private randomizer: RandomizerService,
   ) {
@@ -119,12 +118,12 @@ export class RandomizerComponent implements OnInit {
     this.undoable$ = Observable.combineLatest(
         this.selectedIndexInHistory$,
         this.selectedCardsHistory$,
-        (index, history) => history.length > 0 && this.utils.isInRange( index, -1, history.length - 1 ) );
+        (index, history) => history.length > 0 && utils.number.isInRange( index, -1, history.length - 1 ) );
 
     this.redoable$ = Observable.combineLatest(
         this.selectedIndexInHistory$,
         this.selectedCardsHistory$,
-        (index, history) => history.length > 0 && this.utils.isInRange( index, 1, history.length ) );
+        (index, history) => history.length > 0 && utils.number.isInRange( index, 1, history.length ) );
   }
 
 
@@ -162,7 +161,7 @@ export class RandomizerComponent implements OnInit {
     const selectedCards = ( history[ index ] || new SelectedCards() );
     this.selectedCardsChange.emit( selectedCards );
     const BlackMarketPileShuffled
-      = this.utils.getShuffled( selectedCards.BlackMarketPile )
+      = utils.number.random.getShuffled( selectedCards.BlackMarketPile )
                   .map( e => ({ cardIndex: e, faceUp: false }) );
     this.BlackMarketPileShuffledChange.emit( BlackMarketPileShuffled );
   }

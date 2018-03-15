@@ -1,4 +1,4 @@
-import { shuffle, objectEntries, seq0, objectForEach } from '../../my-own-library/utilities';
+import { utils } from '../../my-own-library/utilities';
 import { SelectedCards } from '../selected-cards';
 import { GameState } from './game-state';
 import { CardProperty, numberToPrepare, toListIndex } from '../card-property';
@@ -14,8 +14,8 @@ export class GameRoom {
   isSelectedExpansions: boolean[] = [];
 
   // set automatically
-  playerShuffler: number[] = [];
-  playersName:    string[] = [];
+  playerShuffler:  number[] = [];
+  playersNameList: string[] = [];
 
   databaseKey:             string        = '';
   gameRoomCommunicationId: string        = '';
@@ -29,7 +29,7 @@ export class GameRoom {
       memo:                    string,
       isSelectedExpansions:    boolean[],
       playerShuffler:          number[],
-      playersName:             Object,
+      playersNameList:         Object,
       gameRoomCommunicationId: string,
       timeStamp:               number,
       selectedCards:           any,
@@ -43,8 +43,8 @@ export class GameRoom {
     this.memo                 = ( dataObj.memo || '' );
     this.isSelectedExpansions = ( dataObj.isSelectedExpansions || [] );
 
-    this.playerShuffler = ( dataObj.playerShuffler || [] );
-    this.playersName    = objectEntries( dataObj.playersName );
+    this.playerShuffler  = ( dataObj.playerShuffler || [] );
+    this.playersNameList = utils.object.entries( dataObj.playersNameList );
 
     this.gameRoomCommunicationId = ( dataObj.gameRoomCommunicationId || '' );
     this.date                    = new Date( dataObj.timeStamp || Date.now() );
@@ -55,7 +55,7 @@ export class GameRoom {
 
 
   playersNameShuffled() {
-    return this.playersName.map( (_, i) => this.playersName[ this.playerShuffler[i] ] );
+    return this.playersNameList.map( (_, i) => this.playersNameList[ this.playerShuffler[i] ] );
   }
 
 
@@ -69,8 +69,8 @@ export class GameRoom {
       const card = new DCard();
       card.id = serialNumber++;
       card.cardProperty = cardList[ cardListIndex ];
-      card.faceUp   = seq0( this.numberOfPlayers ).map( _ => true  );
-      card.isButton = seq0( this.numberOfPlayers ).map( _ => false );
+      card.faceUp   = utils.number.seq0( this.numberOfPlayers ).map( _ => true  );
+      card.isButton = utils.number.seq0( this.numberOfPlayers ).map( _ => false );
 
       let ref: any = this.initialState.DCards;
       for ( let i = 0; i < placePath.length; ++i ) {
@@ -90,8 +90,6 @@ export class GameRoom {
         }
       };
 
-    const usePotion = () => false;
-
     const toCardPropIndex = ( cardId: string ) => toListIndex( cardList, cardId );
 
     // basic cards
@@ -106,7 +104,7 @@ export class GameRoom {
       addMultipleCards( ['BasicCards', 'Platinum'], toCardPropIndex('Platinum') );
       addMultipleCards( ['BasicCards', 'Colony'  ], toCardPropIndex('Colony'  ) );
     }
-    if ( usePotion() ) {
+    if ( this.selectedCards.usePotion( cardList ) ) {
       addMultipleCards( ['BasicCards', 'Potion'  ], toCardPropIndex('Potion'  ) );
     }
 
@@ -135,7 +133,7 @@ export class GameRoom {
 
       playerCards.Deck.forEach( c => c.faceUp = c.faceUp.map( _ => false ) );
 
-      shuffle( playerCards.Deck );
+      utils.number.random.shuffle( playerCards.Deck );
 
       for ( let i = 0; i < 5; ++i ) {
         playerCards.HandCards.push( playerCards.Deck.pop() );
@@ -156,6 +154,6 @@ export class GameRoom {
 
 
   waitingForNewPlayers(): boolean {
-    return ( this.playersName.length < this.numberOfPlayers );
+    return ( this.playersNameList.length < this.numberOfPlayers );
   }
 }

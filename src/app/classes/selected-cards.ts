@@ -1,3 +1,5 @@
+import { CardProperty } from './card-property';
+
 export class SelectedCards {
   date:             Date = new Date();
 
@@ -48,5 +50,10 @@ export class SelectedCards {
 
   isEmpty() {
     return this.KingdomCards10.length === 0;
+  }
+
+  usePotion( cardPropertyList: CardProperty[] ) {
+    return this.concatAllCards()
+              .some( e => cardPropertyList[e].cost.potion > 0 );
   }
 }

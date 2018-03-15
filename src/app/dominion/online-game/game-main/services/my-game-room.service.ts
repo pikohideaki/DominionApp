@@ -4,11 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/combineLatest';
 
 import { GameRoom } from '../../../../classes/online-game/game-room';
-import { UtilitiesService } from '../../../../my-own-library/utilities.service';
 import { GameState } from '../../../../classes/online-game/game-state';
 
 import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 
 
 @Injectable()
@@ -37,8 +36,17 @@ export class MyGameRoomService {
     = this.myGameRoom$.map( e => e.gameRoomCommunicationId )
         .distinctUntilChanged();
 
-  Prosperity$
-    = this.myGameRoom$.map( e => e.selectedCards.Prosperity )
+  private selectedCards$ = this.myGameRoom$.map( e => e.selectedCards );
+
+  Prosperity$: Observable<boolean>
+    = this.selectedCards$.map( e => e.Prosperity )
+        .startWith( false )
+        .distinctUntilChanged();
+
+  usePotion$: Observable<boolean>
+    = this.selectedCards$
+        .combineLatest( this.database.cardPropertyList$ )
+        .map( ([selectedCards, cardList]) => selectedCards.usePotion( cardList ) )
         .startWith( false )
         .distinctUntilChanged();
 
@@ -49,8 +57,7 @@ export class MyGameRoomService {
 
 
   constructor(
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private user: MyUserInfoService
   ) {
   }

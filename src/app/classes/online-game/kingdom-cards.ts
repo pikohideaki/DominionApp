@@ -1,5 +1,5 @@
-import { DCard } from "./dcard";
-import { getDCardsByIdArray } from "./get-dcards-by-id-array";
+import { DCard } from './dcard';
+import { getDCardsByIdArray } from './get-dcards-by-id-array';
 
 
 export class KingdomCards extends Array<DCard[]> {

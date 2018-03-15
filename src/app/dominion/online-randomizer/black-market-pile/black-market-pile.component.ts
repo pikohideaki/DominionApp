@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 
 import { ConfirmDialogComponent } from '../../../my-own-library/confirm-dialog.component';
 
-import { UtilitiesService       } from '../../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../my-own-library/utilities';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
 import { CardProperty        } from '../../../classes/card-property';
@@ -48,8 +48,7 @@ export class BlackMarketPileComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService
   ) {
   }
@@ -101,7 +100,7 @@ export class BlackMarketPileComponent implements OnInit {
           dialogRef.componentInstance.message = `「${cardPropertyList[cardIndex].nameJp}」を購入しますか？`;
           const yn = await dialogRef.afterClosed().toPromise();
           if ( yn === 'yes' ) {
-            this.utils.removeAt( BlackMarketPileShuffled, clickedElementValue );
+            utils.array.removeAt( BlackMarketPileShuffled, clickedElementValue );
             this.myRandomizerGroup.setBMPileShuffled( BlackMarketPileShuffled );
             break;
           }
@@ -118,7 +117,7 @@ export class BlackMarketPileComponent implements OnInit {
               this.promiseResolver['putOnTheBottom'] = resolve );
         if ( clickedElementValue === -1 ) break;
 
-        const selectedElement = this.utils.removeAt( BlackMarketPileShuffled, clickedElementValue );
+        const selectedElement = utils.array.removeAt( BlackMarketPileShuffled, clickedElementValue );
         BlackMarketPileShuffled.push( selectedElement );
         this.myRandomizerGroup.setBMPileShuffled( BlackMarketPileShuffled );
       }

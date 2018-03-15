@@ -4,10 +4,10 @@ import { Observable } from 'rxjs/Observable';
 import { GameResult           } from '../../../../classes/game-result';
 import { NumberOfVictoryCards } from '../../../../classes/number-of-victory-cards';
 
-import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameStateService } from './game-state-services/game-state.service';
 import { MyGameRoomService } from './my-game-room.service';
-import { UtilitiesService } from '../../../../my-own-library/utilities.service';
+import { utils } from '../../../../my-own-library/utilities';
 import { GameState } from '../../../../classes/online-game/game-state';
 
 
@@ -63,8 +63,7 @@ export class SubmitGameResultService {
 
 
   constructor(
-    private database: CloudFirestoreMediatorService,
-    private utils: UtilitiesService,
+    private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
     private gameStateService: GameStateService,
   ) { }
@@ -75,28 +74,32 @@ export class SubmitGameResultService {
     return this.database.gameResult.add( gameResult );
   }
 
-  private countNumberOfVictoryCards( playerIndex: number, gameState: GameState ): NumberOfVictoryCards {
-    const numberOfVictoryCards = new NumberOfVictoryCards();
+  private countNumberOfVictoryCards(
+    playerIndex: number,
+    gameState: GameState
+  ): NumberOfVictoryCards {
+    const nofVictoryCards = new NumberOfVictoryCards();
+    nofVictoryCards.VPtoken = gameState.allPlayersData[ playerIndex ].VPtoken;
     const playerCards = gameState.DCards.allPlayersCards[ playerIndex ];
     const allCards = playerCards.getDCards();
     allCards
       .filter( dcard => dcard.cardProperty.cardTypes.includes('Victory') )
       .forEach( dcard => {
-        numberOfVictoryCards[ dcard.cardProperty.cardId ]++;
+        nofVictoryCards[ dcard.cardProperty.cardId ]++;
       });
-    numberOfVictoryCards.DeckSize
+    nofVictoryCards.DeckSize
       = allCards.length;
-    numberOfVictoryCards.numberOfActionCards
+    nofVictoryCards.numberOfActionCards
       = allCards.filter( e => e.cardProperty.cardTypes.includes('Action') )
           .length;
-    numberOfVictoryCards.numberOfDifferentlyNamedCards
-      = this.utils.uniq( allCards.map( e => e.cardProperty.nameEng ) )
+    nofVictoryCards.numberOfDifferentlyNamedCards
+      = utils.array.uniq( allCards.map( e => e.cardProperty.nameEng ) )
           .length;
-    numberOfVictoryCards.numberOfSilvers
+    nofVictoryCards.numberOfSilvers
       = allCards.filter( e => e.cardProperty.cardId === 'Silver' )
           .length;
     // TavernMatを追加したら編集
-    numberOfVictoryCards.Distant_Lands_on_TavernMat = 0;
-    return numberOfVictoryCards;
+    nofVictoryCards.Distant_Lands_on_TavernMat = 0;
+    return nofVictoryCards;
   }
 }

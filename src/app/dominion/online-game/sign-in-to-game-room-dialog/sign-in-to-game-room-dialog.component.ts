@@ -7,7 +7,7 @@ import 'rxjs/add/operator/takeWhile';
 import { MatDialog, MatDialogRef } from '@angular/material';
 
 import { MyUserInfoService             } from '../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameRoom } from '../../../classes/online-game/game-room';
 import { SelectedCards } from '../../../classes/selected-cards';
 
@@ -24,29 +24,30 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
   dialogRef;  // input
 
   allPlayersAreReady$: Observable<boolean>;
-  playersName$: Observable<string[]>;
   selectedExpansionNameList$: Observable<string[]>;
   selectedCards$: Observable<SelectedCards>;
+
+  playersNameList$: Observable<string[]>;
 
 
   constructor(
     private router: Router,
     private dialog: MatDialog,
-    private database: CloudFirestoreMediatorService,
-    private myUserInfo: MyUserInfoService
+    private database: FireDatabaseService,
+    private user: MyUserInfoService
   ) { }
 
   ngOnInit() {
     this.selectedCards$ = Observable.of( this.newRoom.selectedCards );
 
-    this.myUserInfo.setOnlineGameRoomId( this.newRoom.databaseKey );
-    this.myUserInfo.setGameCommunicationId( this.newRoom.gameRoomCommunicationId );
+    this.user.setOnlineGameRoomId( this.newRoom.databaseKey );
+    this.user.setGameCommunicationId( this.newRoom.gameRoomCommunicationId );
 
     // set Observables
-    this.playersName$
+    this.playersNameList$
       = this.database.onlineGameRooms$
           .map( list => ( list.find( e => e.databaseKey === this.newRoom.databaseKey )
-                            || new GameRoom() ).playersName )
+                            || new GameRoom() ).playersNameList )
           .startWith([]);
 
     const selectingRoomRemoved$
@@ -55,7 +56,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
                              .includes( this.newRoom.databaseKey ) );
 
     this.allPlayersAreReady$
-      = this.playersName$.map( e => e.length >= this.newRoom.numberOfPlayers )
+      = this.playersNameList$.map( e => e.length >= this.newRoom.numberOfPlayers )
           .startWith( false );
 
     this.selectedExpansionNameList$

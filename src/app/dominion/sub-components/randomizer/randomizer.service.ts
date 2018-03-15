@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../my-own-library/utilities';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty  } from '../../../classes/card-property';
 import { SelectedCards } from '../../../classes/selected-cards';
@@ -15,8 +15,7 @@ export class RandomizerService {
   private expansionNameList;
 
   constructor(
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
   ) {
     this.database.cardPropertyList$
       .subscribe( val => this.cardPropertyList = val );
@@ -33,7 +32,7 @@ export class RandomizerService {
 
     // 選択されている拡張セットに含まれているカードすべてをシャッフルし，indexとペアにしたリスト
     const CardsInSelectedSets_Shuffled: { index: number, data: CardProperty }[]
-     = this.utils.getShuffled(
+     = utils.number.random.getShuffled(
         this.cardPropertyList
           .map( (val: CardProperty, index) => ({ index: index, data: val }) )
           .filter( e => e.data.randomizerCandidate )
@@ -75,7 +74,7 @@ export class RandomizerService {
       if ( CardsInSelectedSets_Shuffled.length <= 0 ) {
         return { valid: false, selectedCards: selectedCardsTemp };
       }
-      const cardIndex = this.utils.removeIf( CardsInSelectedSets_Shuffled, e => (
+      const cardIndex = utils.array.removeIf( CardsInSelectedSets_Shuffled, e => (
                e.data.cost.debt   <= 0
             && e.data.cost.potion <= 0
             && e.data.cost.coin   >=  2
@@ -100,12 +99,12 @@ export class RandomizerService {
          .map( e => this.cardPropertyList[e].nameEng ).includes('Obelisk') ) {
       const cardIndex: number = ( () => {
         const supplyUsed: number[] = [].concat( selectedCardsTemp.KingdomCards10, selectedCardsTemp.BaneCard );
-        const ObeliskCandidatesActionCards: number[] = this.utils.copy( supplyUsed );
+        const ObeliskCandidatesActionCards: number[] = utils.array.copy( supplyUsed );
         if ( supplyUsed.map( e => this.cardPropertyList[e].cardType ).includes('略奪者') ) {
           const ruinsIndex: number = this.cardPropertyList.findIndex( e => e.nameJp === '廃墟' );
           ObeliskCandidatesActionCards.unshift( ruinsIndex );
         }
-        return this.utils.getRandomValue( supplyUsed );
+        return utils.number.random.getRandomElement( supplyUsed );
       } )();
       selectedCardsTemp.Obelisk = [cardIndex];
     }

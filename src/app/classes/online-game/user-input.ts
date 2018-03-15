@@ -1,5 +1,5 @@
 import { UserInputCommand } from './user-input-command';
-import { permutation } from '../../my-own-library/utilities';
+import { utils } from '../../my-own-library/utilities';
 
 
 export class UserInput {
@@ -30,7 +30,7 @@ export class UserInput {
     this.data = {
         playerId:  initObj.data.playerId,
         autoSort:  initObj.data.autoSort,
-        shuffleBy: ( initObj.data.shuffleBy || permutation( 200 ) ),
+        shuffleBy: ( initObj.data.shuffleBy || utils.number.random.permutation( 200 ) ),
       };
     if ( initObj.data.clickedCardId !== undefined ) {
       this.data.clickedCardId = initObj.data.clickedCardId;

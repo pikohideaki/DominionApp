@@ -21,8 +21,8 @@
         <mat-icon mat-card-avatar>group</mat-icon>
         <mat-card-title> {{room.name}} </mat-card-title>
         <mat-card-subtitle>
-          {{room.playersName.join(", ")}}<br>
-          {{utils.toYMDHMS(room.date)}}
+          {{room.playersNameList.join(", ")}}<br>
+          {{toYMDHMS(room.date)}}
         </mat-card-subtitle>
       </mat-card-header>
 

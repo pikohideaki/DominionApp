@@ -11,8 +11,8 @@ import { UserInput                } from '../../../../classes/online-game/user-i
 import { UserInputCommand         } from '../../../../classes/online-game/user-input-command';
 
 import { MyUserInfoService             } from '../../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
-import { UtilitiesService } from '../../../../my-own-library/utilities.service';
+import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../../my-own-library/utilities';
 import { MyGameRoomService } from './my-game-room.service';
 
 
@@ -38,8 +38,7 @@ export class GameRoomCommunicationService {
   constructor(
     private afdb: AngularFireDatabase,
     private user: MyUserInfoService,
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
   ) {
     const gameRoomCommunication$
@@ -141,7 +140,7 @@ export class GameRoomCommunicationService {
                 playerId:      playerId,
                 autoSort:      autoSort,
                 clickedCardId: clickedCardId,
-                shuffleBy:     this.utils.permutation( this.shuffleByLength ),
+                shuffleBy:     utils.number.random.permutation( this.shuffleByLength ),
               },
             }, null );
     await this.database.onlineGameCommunication

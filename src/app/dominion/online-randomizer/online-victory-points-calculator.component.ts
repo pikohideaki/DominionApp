@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
-import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyRandomizerGroupService      } from './my-randomizer-group.service';
 import { MyUserInfoService             } from '../../firebase-mediator/my-user-info.service';
 
@@ -43,7 +43,7 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
 
   constructor(
     private myUserInfo: MyUserInfoService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
   }

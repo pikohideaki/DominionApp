@@ -17,7 +17,7 @@ import { MyOwnLibraryModule } from '../my-own-library/my-own-library.module';
 
 import { AutoBackupOnFirebaseService   } from './auto-backup-on-firebase.service';
 import { MyUserInfoService             } from './my-user-info.service';
-import { CloudFirestoreMediatorService } from './cloud-firestore-mediator.service';
+import { FireDatabaseService } from './cloud-firestore-mediator.service';
 
 import { EditDatabaseComponent         } from './edit-database.component';
 import { UserAdminComponent            } from './user-admin/user-admin.component';
@@ -45,7 +45,7 @@ import { MyPageComponent               } from './my-page.component';
   ],
   providers: [
     MyUserInfoService,
-    CloudFirestoreMediatorService,
+    FireDatabaseService,
     AutoBackupOnFirebaseService,
   ]
 })

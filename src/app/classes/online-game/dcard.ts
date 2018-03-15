@@ -1,4 +1,4 @@
-import { CardProperty } from "../card-property";
+import { CardProperty } from '../card-property';
 
 
 export class DCard {  // Dominion card

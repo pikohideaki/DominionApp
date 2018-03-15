@@ -5,8 +5,8 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { CardProperty } from '../../../classes/card-property';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../../my-own-library/utilities';
 
 
 @Component({
@@ -55,8 +55,7 @@ export class CardPropertyDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<CardPropertyDialogComponent>,
-    private database: CloudFirestoreMediatorService,
-    private utils: UtilitiesService
+    private database: FireDatabaseService,
   ) {
   }
 
@@ -69,7 +68,7 @@ export class CardPropertyDialogComponent implements OnInit {
         this.cardPropertyList$,
         (showingIndex, indiceInCardList, cardPropertyList) =>
           ( indiceInCardList.length === 0 ||
-            !this.utils.isInArrayRange( showingIndex, indiceInCardList )
+            !utils.array.isInArrayRange( showingIndex, indiceInCardList )
               ? new CardProperty()
               : cardPropertyList[ indiceInCardList[ showingIndex ] ] ) );
 

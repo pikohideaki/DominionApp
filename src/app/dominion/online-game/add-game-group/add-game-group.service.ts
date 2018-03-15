@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { utils } from '../../../my-own-library/utilities';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';
 import { SelectedCards       } from '../../../classes/selected-cards';
@@ -22,9 +22,8 @@ export class AddGameGroupService {
   private myName: string = '';
 
   constructor(
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myUserInfo: MyUserInfoService,
-    private utils: UtilitiesService,
   ) {
     this.database.cardPropertyList$
       .subscribe( val => this.cardPropertyList = val );
@@ -37,36 +36,44 @@ export class AddGameGroupService {
     numberOfPlayers: number,
     isSelectedExpansions: boolean[],
     memo: string,
-    selectCards: SelectedCards
+    selectedCards: SelectedCards
   ) {
     const newRoom = new GameRoom();
     {
       newRoom.numberOfPlayers      = numberOfPlayers;
       newRoom.isSelectedExpansions = isSelectedExpansions;
       newRoom.memo                 = memo;
-      newRoom.selectedCards        = selectCards;
-      newRoom.playerShuffler       = this.utils.permutation( numberOfPlayers );
+      newRoom.selectedCards        = selectedCards;
+      newRoom.playerShuffler       = utils.number.random.permutation( numberOfPlayers );
       newRoom.initCards( this.cardPropertyList );
       newRoom.initDecks();
       newRoom.initialState.setNumberOfPlayers( numberOfPlayers );
+      newRoom.initialState.usePotion = selectedCards.usePotion( this.cardPropertyList );
       newRoom.initialState.turnInfo = new TurnInfo({
             phase:  '',
             action: 1,
             buy:    1,
-            coin:   0
+            coin:   0,
+            potion: 0,
         });
+      if ( selectedCards.concatAllCards()
+            .map( i => this.cardPropertyList[i].cardId )
+            .includes('Baker')
+      ) {
+        newRoom.initialState.allPlayersData.forEach( p => p.vcoin++ );
+      }
     }
 
     {
       const newComm = new GameCommunication();
-      newComm.thinkingState = this.utils.seq0( numberOfPlayers ).map( _ => false );
+      newComm.thinkingState = utils.number.seq0( numberOfPlayers ).map( _ => false );
       // 最初のプレイヤーの自動でgoToNextPhaseを1回発動
       newComm.userInputList.push( new UserInput( {
                                     command: 'clicked goToNextPhase',
                                     data: {
                                       playerId: 0,
                                       autoSort: true,
-                                      shuffleBy: this.utils.permutation(10),
+                                      shuffleBy: utils.number.random.permutation(10),
                                     }
                                   }, null ) );
       const result = await this.database.onlineGameCommunication.add( newComm );

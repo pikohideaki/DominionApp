@@ -7,9 +7,9 @@ import 'rxjs/add/observable/combineLatest';
 
 import { MatDialog, MatSnackBar } from '@angular/material';
 
-import { UtilitiesService } from '../../../my-own-library/utilities.service';
+import { utils } from '../../../my-own-library/utilities';
 import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { AddGameGroupService } from './add-game-group.service';
 
 import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/sign-in-to-game-room-dialog.component';
@@ -56,7 +56,7 @@ export class AddGameGroupComponent implements OnInit {
 
   disableMakeRoomButton$: Observable<boolean>
     = Observable.combineLatest(
-        this.numberOfPlayers$.map( e => !this.utils.isInRange( e, 2, 7 ) ),
+        this.numberOfPlayers$.map( e => !utils.number.isInRange( e, 2, 7 ) ),
         this.isSelectedExpansions$.map( list => list.every( e => !e ) ),
         this.selectedCards$.map( e => e.isEmpty() ),
         this.preparingDialog$,
@@ -71,8 +71,7 @@ export class AddGameGroupComponent implements OnInit {
   constructor(
     public snackBar: MatSnackBar,
     public dialog: MatDialog,
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private user: MyUserInfoService,
     private addGameGroupService: AddGameGroupService
   ) {
@@ -142,7 +141,7 @@ export class AddGameGroupComponent implements OnInit {
 
     if ( this.addTestPlayer ) {
       for ( let i = 1; i < numberOfPlayers; ++i ) {
-        await this.utils.sleep(1);
+        await utils.asyncOperation.sleep(1);
         await this.database.onlineGameRoom.addMember( newRoom.databaseKey, `testPlayer${i}` );
         console.log('added testPlayer');
       }

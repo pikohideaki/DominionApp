@@ -2,11 +2,12 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 
-import { UtilitiesService } from '../../../../../../my-own-library/utilities.service';
+import { utils } from '../../../../../../my-own-library/utilities';
 import { MyGameRoomService } from '../../../services/my-game-room.service';
 import { GameStateService  } from '../../../services/game-state-services/game-state.service';
 import { GameConfigService } from '../../../services/game-config.service';
 import { DCard } from '../../../../../../classes/online-game/dcard';
+import { PlayerData } from '../../../../../../classes/online-game/players-data';
 
 
 @Component({
@@ -27,10 +28,12 @@ export class SmallPlayerAreaComponent implements OnInit {
   @Input() thinkingState: boolean = false;
 
   playerCards;
+  VPtoken$: Observable<number>;
+  vcoin$:   Observable<number>;
+  debt$:    Observable<number>;
 
 
   constructor(
-    private utils: UtilitiesService,
     private gameStateService: GameStateService,
     private gameRoomService: MyGameRoomService,
     private config: GameConfigService,
@@ -49,8 +52,15 @@ export class SmallPlayerAreaComponent implements OnInit {
       HandCards$ : playerCards$.map( e => e.HandCards ),
       Open$      : playerCards$.map( e => e.Open      ),
       PlayArea$  : playerCards$.map( e => e.PlayArea  ),
-      DiscardPileReveresed$ : playerCards$.map( e => this.utils.getReversed( e.DiscardPile ) ),
+      DiscardPileReveresed$ : playerCards$.map( e => utils.array.getReversed( e.DiscardPile ) ),
     };
+
+    const playerData$: Observable<PlayerData>
+      = this.gameStateService.allPlayersData$.map( e => e[ this.playerIndex ] );
+
+    this.VPtoken$ = playerData$.map( e => e.VPtoken );
+    this.vcoin$   = playerData$.map( e => e.vcoin   );
+    this.debt$    = playerData$.map( e => e.debt    );
   }
 
   onClick( dcard: DCard ) {

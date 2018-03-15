@@ -13,7 +13,7 @@ import { DCard } from '../../../../../classes/online-game/dcard';
 export class OnlineGamePlayerCardsDialogComponent implements OnInit {
 
   allPlayersCards$: Observable<PlayerCards[]>;  // input
-  playersName$: Observable<string[]>;  // input
+  playersNameList$: Observable<string[]>;  // input
 
 
   constructor( ) { }

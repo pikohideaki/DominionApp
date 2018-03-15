@@ -3,8 +3,8 @@ import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import 'rxjs/add/operator/distinctUntilChanged';
 
-import { UtilitiesService } from '../../my-own-library/utilities.service';
-import { CloudFirestoreMediatorService } from '../../firebase-mediator/cloud-firestore-mediator.service';
+import { utils } from '../../my-own-library/utilities';
+import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { GameResult } from '../../classes/game-result';
 
@@ -24,7 +24,7 @@ export class GameResultComponent implements OnInit {
 
   private numberOfPlayersOptionsSource
     = new BehaviorSubject<{ numberOfPlayers: number, checked: boolean }[]>(
-        this.utils.numberSequence( 2, 5 )
+        utils.number.numberSequence( 2, 5 )
           .map( i => ({ numberOfPlayers: i, checked: (i <= 4) })) );
           // [2:true, 3:true, 4:true, 5:false, 6:false]
   numberOfPlayersOptions$: Observable<{ numberOfPlayers: number, checked: boolean }[]>
@@ -43,7 +43,7 @@ export class GameResultComponent implements OnInit {
           dateEnd: Date,
           numberOfPlayersChecked ) =>
             gameResultList.filter( gr => {
-              const mDate = this.utils.getMidnightOfDate( gr.date );
+              const mDate = utils.date.toMidnight( gr.date );
               return (   mDate >= dateBegin
                       && mDate <= dateEnd
                       && numberOfPlayersChecked
@@ -53,8 +53,7 @@ export class GameResultComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService,
-    private database: CloudFirestoreMediatorService
+    private database: FireDatabaseService
   ) {
     this.gameResultList$.first()
       .subscribe( list => this.resetFormControls( list ) );
@@ -86,17 +85,17 @@ export class GameResultComponent implements OnInit {
 
   private setDateToLatest( gameResultList: GameResult[] ) {
     if ( gameResultList.length === 0 ) return;
-    const latestDate = this.utils.getMidnightOfDate( this.utils.back( gameResultList ).date );
+    const latestDate = utils.date.toMidnight( utils.array.back( gameResultList ).date );
     this.changeDateBegin( latestDate );
     this.changeDateEnd( latestDate );
   }
 
   private resetFormControls( gameResultList: GameResult[] ) {
     if ( gameResultList.length === 0 ) return;
-    const dateBegin = this.utils.getMidnightOfDate( this.utils.front( gameResultList ).date );
-    const dateEnd   = this.utils.getMidnightOfDate( this.utils.back ( gameResultList ).date );
+    const dateBegin = utils.date.toMidnight( utils.array.front( gameResultList ).date );
+    const dateEnd   = utils.date.toMidnight( utils.array.back ( gameResultList ).date );
     const numberOfPlayersOptions
-      = this.utils.uniq( gameResultList.map( e => e.players.length ) )
+      = utils.array.uniq( gameResultList.map( e => e.players.length ) )
                   .sort( (a, b) => a - b )
                   .map( num => ({ numberOfPlayers: num, checked: true }) );
     this.changeDateBegin( dateBegin );

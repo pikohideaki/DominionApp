@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { MatDialog } from '@angular/material';
 
-import { CloudFirestoreMediatorService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
+import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyRandomizerGroupService       } from '../my-randomizer-group.service';
 
 import { CardProperty  } from '../../../classes/card-property';
@@ -27,7 +27,7 @@ export class RandomizerCardImageComponent implements OnInit {
 
   constructor(
     public dialog: MatDialog,
-    private database: CloudFirestoreMediatorService,
+    private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
   }

@@ -2,12 +2,35 @@
     PlayArea:         myCards.PlayArea$ | async,
     Aside:            myCards.Aside$    | async,
     showCardProperty: showCardProperty$ | async,
-    isMyTurn:         isMyTurn$         | async
+    isMyTurn:         isMyTurn$         | async,
+    VPtoken:          VPtoken$          | async,
+    vcoin:            vcoin$            | async,
+    debt:             debt$             | async
   } as data">
 
 <div class="body">
+
+  <div class="my-tokens">
+    <div *ngIf="data.vcoin + data.debt > 0"
+        class="vcoins-debts box-shadow"
+        [class.is-my-turn]="data.isMyTurn">
+      <app-vcoins diameter="24" [number$]="vcoin$"
+          [isButton]="buttonizeVCoins"
+          (onClick)="vcoinClick()">
+      </app-vcoins>
+      <app-debts  diameter="24" [number$]="debt$"
+          [isButton]="buttonizeDebts"
+          (onClick)="debtClick()">
+      </app-debts>
+    </div>
+    <div class="spacer"></div>
+    <app-vp-tokens *ngIf="data.VPtoken > 0"
+        [diameter]="24" [VPtoken]="data.VPtoken"></app-vp-tokens>
+  </div>
+
   <div class="PlayArea_Aside">
-    <div *ngIf="data.isMyTurn || data.PlayArea?.length > 0"
+    <!-- <div *ngIf="data.isMyTurn || data.PlayArea?.length > 0" -->
+    <div
         class="card-area box-shadow PlayArea"
         [class.is-my-turn]="data.isMyTurn">
       <app-cards-lined-up
@@ -18,7 +41,8 @@
         (cardClicked)="onClick( $event )" >
       </app-cards-lined-up>
     </div>
-    <div *ngIf="data.isMyTurn || data.Aside?.length > 0"
+    <!-- <div *ngIf="data.isMyTurn || data.Aside?.length > 0" -->
+    <div
         class="card-area box-shadow Aside"
         [class.is-my-turn]="data.isMyTurn">
       <app-cards-lined-up

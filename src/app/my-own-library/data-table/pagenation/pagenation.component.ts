@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { UtilitiesService } from '../../utilities.service';
+import { utils } from '../../utilities';
 
 
 @Component({
@@ -24,7 +24,6 @@ export class PagenationComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService
   ) {
   }
 
@@ -35,7 +34,7 @@ export class PagenationComponent implements OnInit {
         (itemsPerPage, dataSize) => Math.ceil( dataSize / itemsPerPage ) );
 
     this.pageIndice$
-      = this.pageLength$.map( len => this.utils.seq0( len ) );
+      = this.pageLength$.map( len => utils.number.seq0( len ) );
 
     this.rangeStart$ = Observable.combineLatest(
         this.itemsPerPage$,

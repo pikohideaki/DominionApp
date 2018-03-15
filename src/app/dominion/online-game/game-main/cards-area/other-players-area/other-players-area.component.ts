@@ -4,7 +4,6 @@ import { Observable } from 'rxjs/Observable';
 
 import { MyGameRoomService  } from '../../services/my-game-room.service';
 import { GameStateService } from '../../services/game-state-services/game-state.service';
-import { UtilitiesService } from '../../../../../my-own-library/utilities.service';
 import { GameRoomCommunicationService } from '../../services/game-room-communication.service';
 
 
@@ -42,7 +41,6 @@ export class OtherPlayerAreaComponent implements OnInit {
 
 
   constructor(
-    private utils: UtilitiesService,
     private myGameRoomService: MyGameRoomService,
     private communication: GameRoomCommunicationService
   ) {
