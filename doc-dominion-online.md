@@ -6,7 +6,7 @@
 * 山札・捨て札のサイズが0になっている
 * プレイヤー募集画面のキャンセルのdisable
 * 設定画面
-    * カードサイズ調整
+  * カードサイズ調整
 * forEachを使って検索するときにbreakできるように Array.some を使って utils のメソッドを書き直す
 * move -> state transition
 * カードの圧縮表示
@@ -47,7 +47,7 @@
 
 * Object.assign( dest, src ) でオブジェクトのコピー
 * obs1.buffer(obs2) で ob1 の出力を obs2 が発火するタイミングまで溜めて配列で出力ができる
-    * idleTime を作って
+  * idleTime を作って
 
 ## 設計方針
 
@@ -182,3 +182,7 @@
     そもそもその内部処理はコマンドの処理をすることになりあまり大差が無い
   * userInputSeqenceではなくuserInput一つごとに前のgameStateと合わせて次のgameStateを作る設計が自然だが，
     状態遷移は前の状態遷移の完了を待つ必要があるためsubscribeをPromiseの完了まで待機させる必要があり厄介．
+
+## 2018/3/16
+
+* アクションフェーズのスキップ 貧民街でバグ
