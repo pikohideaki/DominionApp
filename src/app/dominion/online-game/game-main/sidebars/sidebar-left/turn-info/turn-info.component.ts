@@ -22,12 +22,12 @@ export class TurnInfoComponent implements OnInit {
             case ''            : return '';
             case 'StartOfTurn' : return '';
             case 'Action'      : return 'A';
-            case 'Action*'     : return '〈A〉';
+            case '<Action>'    : return '〈A〉';
             case 'BuyPlay'     : return 'B';
-            case 'BuyPlay*'    : return '〈B〉';
+            case '<BuyPlay>'   : return '〈B〉';
             case 'BuyCard'     : return 'B*';
             case 'Night'       : return 'N';
-            case 'Night*'      : return '〈N〉';
+            case '<Night>'     : return '〈N〉';
             case 'CleanUp'     : return 'C';
             case 'EndOfTurn'   : return '';
             case 'GameIsOver'  : return '';
