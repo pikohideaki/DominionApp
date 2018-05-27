@@ -14,14 +14,13 @@ import { getDCardsByIdArray } from './get-dcards-by-id-array';
 
 
 
-
 export class GameState {
   turnCounter:     number = 0;
   numberOfPlayers: number = 0;
   Prosperity:      boolean = false;
   usePotion:       boolean = false;
 
-  turnInfo:        TurnInfo     = new TurnInfo();
+  turnInfo:        TurnInfo = new TurnInfo();
   allPlayersData:  PlayerData[] = [];
 
   DCards: {

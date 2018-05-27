@@ -235,7 +235,7 @@ export const utils = {
     },
 
     integerDivision: ( a: number, b: number ): number =>
-      Math.floor(Math.floor(a) / Math.floor(b)),
+      Math.floor( Math.floor(a) / Math.floor(b) ),
 
     divint: ( a: number, b: number ) =>
       utils.number.integerDivision( a, b ),
@@ -365,7 +365,6 @@ export const utils = {
       const result = await Promise.all( array.map( e => asyncFunction(e) ) );
       return array.filter( (_, i) => result[i] );
     },
-
   }
 
 

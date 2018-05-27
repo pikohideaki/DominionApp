@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
   selector: 'app-message-for-me-dialog-list',
   template: `
     <div mat-dialog-content>
-      <div *ngFor="let message of messageForMeList">
+      <div *ngFor="let message of gameMessageList">
         <div>{{message}}</div>
       </div>
     </div>
@@ -24,7 +24,7 @@ import { Component, OnInit } from '@angular/core';
   `]
 })
 export class MessageForMeListDialogComponent implements OnInit {
-  messageForMeList: string[] = []; // input
+  gameMessageList: string[] = []; // input
   constructor() { }
   ngOnInit() { }
 }
