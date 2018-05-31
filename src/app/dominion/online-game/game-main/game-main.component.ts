@@ -17,8 +17,6 @@ import { GameRoomCommunicationService } from './services/game-room-communication
 import { GameMessageService           } from './services/game-message.service';
 import { SubmitGameResultService      } from './services/submit-game-result.service';
 import { GameStateService             } from './services/game-state-services/game-state.service';
-import { GameStateShortcutService     } from './services/game-state-services/game-state-shortcut.service';
-import { GameLoopService              } from './services/game-state-services/game-loop.service';
 import { TransitStateService          } from './services/game-state-services/transit-state.service';
 
 import { ValuesForViewService } from './services/values-for-view.service';
@@ -32,9 +30,7 @@ import { DCard } from '../../../classes/online-game/dcard';
     MyGameRoomService,
     GameStateService,
     GameRoomCommunicationService,
-    GameStateShortcutService,
     TransitStateService,
-    GameLoopService,
     GameMessageService,
     SubmitGameResultService,
     ValuesForViewService,
@@ -46,12 +42,13 @@ import { DCard } from '../../../classes/online-game/dcard';
 export class GameMainComponent implements OnInit, OnDestroy {
   private alive = true;
 
-  messageForMe$     = this.gameMessage.messageForMeWithTime$;
-  messageForMeList$ = this.gameMessage.messageForMeList$;
-  myIndex$          = this.myGameRoomService.myIndex$;
-  isMyTurn$         = this.gameStateService.isMyTurn$;
-  gameIsOver$       = this.gameStateService.gameIsOver$;
-  gameResult$       = this.submitGameResultService.gameResult$;
+  gameMessageList$         = this.gameMessage.gameMessageList$;
+  gameMessageListSliced$   = this.gameMessage.gameMessageListSliced$;
+  gameMessageIndexDelayed$ = this.gameMessage.gameMessageIndexDelayed$;
+  myIndex$                 = this.myGameRoomService.myIndex$;
+  isMyTurn$                = this.gameStateService.isMyTurn$;
+  gameIsOver$              = this.gameStateService.gameIsOver$;
+  gameResult$              = this.submitGameResultService.gameResult$;
 
   private initialStateIsReadySource = new BehaviorSubject<boolean>( false );
   initialStateIsReady$
@@ -144,6 +141,7 @@ export class GameMainComponent implements OnInit, OnDestroy {
             this.gameStateService.turnPlayerIndex$,
             this.initialStateIsReady$,
             this.gameStateService.gameState$ )
+      .takeWhile( () => this.alive )
       .subscribe( ([_, myIndex, turnPlayerIndex, initialStateIsReady, gameState]) =>
           console.log(
               `myIndex = ${myIndex}`,
