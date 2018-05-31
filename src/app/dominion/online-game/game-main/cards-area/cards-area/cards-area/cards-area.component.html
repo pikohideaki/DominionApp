@@ -23,17 +23,18 @@
           [style.paddingRight.px]="padding">
 
         <div class="card-image-wrapper">
-          <app-dominion-card-image
-            [class.unavailable]="hideNonButtonCards && !dcard.isButton[ data.myIndex ]"
-            [matTooltip]="dcard.cardProperty.nameJp" matTooltipPosition="below"
-            [matTooltipDisabled]="!dcard.faceUp[ data.myIndex ]"
-            [card]="dcard.cardProperty"
-            [faceUp]="dcard.faceUp[ data.myIndex ]"
-            [isButton]="dcard.isButton[ data.myIndex ]"
-            [width]="data.width"
-            [empty]="false"
-            (cardClicked)="onClicked( dcard )" >
-          </app-dominion-card-image>
+          <div [matTooltip]="dcard.cardProperty.nameJp" matTooltipPosition="below"
+              [matTooltipDisabled]="!dcard.faceUp[ data.myIndex ]">
+            <app-dominion-card-image
+              [class.unavailable]="hideNonButtonCards && !dcard.isButton[ data.myIndex ]"
+              [card]="dcard.cardProperty"
+              [faceUp]="dcard.faceUp[ data.myIndex ]"
+              [isButton]="dcard.isButton[ data.myIndex ]"
+              [width]="data.width"
+              [empty]="false"
+              (cardClicked)="onClicked( dcard )" >
+            </app-dominion-card-image>
+          </div>
           <div class="pile-info absolute-position">
             <div *ngIf="dcard.faceUp[ data.myIndex ]"
                 class="card-cost-coin"
