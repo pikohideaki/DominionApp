@@ -17,6 +17,7 @@ import { SetMemoDialogComponent } from '../../sub-components/set-memo-dialog.com
 
 import { SelectedCards       } from '../../../classes/selected-cards';
 import { BlackMarketPileCard } from '../../../classes/black-market-pile-card';
+import { testKingdomCards } from '../game-main/services/game-state-services/card-effect-definitions/testKingdomCards10';
 
 
 
@@ -83,7 +84,8 @@ export class AddGameGroupComponent implements OnInit {
 
   selectedCardsOnChange( value: SelectedCards ) {
     if ( this.isdevmode ) {
-      console.log('selected test KingdomCards', value.KingdomCards10);
+      value.KingdomCards10 = testKingdomCards;
+      console.log('selected test KingdomCards', value.KingdomCards10 );
     }
     this.selectedCardsSource.next( value );
   }
