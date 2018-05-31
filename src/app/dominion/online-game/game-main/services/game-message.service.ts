@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/concatMap';
+import 'rxjs/add/operator/delayWhen';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
@@ -9,32 +10,30 @@ import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.se
 @Injectable()
 export class GameMessageService {
 
-  private messageSec$ = this.myUserInfo.onlineGame.messageSec$;
+  private gameMessageSource = new BehaviorSubject<string>('');
+  private gameMessage$ = this.gameMessageSource.asObservable().skip(1);
 
-  private messageForMeSource = new BehaviorSubject<string>('');
-  private messageForMe$ = this.messageForMeSource.asObservable();
+  gameMessageList$
+    = this.gameMessage$
+        .scan( (acc: string[], val: string, idx: number) => [].concat( acc, [`${idx + 1}. ${val}`] ), [] );
 
-  private messageForMeList = [];
-  messageForMeList$
-    = this.messageForMe$.map( _ => this.messageForMeList );
+  gameMessageIndex$ = this.gameMessage$.map( (value, index) => index );
+  gameMessageIndexDelayed$ = this.gameMessageIndex$.delay( 2000 );
 
-  messageForMeWithTime$: Observable<string>
-    = this.messageForMe$
-        .withLatestFrom( this.messageSec$ )
-        .concatMap( ([x, messageMillisec]) =>
-            Observable.merge(
-                Observable.of(x),
-                Observable.of('').delay(messageMillisec * 1000) ) );
+  gameMessageListSliced$
+    = Observable.combineLatest(
+        this.gameMessageList$,
+        this.gameMessageIndexDelayed$,
+        this.gameMessageIndex$,
+        (list, begin, end) => list.slice( begin + 1, end + 1 ) );
 
 
-  constructor(
-    private myUserInfo: MyUserInfoService
-  ) {
+
+  constructor( private user: MyUserInfoService ) {
   }
 
 
   pushMessage( message: string ) {
-    this.messageForMeList.push( message );
-    this.messageForMeSource.next( message );
+    this.gameMessageSource.next( message );
   }
 }

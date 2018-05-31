@@ -10,6 +10,7 @@ import { MyGameRoomService            } from '../../services/my-game-room.servic
 import { GameConfigService            } from '../../services/game-config.service';
 import { GameRoomCommunicationService } from '../../services/game-room-communication.service';
 import { HelpDialogComponent } from '../../dialogs/help-dialog/help-dialog.component';
+import { GameMessageService } from '../../services/game-message.service';
 
 
 
@@ -43,6 +44,7 @@ export class SideBarLeftComponent implements OnInit {
     private gameStateService: GameStateService,
     private gameRoomCommunication: GameRoomCommunicationService,
     private config: GameConfigService,
+    private gameMessageService: GameMessageService,
   ) { }
 
   ngOnInit() {
@@ -78,11 +80,15 @@ export class SideBarLeftComponent implements OnInit {
       this.gameRoomCommunication.setTerminatedState( true );
     }
     if ( result === 'resetGame' ) {
-      this.gameRoomCommunication.setTerminatedState( false );
       this.initialStateIsReadyChange.emit( false );
-      await this.gameRoomCommunication.removeAllUserInput();
+      this.gameMessageService.pushMessage('【ゲームをリセットしました】');
+      await Promise.all([
+        this.gameRoomCommunication.setTerminatedState( false ),
+        this.gameRoomCommunication.setResultSubmittedState( false ),
+        this.gameRoomCommunication.removeAllUserInput(),
+        this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0, true ),
+      ]);
       // 最初のプレイヤーは自動でgoToNextPhaseを1回発動
-      await this.gameRoomCommunication.sendUserInput('clicked goToNextPhase', 0, true );
     }
   }
 

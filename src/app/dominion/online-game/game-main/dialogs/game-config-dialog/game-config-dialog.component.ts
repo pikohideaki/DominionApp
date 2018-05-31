@@ -15,7 +15,7 @@ export class GameConfigDialogComponent implements OnInit {
 
   cardSizeAutoChange$ = this.config.cardSizeAutoChange$;
   cardSizeRatio$      = this.config.cardSizeRatio$;
-  messageSec$         = this.config.messageSec$;
+  // messageSec$         = this.config.messageSec$;
   devMode$            = this.config.devMode$;
   autoSort$           = this.config.autoSort$;
 
@@ -50,9 +50,9 @@ export class GameConfigDialogComponent implements OnInit {
     this.config.setCardSizeRatio( value );
   }
 
-  setMessageSec( sec: number ) {
-    this.config.setMessageSec( sec );
-  }
+  // setMessageSec( sec: number ) {
+  //   this.config.setMessageSec( sec );
+  // }
 
   setAutoSort( value: boolean ) {
     this.config.setAutoSort( value );

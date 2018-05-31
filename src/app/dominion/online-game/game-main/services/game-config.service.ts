@@ -9,7 +9,7 @@ export class GameConfigService {
 
   cardSizeAutoChange$ = this.user.onlineGame.cardSizeAutoChange$;
   cardSizeRatio$      = this.user.onlineGame.cardSizeRatio$;
-  messageSec$         = this.user.onlineGame.messageSec$;
+  // messageSec$         = this.user.onlineGame.messageSec$;
   autoSort$           = this.user.onlineGame.autoSort$;
 
   private devModeSource = new BehaviorSubject<boolean>(true);
@@ -29,9 +29,9 @@ export class GameConfigService {
     this.user.setOnlineGameCardSizeRatio( value );
   }
 
-  setMessageSec( sec: number ) {
-    this.user.setOnlineGameMessageSec( sec );
-  }
+  // setMessageSec( sec: number ) {
+  //   this.user.setOnlineGameMessageSec( sec );
+  // }
 
   setDevMode( value: boolean ) {
     this.devModeSource.next( value );

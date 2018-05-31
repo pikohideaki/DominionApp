@@ -1,24 +1,25 @@
 <ng-container *ngIf="{
-      isMyTurn:             isMyTurn$             | async,
-      isBuyPlayPhase:       isBuyPlayPhase$       | async,
-      messageForMe:         messageForMe$         | async,
-      messageForMeList:     messageForMeList$     | async,
-      myIndex:              myIndex$              | async,
-      myThinkingState:      myThinkingState$      | async,
-      autoSort:             autoSort$             | async,
-      gameIsOver:           gameIsOver$           | async
+      isMyTurn:        isMyTurn$        | async,
+      isBuyPlayPhase:  isBuyPlayPhase$  | async,
+      gameMessageList: gameMessageList$ | async,
+      myIndex:         myIndex$         | async,
+      myThinkingState: myThinkingState$ | async,
+      autoSort:        autoSort$        | async,
+      gameIsOver:      gameIsOver$      | async
     } as data">
 
 <div class="body" [class.is-my-turn]="data.isMyTurn">
 
   <div class="bar">
     <button mat-icon-button id="show-message-history-button"
-        (click)="showMessageHistory( data.messageForMeList )">
+        (click)="showMessageHistory( data.gameMessageList )">
       <mat-icon>history</mat-icon>
     </button>
-    <div class="messageForMe-area">
-      {{data.messageForMe || '　'}}
-    </div>
+    <app-message-for-me-area
+        class="gameMessage-area"
+        [gameMessageIndexDelayed$]="gameMessageIndexDelayed$"
+        [gameMessageList$]="gameMessageList$">
+    </app-message-for-me-area>
 
     <div class="buttons-area" *ngIf="!data.gameIsOver">
       <button mat-icon-button class="sidebar-button"

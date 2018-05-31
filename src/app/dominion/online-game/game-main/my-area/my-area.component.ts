@@ -8,6 +8,7 @@ import { MessageForMeListDialogComponent } from '../dialogs/message-for-me-dialo
 import { GameRoomCommunicationService } from '../services/game-room-communication.service';
 import { DCard } from '../../../../classes/online-game/dcard';
 
+
 @Component({
   selector: 'app-my-area',
   templateUrl: './my-area.component.html',
@@ -15,15 +16,16 @@ import { DCard } from '../../../../classes/online-game/dcard';
 })
 export class MyAreaComponent implements OnInit {
 
-  @Input() isMyTurn$:         Observable<boolean>;
-  @Input() isBuyPlayPhase$:   Observable<boolean>;
-  @Input() messageForMe$:     Observable<string>;
-  @Input() messageForMeList$: Observable<string[]>;
-  @Input() myIndex$:          Observable<number>;
-  @Input() autoSort$:         Observable<boolean>;
-  @Input() showCardProperty$: Observable<boolean>;
-  @Input() gameIsOver$:       Observable<boolean>;
-  @Input() myThinkingState$:  Observable<boolean>;
+  @Input() isMyTurn$:                Observable<boolean>;
+  @Input() isBuyPlayPhase$:          Observable<boolean>;
+  @Input() gameMessageList$:         Observable<string[]>;
+  @Input() gameMessageListSliced$:   Observable<string[]>;
+  @Input() gameMessageIndexDelayed$: Observable<number>;
+  @Input() myIndex$:                 Observable<number>;
+  @Input() autoSort$:                Observable<boolean>;
+  @Input() showCardProperty$:        Observable<boolean>;
+  @Input() gameIsOver$:              Observable<boolean>;
+  @Input() myThinkingState$:         Observable<boolean>;
 
   @Output() cardClicked  = new EventEmitter<DCard>();
   @Output() vcoinClicked = new EventEmitter<void>();
@@ -38,9 +40,9 @@ export class MyAreaComponent implements OnInit {
   }
 
 
-  showMessageHistory( messageForMeList: string[] ) {
+  showMessageHistory( gameMessageList: string[] ) {
     const dialogRef = this.dialog.open( MessageForMeListDialogComponent );
-    dialogRef.componentInstance.messageForMeList = messageForMeList;
+    dialogRef.componentInstance.gameMessageList = gameMessageList;
   }
 
   onCardClick( value: DCard ) { this.cardClicked.emit( value ); }

@@ -20,7 +20,7 @@
 .bar #show-message-history-button {
   flex-grow: 0;
 }
-.bar .messageForMe-area {
+.bar .gameMessage-area {
   flex-grow: 1;
   flex-basis: 60%;
 }
@@ -28,19 +28,6 @@
   flex-grow: 0;
 }
 
-.bar .messageForMe-area {
-  padding: 3px 8px;
-  border-radius: 5px;
-  background-color: white;
-  color: black;
-  font-family: sans-serif;
-}
-
-.bar .messageForMe-area {
-  display: inline-flex;
-  flex-direction: row;
-  align-items: center;
-}
 
 .bar .buttons-area {
   display: inline-flex;

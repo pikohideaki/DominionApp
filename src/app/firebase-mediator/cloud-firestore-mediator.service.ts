@@ -70,7 +70,7 @@ export class FireDatabaseService {
         chatOpened:           ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeAutoChange:   ( uid: string, value: boolean                ) => Promise<void>,
         cardSizeRatio:        ( uid: string, value: number                 ) => Promise<void>,
-        messageSec:           ( uid: string, value: number                 ) => Promise<void>,
+        // messageSec:           ( uid: string, value: number                 ) => Promise<void>,
         autoSort:             ( uid: string, value: boolean                ) => Promise<void>,
       }
     }
@@ -232,8 +232,8 @@ export class FireDatabaseService {
           cardSizeRatio: ( uid: string, value: number ) =>
             userSetProperty( uid, 'onlineGame/cardSizeRatio', value ),
 
-          messageSec: ( uid: string, value: number ) =>
-            userSetProperty( uid, 'onlineGame/messageSec', value ),
+          // messageSec: ( uid: string, value: number ) =>
+          //   userSetProperty( uid, 'onlineGame/messageSec', value ),
 
           autoSort: ( uid: string, value: boolean ) =>
             userSetProperty( uid, 'onlineGame/autoSort', value ),

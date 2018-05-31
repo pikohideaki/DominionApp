@@ -42,6 +42,7 @@ import { VpTokenComponent } from './game-main/token/vp-token.component';
 import { VcoinsComponent } from './game-main/token/vcoins.component';
 import { VpTokensComponent } from './game-main/token/vp-tokens.component';
 import { DebtsComponent } from './game-main/token/debts.component';
+import { MessageForMeAreaComponent } from './game-main/my-area/message-for-me-area/message-for-me-area.component';
 
 
 @NgModule({
@@ -100,6 +101,7 @@ import { DebtsComponent } from './game-main/token/debts.component';
     VcoinsComponent,
     VpTokensComponent,
     DebtsComponent,
+    MessageForMeAreaComponent,
   ],
   entryComponents: [
     SignInToGameRoomDialogComponent,
