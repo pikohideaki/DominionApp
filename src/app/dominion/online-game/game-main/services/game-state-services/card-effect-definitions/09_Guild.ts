@@ -1,20 +1,22 @@
 import { DataForCardEffect } from './data-for-card-effect';
-import * as CardEffectShortcut from './card-effect-shortcut';
+import * as cs from './card-effect-shortcut';
 import { DCard } from '../../../../../../classes/online-game/dcard';
 
 
-/* パン屋 */
-export const Baker = async ( dcard: DCard, playerId: number,
+/* 231. パン屋 */
+export const Baker = async ( thisDcard: DCard, pid: number,
   data: DataForCardEffect
 ) => {
-  CardEffectShortcut.incrementVcoin( playerId, data );
+  cs.incrementVcoin( pid, data );
+  cs.goToDeterminatePhase( data );
 };
 
-/* 蝋燭職人 */
-export const Candlestick_Maker = async ( dcard: DCard, playerId: number,
+/* 233. 蝋燭職人 */
+export const Candlestick_Maker = async ( thisDcard: DCard, pid: number,
   data: DataForCardEffect
 ) => {
-  CardEffectShortcut.incrementVcoin( playerId, data );
+  cs.incrementVcoin( pid, data );
+  cs.goToDeterminatePhase( data );
 };
 
 
