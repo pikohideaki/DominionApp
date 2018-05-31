@@ -50,11 +50,12 @@ export class AddGameGroupService {
       newRoom.initialState.setNumberOfPlayers( numberOfPlayers );
       newRoom.initialState.usePotion = selectedCards.usePotion( this.cardPropertyList );
       newRoom.initialState.turnInfo = new TurnInfo({
-            phase:  '',
             action: 1,
             buy:    1,
             coin:   0,
             potion: 0,
+            phase:  '',
+            runningCards: [],
         });
       if ( selectedCards.concatAllCards()
             .map( i => this.cardPropertyList[i].cardId )
