@@ -56,10 +56,12 @@
         </div>
         <div class="spacer"></div>
         <div class="my-area">
+            <!-- [gameMessage$]="gameMessage$" -->
           <app-my-area
             [isMyTurn$]="isMyTurn$"
-            [messageForMe$]="messageForMe$"
-            [messageForMeList$]="messageForMeList$"
+            [gameMessageList$]="gameMessageList$"
+            [gameMessageListSliced$]="gameMessageListSliced$"
+            [gameMessageIndexDelayed$]="gameMessageIndexDelayed$"
             [myIndex$]="myIndex$"
             [autoSort$]="autoSort$"
             [showCardProperty$]="showCardProperty$"
