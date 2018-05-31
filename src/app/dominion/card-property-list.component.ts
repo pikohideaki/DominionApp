@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { ColumnSetting } from '../my-own-library/data-table/data-table.component';
+import { ColumnState } from '../my-own-library/data-table/column-state';
 
 import { FireDatabaseService } from '../firebase-mediator/cloud-firestore-mediator.service';
 
@@ -20,7 +20,7 @@ import { CardPropertyDialogComponent } from './sub-components/card-property-dial
       <app-data-table
         [data$]='cardPropertyList$'
         [transform]="transformFunction"
-        [columnSettings]='columnSettings'
+        [columnStates]='columnStates'
         [itemsPerPageOptions]='[ 25, 50, 100, 200 ]'
         [itemsPerPageInit]='50'
         (onClick)='showDetail( $event )'
@@ -35,7 +35,7 @@ export class CardPropertyListComponent implements OnInit {
   private filteredIndiceSource = new BehaviorSubject<number[]>([]);
 
 
-  columnSettings: ColumnSetting[] = [
+  columnStates: ColumnState[] = [
     { isButton: false, manip: ''               , name: 'no'                 , headerTitle: 'No.' },
     { isButton: true,  manip: 'input'          , name: 'nameJp'             , headerTitle: '名前' },
     { isButton: false, manip: 'input'          , name: 'nameEng'            , headerTitle: 'Name' },

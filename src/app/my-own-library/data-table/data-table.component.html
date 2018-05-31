@@ -3,7 +3,7 @@
       filteredDataLength: filteredDataLength$       | async,
       datalist:           data$                     | async,
       itemsPerPage:       itemsPerPage$             | async,
-      columnSettings:     columnSettings$           | async
+      columnStates:       columnStates$             | async
     } as dat">
   <app-waiting-spinner [done]="!!dat.datalist"></app-waiting-spinner>
 
@@ -30,7 +30,7 @@
     <table class='data-table data-table--shadow3px data-table--vertical-line'>
       <thead>
         <tr>
-          <th *ngFor='let column of dat.columnSettings'
+          <th *ngFor='let column of dat.columnStates'
               [class.data-table--cell-alignLeft]  ="column.align === 'l' "
               [class.data-table--cell-alignCenter]="column.align === 'c' "
               [class.data-table--cell-alignRight] ="column.align === 'r' " >
@@ -106,7 +106,7 @@
       </thead>
       <tbody>
         <tr *ngFor='let value of dat.trPagenatedData; let rowIndex = index'>
-          <td *ngFor='let column of dat.columnSettings'
+          <td *ngFor='let column of dat.columnStates'
               [class.data-table--cell-alignLeft]  ="column.align=='l'"
               [class.data-table--cell-alignCenter]="column.align=='c'"
               [class.data-table--cell-alignRight] ="column.align=='r'" >
@@ -118,7 +118,7 @@
                         dat.datalist,
                         rowIndex,
                         column.name,
-                        dat.columnSettings )">
+                        dat.columnStates )">
                 {{ value[column.name] }}
               </button>
             </ng-template>

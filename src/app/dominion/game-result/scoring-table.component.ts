@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
-import { ColumnSetting } from '../../my-own-library/data-table/data-table.component';
+import { ColumnState } from '../../my-own-library/data-table/column-state';
 
 
 @Component({
@@ -12,7 +12,7 @@ import { ColumnSetting } from '../../my-own-library/data-table/data-table.compon
       <app-data-table
           [usePagenation]="false"
           [data$]='scoringTableForView$'
-          [columnSettings]='columnSettings' >
+          [columnStates]='columnStates' >
       </app-data-table>
       <app-waiting-spinner [done]="!!(scoringTableForView$ | async)"></app-waiting-spinner>
     </div>
@@ -31,7 +31,7 @@ export class ScoringTableComponent implements OnInit {
     rank_6th: string,
   }[]>;
 
-  columnSettings: ColumnSetting[] = [
+  columnStates: ColumnState[] = [
     { name: 'numberOfPlayers', headerTitle: 'プレイヤー数' },
     { name: 'rank_1st'       , headerTitle: '1位' },
     { name: 'rank_2nd'       , headerTitle: '2位' },
