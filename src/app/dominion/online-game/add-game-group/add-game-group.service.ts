@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { utils } from '../../../my-own-library/utilities';
-import { UserService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/user.service';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';

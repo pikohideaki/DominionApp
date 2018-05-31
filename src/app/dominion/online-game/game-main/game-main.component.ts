@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { MessageDialogComponent } from '../../../my-own-library/message-dialog.component';
 import { OnlineGameResultDialogComponent } from './dialogs/online-game-result-dialog/online-game-result-dialog.component';
 
-import { UserService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/user.service';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyGameRoomService } from './services/my-game-room.service';
 

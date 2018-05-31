@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs/Observable';
 import { Router } from '@angular/router';
 
-import { UserService } from './firebase-mediator/my-user-info.service';
+import { UserService } from './firebase-mediator/user.service';
 import { AutoBackupOnFirebaseService } from './firebase-mediator/auto-backup-on-firebase.service';
 
 

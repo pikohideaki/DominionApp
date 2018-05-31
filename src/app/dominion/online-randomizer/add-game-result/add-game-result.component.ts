@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { utils } from '../../../my-own-library/utilities';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { UserService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/user.service';
 
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 

@@ -3,7 +3,7 @@ import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { ChatMessage } from '../../../../classes/online-game/chat-message';
-import { UserService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/user.service';
 import { GameRoomCommunicationService } from '../services/game-room-communication.service';
 
 

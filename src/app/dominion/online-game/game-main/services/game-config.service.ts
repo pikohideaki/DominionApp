@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { UserService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/user.service';
 
 
 @Injectable()

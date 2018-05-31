@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyRandomizerGroupService      } from './my-randomizer-group.service';
-import { UserService             } from '../../firebase-mediator/my-user-info.service';
+import { UserService             } from '../../firebase-mediator/user.service';
 
 import { SelectedCards } from '../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';

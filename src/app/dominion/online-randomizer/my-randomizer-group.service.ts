@@ -5,7 +5,7 @@ import { Subject } from 'rxjs/Subject';
 import { switchMap, switchMapTo } from 'rxjs/operators';
 
 import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
-import { UserService } from '../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../firebase-mediator/user.service';
 
 import { RandomizerGroup       } from '../../classes/online-randomizer/randomizer-group';
 import { SelectedCards         } from '../../classes/selected-cards';

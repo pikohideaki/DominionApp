@@ -4,7 +4,7 @@ import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/delayWhen';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { UserService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/user.service';
 
 
 @Injectable()

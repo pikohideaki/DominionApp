@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { UserService } from '../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../firebase-mediator/user.service';
 
 
 @Component({

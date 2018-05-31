@@ -6,7 +6,7 @@ import 'rxjs/add/operator/combineLatest';
 import { GameRoom } from '../../../../classes/online-game/game-room';
 import { GameState } from '../../../../classes/online-game/game-state';
 
-import { UserService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/user.service';
 import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 
 

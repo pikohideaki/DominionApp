@@ -10,7 +10,7 @@ import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-
 
 import { GameRoom } from '../../../classes/online-game/game-room';
 import { SignInToGameRoomDialogComponent } from '../sign-in-to-game-room-dialog/sign-in-to-game-room-dialog.component';
-import { UserService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/user.service';
 import { Router } from '@angular/router';
 import { utils } from '../../../my-own-library/utilities';
 

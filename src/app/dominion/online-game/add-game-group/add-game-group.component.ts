@@ -8,7 +8,7 @@ import 'rxjs/add/observable/combineLatest';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
 import { utils } from '../../../my-own-library/utilities';
-import { UserService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/user.service';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { AddGameGroupService } from './add-game-group.service';
 
