@@ -10,7 +10,7 @@ import { GameCommunication        } from '../../../../classes/online-game/game-r
 import { UserInput                } from '../../../../classes/online-game/user-input';
 import { UserInputCommand         } from '../../../../classes/online-game/user-input-command';
 
-import { MyUserInfoService             } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService             } from '../../../../firebase-mediator/my-user-info.service';
 import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 import { utils } from '../../../../my-own-library/utilities';
 import { MyGameRoomService } from './my-game-room.service';
@@ -37,7 +37,7 @@ export class GameRoomCommunicationService {
 
   constructor(
     private afdb: AngularFireDatabase,
-    private user: MyUserInfoService,
+    private user: UserService,
     private database: FireDatabaseService,
     private myGameRoomService: MyGameRoomService,
   ) {

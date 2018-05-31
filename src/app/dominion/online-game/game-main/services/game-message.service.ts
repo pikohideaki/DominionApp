@@ -4,7 +4,7 @@ import 'rxjs/add/operator/concatMap';
 import 'rxjs/add/operator/delayWhen';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
-import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/my-user-info.service';
 
 
 @Injectable()
@@ -29,7 +29,7 @@ export class GameMessageService {
 
 
 
-  constructor( private user: MyUserInfoService ) {
+  constructor( private user: UserService ) {
   }
 
 

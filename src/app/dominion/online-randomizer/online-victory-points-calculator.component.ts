@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
 import { MyRandomizerGroupService      } from './my-randomizer-group.service';
-import { MyUserInfoService             } from '../../firebase-mediator/my-user-info.service';
+import { UserService             } from '../../firebase-mediator/my-user-info.service';
 
 import { SelectedCards } from '../../classes/selected-cards';
 import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
@@ -32,7 +32,7 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
 
   selectedCards$ = this.myRandomizerGroup.selectedCards$;  // 存在するもののみ表示
   resetVPCalculator$ = this.myRandomizerGroup.resetVPCalculator$;
-  uid$: Observable<string> = this.myUserInfo.uid$;
+  uid$: Observable<string> = this.user.uid$;
   numberOfVictoryCards$
     = Observable.combineLatest(
         this.myRandomizerGroup.newGameResult.players$,
@@ -42,7 +42,7 @@ export class OnlineVictoryPointsCalculatorComponent implements OnInit {
 
 
   constructor(
-    private myUserInfo: MyUserInfoService,
+    private user: UserService,
     private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { utils } from '../../../my-own-library/utilities';
-import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/my-user-info.service';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 
 import { CardProperty, numberToPrepare, toListIndex } from '../../../classes/card-property';
@@ -23,12 +23,12 @@ export class AddGameGroupService {
 
   constructor(
     private database: FireDatabaseService,
-    private myUserInfo: MyUserInfoService,
+    private user: UserService,
   ) {
     this.database.cardPropertyList$
       .subscribe( val => this.cardPropertyList = val );
 
-    this.myUserInfo.name$
+    this.user.name$
       .subscribe( val => this.myName = val );
   }
 

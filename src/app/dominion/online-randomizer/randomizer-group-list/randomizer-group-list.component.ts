@@ -6,7 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { utils } from '../../../my-own-library/utilities';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/my-user-info.service';
 
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
@@ -26,9 +26,9 @@ export class RandomizerGroupListComponent implements OnInit {
 
   @Input() private sidenav;
 
-  uid$:        Observable<string> = this.myUserInfo.uid$;
-  myName$:     Observable<string> = this.myUserInfo.name$;
-  myNameYomi$: Observable<string> = this.myUserInfo.nameYomi$;
+  uid$:        Observable<string> = this.user.uid$;
+  myName$:     Observable<string> = this.user.name$;
+  myNameYomi$: Observable<string> = this.user.nameYomi$;
 
   randomizerGroupListWithUsers$: Observable<{ group: RandomizerGroup, users: string[] }[]>
     = Observable.combineLatest(
@@ -50,7 +50,7 @@ export class RandomizerGroupListComponent implements OnInit {
 
   constructor(
     public snackBar: MatSnackBar,
-    private myUserInfo: MyUserInfoService,
+    private user: UserService,
     private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService
   ) {
@@ -114,7 +114,7 @@ export class RandomizerGroupListComponent implements OnInit {
 
     const ref = await this.database.randomizerGroup.addGroup( newRandomizerGroup );
     const groupId = ref.key;
-    await this.myUserInfo.setRandomizerGroupId( groupId );
+    await this.user.setRandomizerGroupId( groupId );
     await this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi );
     // await this.removeMemberEmptyGroup();
     this.resetAddGroupForm();
@@ -151,7 +151,7 @@ export class RandomizerGroupListComponent implements OnInit {
 
     this.resetSignInForm();
     await Promise.all([
-      this.myUserInfo.setRandomizerGroupId( groupId ),
+      this.user.setRandomizerGroupId( groupId ),
       this.myRandomizerGroup.addMember( groupId, uid, myName, myNameYomi ),
     ]);
 
@@ -170,7 +170,7 @@ export class RandomizerGroupListComponent implements OnInit {
     this.resetSignInForm();
     await Promise.all([
       this.myRandomizerGroup.removeMember( groupId, uid ),
-      this.myUserInfo.setRandomizerGroupId(''),
+      this.user.setRandomizerGroupId(''),
     ]);
 
     this.openSnackBar('Successfully signed out!');

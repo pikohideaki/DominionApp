@@ -16,7 +16,7 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { MyOwnLibraryModule } from '../my-own-library/my-own-library.module';
 
 import { AutoBackupOnFirebaseService   } from './auto-backup-on-firebase.service';
-import { MyUserInfoService             } from './my-user-info.service';
+import { UserService             } from './my-user-info.service';
 import { FireDatabaseService } from './cloud-firestore-mediator.service';
 
 import { EditDatabaseComponent         } from './edit-database.component';
@@ -44,7 +44,7 @@ import { MyPageComponent               } from './my-page.component';
     MyPageComponent,
   ],
   providers: [
-    MyUserInfoService,
+    UserService,
     FireDatabaseService,
     AutoBackupOnFirebaseService,
   ]

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../firebase-mediator/my-user-info.service';
 
 
 @Component({
@@ -24,10 +24,10 @@ import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service'
   styles: []
 })
 export class OnlineGameComponent implements OnInit {
-  signedIn$: Observable<boolean> = this.myUserInfo.signedIn$;
+  signedIn$: Observable<boolean> = this.user.signedIn$;
 
   constructor(
-    private myUserInfo: MyUserInfoService
+    private user: UserService
   ) {
   }
 

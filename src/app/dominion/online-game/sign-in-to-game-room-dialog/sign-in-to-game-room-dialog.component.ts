@@ -6,7 +6,7 @@ import 'rxjs/add/operator/takeWhile';
 
 import { MatDialog, MatDialogRef } from '@angular/material';
 
-import { MyUserInfoService             } from '../../../firebase-mediator/my-user-info.service';
+import { UserService             } from '../../../firebase-mediator/my-user-info.service';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
 import { GameRoom } from '../../../classes/online-game/game-room';
 import { SelectedCards } from '../../../classes/selected-cards';
@@ -34,7 +34,7 @@ export class SignInToGameRoomDialogComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private database: FireDatabaseService,
-    private user: MyUserInfoService
+    private user: UserService
   ) { }
 
   ngOnInit() {

@@ -5,7 +5,7 @@ import { Subject } from 'rxjs/Subject';
 import { switchMap, switchMapTo } from 'rxjs/operators';
 
 import { FireDatabaseService } from '../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../firebase-mediator/my-user-info.service';
 
 import { RandomizerGroup       } from '../../classes/online-randomizer/randomizer-group';
 import { SelectedCards         } from '../../classes/selected-cards';
@@ -19,7 +19,7 @@ import { NumberOfVictoryCards } from '../../classes/number-of-victory-cards';
 @Injectable()
 export class MyRandomizerGroupService {
   private myGrpId$: Observable<string>
-    = this.myUserInfo.randomizerGroupId$;
+    = this.user.randomizerGroupId$;
   private myGrpId: string = '';
   private myGrpIdIsReadySource = new Subject<void>();
   private myGrpIdIsReady$ = this.myGrpIdIsReadySource.asObservable();
@@ -106,7 +106,7 @@ export class MyRandomizerGroupService {
 
   constructor(
     private database: FireDatabaseService,
-    private myUserInfo: MyUserInfoService
+    private user: UserService
   ) {
     // this.myGrp$.subscribe( val => console.log('myGrp$', val ) );
 

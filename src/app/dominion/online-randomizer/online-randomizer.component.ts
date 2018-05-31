@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { Observable } from 'rxjs/Observable';
 
-import { MyUserInfoService } from '../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../firebase-mediator/my-user-info.service';
 import { MyRandomizerGroupService } from './my-randomizer-group.service';
 
 
@@ -20,11 +20,11 @@ export class OnlineRandomizerComponent implements OnInit {
 
 
   constructor(
-    private myUserInfo: MyUserInfoService,
+    private user: UserService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
-    this.signedIn$ = this.myUserInfo.signedIn$;
-    this.signedInToRandomizerGroup$ = this.myUserInfo.signedInToRandomizerGroup$;
+    this.signedIn$ = this.user.signedIn$;
+    this.signedInToRandomizerGroup$ = this.user.signedInToRandomizerGroup$;
     this.myRandomizerGroupName$ = this.myRandomizerGroup.name$;
     this.BlackMarketIsUsed$
       = this.myRandomizerGroup.selectedCards$.map( e => e.BlackMarketPile.length > 0 )

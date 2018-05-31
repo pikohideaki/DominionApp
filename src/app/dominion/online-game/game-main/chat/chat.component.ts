@@ -3,7 +3,7 @@ import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import { ChatMessage } from '../../../../classes/online-game/chat-message';
-import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/my-user-info.service';
 import { GameRoomCommunicationService } from '../services/game-room-communication.service';
 
 
@@ -25,7 +25,7 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
 
   constructor(
-    private user: MyUserInfoService,
+    private user: UserService,
     private gameCommunication: GameRoomCommunicationService,
   ) {
   }

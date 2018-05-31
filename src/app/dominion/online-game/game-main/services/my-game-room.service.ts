@@ -6,7 +6,7 @@ import 'rxjs/add/operator/combineLatest';
 import { GameRoom } from '../../../../classes/online-game/game-room';
 import { GameState } from '../../../../classes/online-game/game-state';
 
-import { MyUserInfoService } from '../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../firebase-mediator/my-user-info.service';
 import { FireDatabaseService } from '../../../../firebase-mediator/cloud-firestore-mediator.service';
 
 
@@ -58,7 +58,7 @@ export class MyGameRoomService {
 
   constructor(
     private database: FireDatabaseService,
-    private user: MyUserInfoService
+    private user: UserService
   ) {
   }
 }

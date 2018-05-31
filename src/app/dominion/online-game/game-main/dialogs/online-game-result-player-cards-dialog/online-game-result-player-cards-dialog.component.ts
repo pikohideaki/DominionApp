@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
-import { MyUserInfoService } from '../../../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../../../firebase-mediator/my-user-info.service';
 import { PlayerCards } from '../../../../../classes/online-game/player-cards';
 import { DCard } from '../../../../../classes/online-game/dcard';
 
@@ -53,13 +53,13 @@ export class EachPlayerCardsComponent implements OnInit {
   @Input() playerIndex: number; // input
   @Input() allPlayersCards$: Observable<PlayerCards[]>;  // input
 
-  cardSizeRatio$ = this.myUserInfo.onlineGame.cardSizeRatio$;
+  cardSizeRatio$ = this.user.onlineGame.cardSizeRatio$;
 
   playerCardsForView$: Observable<DCard[]>;
 
 
   constructor(
-    private myUserInfo: MyUserInfoService
+    private user: UserService
   ) { }
 
   ngOnInit() {

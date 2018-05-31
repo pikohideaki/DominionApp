@@ -10,13 +10,13 @@ import { FireDatabaseService } from './cloud-firestore-mediator.service';
 
 
 @Injectable()
-export class MyUserInfoService {
+export class UserService {
   private uid: string = '';
   uid$:           Observable<string>;
   signedIn$:      Observable<boolean>;
   myDisplayName$: Observable<string>;
 
-  private myUserInfo$: Observable<User>;
+  private user$: Observable<User>;
 
   name$:               Observable<string>;
   nameYomi$:           Observable<string>;
@@ -48,7 +48,7 @@ export class MyUserInfoService {
     this.myDisplayName$
       = this.afAuth.authState.map( user => ( !user ? '' : user.displayName ) );
 
-    this.myUserInfo$ = Observable.combineLatest(
+    this.user$ = Observable.combineLatest(
         this.uid$,
         this.database.users$,
         ( uid: string, users: User[] ) =>
@@ -57,44 +57,44 @@ export class MyUserInfoService {
               : users.find( e => e.databaseKey === uid ) || new User() );
 
     this.name$
-      = this.myUserInfo$.map( e => e.name )
+      = this.user$.map( e => e.name )
           .distinctUntilChanged();
     this.nameYomi$
-      = this.myUserInfo$.map( e => e.nameYomi )
+      = this.user$.map( e => e.nameYomi )
           .distinctUntilChanged();
     this.randomizerGroupId$
-      = this.myUserInfo$.map( e => e.randomizerGroupId )
+      = this.user$.map( e => e.randomizerGroupId )
           .distinctUntilChanged();
     this.onlineGame = {
       isSelectedExpansions$ : Observable.combineLatest(
                 this.database.expansionNameList$.map( list => list.map( _ => false ) ),
-                this.myUserInfo$.map( e => e.onlineGame.isSelectedExpansions )
+                this.user$.map( e => e.onlineGame.isSelectedExpansions )
                   .distinctUntilChanged(),
                 (initArray, isSelectedExpansions) =>
                     initArray.map( (_, i) => !!isSelectedExpansions[i] ) ),
       numberOfPlayers$ :
-        this.myUserInfo$.map( e => e.onlineGame.numberOfPlayers )
+        this.user$.map( e => e.onlineGame.numberOfPlayers )
           .distinctUntilChanged(),
       roomId$ :
-        this.myUserInfo$.map( e => e.onlineGame.roomId )
+        this.user$.map( e => e.onlineGame.roomId )
           .distinctUntilChanged(),
       communicationId$ :
-        this.myUserInfo$.map( e => e.onlineGame.communicationId )
+        this.user$.map( e => e.onlineGame.communicationId )
           .distinctUntilChanged(),
       chatOpened$ :
-        this.myUserInfo$.map( e => e.onlineGame.chatOpened )
+        this.user$.map( e => e.onlineGame.chatOpened )
           .distinctUntilChanged(),
       cardSizeAutoChange$ :
-        this.myUserInfo$.map( e => e.onlineGame.cardSizeAutoChange )
+        this.user$.map( e => e.onlineGame.cardSizeAutoChange )
           .distinctUntilChanged(),
       cardSizeRatio$ :
-        this.myUserInfo$.map( e => e.onlineGame.cardSizeRatio )
+        this.user$.map( e => e.onlineGame.cardSizeRatio )
           .distinctUntilChanged(),
       // messageSec$ :
-      //   this.myUserInfo$.map( e => e.onlineGame.messageSec )
+      //   this.user$.map( e => e.onlineGame.messageSec )
       //     .distinctUntilChanged(),
       autoSort$ :
-        this.myUserInfo$.map( e => e.onlineGame.autoSort )
+        this.user$.map( e => e.onlineGame.autoSort )
           .distinctUntilChanged(),
     };
 

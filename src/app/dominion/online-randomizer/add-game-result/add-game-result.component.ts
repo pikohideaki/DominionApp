@@ -5,7 +5,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { utils } from '../../../my-own-library/utilities';
 import { FireDatabaseService } from '../../../firebase-mediator/cloud-firestore-mediator.service';
-import { MyUserInfoService } from '../../../firebase-mediator/my-user-info.service';
+import { UserService } from '../../../firebase-mediator/my-user-info.service';
 
 import { MyRandomizerGroupService } from '../my-randomizer-group.service';
 
@@ -102,7 +102,7 @@ export class AddGameResultComponent implements OnInit {
   constructor(
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
-    private myUserInfo: MyUserInfoService,
+    private user: UserService,
     private database: FireDatabaseService,
     private myRandomizerGroup: MyRandomizerGroupService,
   ) {
